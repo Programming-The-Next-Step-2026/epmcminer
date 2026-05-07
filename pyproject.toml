@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/epmcminer"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project]
+name = "epmcminer"
+version = "0.0.1"
+authors = [
+  { name="Julian Präsent", email="julian.praesent@gmail.com" },
+]
+description = "desktop application for researchers that automates the retrieval of academic literature from the Europe PubMed Central (Europe PMC) API"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+[project.urls]
+Homepage = "https://github.com/Programming-The-Next-Step-2026/epmcminer"
+Issues = "https://github.com/Programming-The-Next-Step-2026/epmcminer/issues"
