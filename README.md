@@ -1,3 +1,33 @@
+<!-- TOC start (generated with https://github.com/derlin/bitdowntoc) -->
+
+- [epmcminer](#epmcminer)
+   * [Usage](#usage)
+   * [Development](#development)
+   * [Screenshots](#screenshots)
+      + [Screen 1 - Search and filter configuration](#screen-1-search-and-filter-configuration)
+      + [Screen 2 - Results preview and download settings](#screen-2-results-preview-and-download-settings)
+      + [Screen 3 - Download progress](#screen-3-download-progress)
+      + [Screen 4 - Summary report](#screen-4-summary-report)
+   * [Feature specifications](#feature-specifications)
+      + [F1: Keyword search input](#f1-keyword-search-input)
+      + [F2: Search filters](#f2-search-filters)
+      + [F3: Results preview screen](#f3-results-preview-screen)
+      + [F4: Sort order](#f4-sort-order)
+      + [F5: Download settings](#f5-download-settings)
+      + [F6: Parallel downloading with progress tracking](#f6-parallel-downloading-with-progress-tracking)
+      + [F7: Output folder structure](#f7-output-folder-structure)
+      + [F8: Summary report screen](#f8-summary-report-screen)
+      + [F9: Europe PMC API integration](#f9-europe-pmc-api-integration)
+      + [F10: Logging](#f10-logging)
+   * [User stories](#user-stories)
+      + [US1: Searching and downloading papers (primary happy path)](#us1-searching-and-downloading-papers-primary-happy-path)
+      + [US2: Adjusting filters after preview](#us2-adjusting-filters-after-preview)
+      + [US3: Repeat run into the same folder](#us3-repeat-run-into-the-same-folder)
+      + [US4: Exporting the summary report](#us4-exporting-the-summary-report)
+
+<!-- TOC end -->
+
+<!-- TOC --><a name="epmcminer"></a>
 # epmcminer
 
 A desktop application for researchers that automates the retrieval of academic literature from the Europe PubMed Central (Europe PMC) API. It allows users to define a search query and a set of filters, preview matching results, and download up to a specified number of open-access papers — including their PDFs and metadata — into a structured local folder.
@@ -15,9 +45,11 @@ epmcminer only retrieves papers that are freely and legally available in full te
 
 ---
 
+<!-- TOC --><a name="usage"></a>
 ## Usage
 TODO add in the future
 
+<!-- TOC --><a name="development"></a>
 ## Development
 Useful commands for development and testing
 ```python
@@ -28,17 +60,37 @@ source .venv/bin/activate
 pip install -e .
 ```
 
+<!-- TOC --><a name="screenshots"></a>
 ## Screenshots
-TODO add in the future
+Note: these are early mockups and may not reflect the final design, screenshots will be added once the UI is implemented.
 
+<!-- TOC --><a name="screen-1-search-and-filter-configuration"></a>
+### Screen 1 - Search and filter configuration
+![Screen 1 filter settings](docs/screenshots/mockup_screen_1.png)
+
+<!-- TOC --><a name="screen-2-results-preview-and-download-settings"></a>
+### Screen 2 - Results preview and download settings
+![Screen 2 results preview](docs/screenshots/mockup_screen_2.png)
+
+<!-- TOC --><a name="screen-3-download-progress"></a>
+### Screen 3 - Download progress
+![Screen 3 download progress](docs/screenshots/mockup_screen_3.png)
+
+<!-- TOC --><a name="screen-4-summary-report"></a>
+### Screen 4 - Summary report
+TODO add Screen 4
+
+<!-- TOC --><a name="feature-specifications"></a>
 ## Feature specifications
 
+<!-- TOC --><a name="f1-keyword-search-input"></a>
 ### F1: Keyword search input
 
 Users can enter a search query using free text. If no boolean operators are specified, AND logic is assumed between words. Users can explicitly use AND or OR operators (case-insensitive) to control query logic.
 
 ---
 
+<!-- TOC --><a name="f2-search-filters"></a>
 ### F2: Search filters
 
 The following filters are available on the search screen.
@@ -60,6 +112,7 @@ Not a user-facing filter — hardcoded requirement that all results must have a 
 
 ---
 
+<!-- TOC --><a name="f3-results-preview-screen"></a>
 ### F3: Results preview screen
 
 When the user clicks "Continue to preview", a progress animation is displayed while the app queries the API and gathers results. This uses the same visual style as the download progress bar for consistency. Once results are ready, the animation is replaced by the preview content, which includes:
@@ -74,6 +127,7 @@ When the user clicks "Continue to preview", a progress animation is displayed wh
 
 ---
 
+<!-- TOC --><a name="f4-sort-order"></a>
 ### F4: Sort order
 
 A sort order selector is shown in the results preview header on Screen 2. Options are Relevance (default), Date (newest first), and Citations (most cited first). When the user changes the sort order:
@@ -85,6 +139,7 @@ A sort order selector is shown in the results preview header on Screen 2. Option
 
 ---
 
+<!-- TOC --><a name="f5-download-settings"></a>
 ### F5: Download settings
 
 These settings are configured on Screen 2 (the preview screen) after the user has seen what results are available.
@@ -95,6 +150,7 @@ These settings are configured on Screen 2 (the preview screen) after the user ha
 
 ---
 
+<!-- TOC --><a name="f6-parallel-downloading-with-progress-tracking"></a>
 ### F6: Parallel downloading with progress tracking
 
 PDFs are downloaded in parallel using multithreading. Screen 3 shows:
@@ -110,6 +166,7 @@ The UI remains responsive during downloading (non-blocking).
 
 ---
 
+<!-- TOC --><a name="f7-output-folder-structure"></a>
 ### F7: Output folder structure
 
 Downloaded content is saved in the user-specified folder as follows:
@@ -128,6 +185,7 @@ PDF filenames are constructed as `{doi}_{title}.pdf` with special characters san
 
 ---
 
+<!-- TOC --><a name="f8-summary-report-screen"></a>
 ### F8: Summary report screen
 
 After downloading completes, Screen 4 shows a summary containing:
@@ -143,6 +201,7 @@ The report is also saved automatically as `report.csv` in the output folder. An 
 
 ---
 
+<!-- TOC --><a name="f9-europe-pmc-api-integration"></a>
 ### F9: Europe PMC API integration
 
 A dedicated API module handles all communication with Europe PMC:
@@ -155,6 +214,7 @@ A dedicated API module handles all communication with Europe PMC:
 
 ---
 
+<!-- TOC --><a name="f10-logging"></a>
 ### F10: Logging
 
 Each run produces a timestamped log file in `output_folder/logs/`. The log records:
@@ -166,8 +226,10 @@ Each run produces a timestamped log file in `output_folder/logs/`. The log recor
 
 ---
 
+<!-- TOC --><a name="user-stories"></a>
 ## User stories
 
+<!-- TOC --><a name="us1-searching-and-downloading-papers-primary-happy-path"></a>
 ### US1: Searching and downloading papers (primary happy path)
 
 **As** a psychology researcher, **I want** to search for papers on a topic with specific filters and download a set number of available PDFs into a folder on my computer, **so that** I can efficiently build a literature collection without manually searching and downloading.
@@ -197,6 +259,7 @@ Each run produces a timestamped log file in `output_folder/logs/`. The log recor
 
 ---
 
+<!-- TOC --><a name="us2-adjusting-filters-after-preview"></a>
 ### US2: Adjusting filters after preview
 
 **As** a psychology researcher, **I want** to go back and refine my search after seeing the preview results, **so that** I don't waste time downloading papers that are not relevant.
@@ -211,6 +274,7 @@ Each run produces a timestamped log file in `output_folder/logs/`. The log recor
 
 ---
 
+<!-- TOC --><a name="us3-repeat-run-into-the-same-folder"></a>
 ### US3: Repeat run into the same folder
 
 **As** a psychology researcher, **I want** to run the same or a similar search into a folder I have used before, **so that** I can top up my collection without re-downloading papers I already have.
@@ -224,6 +288,7 @@ Each run produces a timestamped log file in `output_folder/logs/`. The log recor
 
 ---
 
+<!-- TOC --><a name="us4-exporting-the-summary-report"></a>
 ### US4: Exporting the summary report
 
 **As** a psychology researcher, **I want** to export the summary report after a download, **so that** I have a record of what was retrieved that I can share or archive.
