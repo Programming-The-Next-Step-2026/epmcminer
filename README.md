@@ -1,34 +1,38 @@
+# epmcminer
+
+## Table of Contents
+
 <!-- TOC start (generated with https://github.com/derlin/bitdowntoc) -->
 
-- [epmcminer](#epmcminer)
-   * [Usage](#usage)
-   * [Development](#development)
-   * [Screenshots](#screenshots)
-      + [Screen 1 - Search and filter configuration](#screen-1-search-and-filter-configuration)
-      + [Screen 2 - Results preview and download settings](#screen-2-results-preview-and-download-settings)
-      + [Screen 3 - Download progress](#screen-3-download-progress)
-      + [Screen 4 - Summary report](#screen-4-summary-report)
-   * [Feature specifications](#feature-specifications)
-      + [F1: Keyword search input](#f1-keyword-search-input)
-      + [F2: Search filters](#f2-search-filters)
-      + [F3: Results preview screen](#f3-results-preview-screen)
-      + [F4: Sort order](#f4-sort-order)
-      + [F5: Download settings](#f5-download-settings)
-      + [F6: Parallel downloading with progress tracking](#f6-parallel-downloading-with-progress-tracking)
-      + [F7: Output folder structure](#f7-output-folder-structure)
-      + [F8: Summary report screen](#f8-summary-report-screen)
-      + [F9: Europe PMC API integration](#f9-europe-pmc-api-integration)
-      + [F10: Logging](#f10-logging)
-   * [User stories](#user-stories)
-      + [US1: Searching and downloading papers (primary happy path)](#us1-searching-and-downloading-papers-primary-happy-path)
-      + [US2: Adjusting filters after preview](#us2-adjusting-filters-after-preview)
-      + [US3: Repeat run into the same folder](#us3-repeat-run-into-the-same-folder)
-      + [US4: Exporting the summary report](#us4-exporting-the-summary-report)
+- [Overview](#overview)
+- [Usage](#usage)
+- [Development](#development)
+- [Screenshots](#screenshots)
+  * [Screen 1 - Search and filter configuration](#screen-1-search-and-filter-configuration)
+  * [Screen 2 - Results preview and download settings](#screen-2-results-preview-and-download-settings)
+  * [Screen 3 - Download progress](#screen-3-download-progress)
+  * [Screen 4 - Summary report](#screen-4-summary-report)
+- [Feature specifications](#feature-specifications)
+  * [F1: Keyword search input](#f1-keyword-search-input)
+  * [F2: Search filters](#f2-search-filters)
+  * [F3: Results preview screen](#f3-results-preview-screen)
+  * [F4: Sort order](#f4-sort-order)
+  * [F5: Download settings](#f5-download-settings)
+  * [F6: Parallel downloading with progress tracking](#f6-parallel-downloading-with-progress-tracking)
+  * [F7: Output folder structure](#f7-output-folder-structure)
+  * [F8: Summary report screen](#f8-summary-report-screen)
+  * [F9: Europe PMC API integration](#f9-europe-pmc-api-integration)
+  * [F10: Logging](#f10-logging)
+- [User stories](#user-stories)
+  * [US1: Searching and downloading papers (primary happy path)](#us1-searching-and-downloading-papers-primary-happy-path)
+  * [US2: Adjusting filters after preview](#us2-adjusting-filters-after-preview)
+  * [US3: Repeat run into the same folder](#us3-repeat-run-into-the-same-folder)
+  * [US4: Exporting the summary report](#us4-exporting-the-summary-report)
 
 <!-- TOC end -->
 
-<!-- TOC --><a name="epmcminer"></a>
-# epmcminer
+<!-- TOC --><a name="overview"></a>
+## Overview
 
 A desktop application for researchers that automates the retrieval of academic literature from the Europe PubMed Central (Europe PMC) API. It allows users to define a search query and a set of filters, preview matching results, and download up to a specified number of open-access papers — including their PDFs and metadata — into a structured local folder.
 
