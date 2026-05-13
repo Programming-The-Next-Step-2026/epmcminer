@@ -82,7 +82,7 @@ Note: these are early mockups and may not reflect the final design, screenshots 
 
 <!-- TOC --><a name="screen-4-summary-report"></a>
 ### Screen 4 - Summary report
-TODO add Screen 4
+![Screen 4 summary report](docs/screenshots/mockup_screen_4.png)
 
 <!-- TOC --><a name="feature-specifications"></a>
 ## Feature specifications
