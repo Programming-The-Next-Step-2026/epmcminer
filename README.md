@@ -51,7 +51,23 @@ epmcminer only retrieves papers that are freely and legally available in full te
 
 <!-- TOC --><a name="usage"></a>
 ## Usage
-TODO add in the future
+
+First, activate your virtual environment and install the package:
+
+```bash
+source venv/bin/activate
+pip install -e ".[dev]"
+```
+
+Then launch the application using either of the following:
+
+```bash
+# as a module
+python -m epmcminer
+
+# via the installed script
+epmcminer
+```
 
 <!-- TOC --><a name="development"></a>
 ## Development
