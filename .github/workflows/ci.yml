@@ -24,8 +24,6 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install ruff  # redundancy if project dev dependencies are incorrectly specified
-          pip install pytest  # redundancy if project dev dependencies are incorrectly specified
           pip install -e ".[dev]"
 
       - name: Lint with ruff
