@@ -9,6 +9,7 @@ from epmcminer.api.client import (
     FREE_FULL_TEXT_FILTER,
     FULL_TEXT_LINKS_URL,
     SEARCH_URL,
+    SORT_BY_DATE,
     APIError,
     EuropePMCClient,
 )
@@ -105,7 +106,7 @@ class TestSearch:
         """A 200 response is returned as a parsed dict."""
         responses.add(responses.GET, SEARCH_URL, json=SEARCH_RESPONSE, status=200)
 
-        result = client.search(query="depression", sort="relevance", page_size=10)
+        result = client.search(query="depression", page_size=10)
 
         assert result["hitCount"] == 2
         assert result["resultList"]["result"][0]["pmid"] == "12345678"
@@ -115,7 +116,7 @@ class TestSearch:
         """The free-full-text filter is always appended to the query."""
         responses.add(responses.GET, SEARCH_URL, json=SEARCH_RESPONSE, status=200)
 
-        client.search(query="depression", sort="relevance", page_size=10)
+        client.search(query="depression", page_size=10)
 
         sent_query = urllib.parse.parse_qs(
             urllib.parse.urlparse(responses.calls[0].request.url).query
@@ -123,12 +124,36 @@ class TestSearch:
         assert FREE_FULL_TEXT_FILTER in sent_query
 
     @responses.activate
+    def test_search_omits_sort_when_none(self, client: EuropePMCClient) -> None:
+        """No sort parameter is sent when sort=None (defaults to relevance)."""
+        responses.add(responses.GET, SEARCH_URL, json=SEARCH_RESPONSE, status=200)
+
+        client.search(query="depression", page_size=10)
+
+        sent_params = urllib.parse.parse_qs(
+            urllib.parse.urlparse(responses.calls[0].request.url).query
+        )
+        assert "sort" not in sent_params
+
+    @responses.activate
+    def test_search_includes_sort_when_provided(self, client: EuropePMCClient) -> None:
+        """The sort parameter is forwarded to the API when provided."""
+        responses.add(responses.GET, SEARCH_URL, json=SEARCH_RESPONSE, status=200)
+
+        client.search(query="depression", page_size=10, sort=SORT_BY_DATE)
+
+        sent_params = urllib.parse.parse_qs(
+            urllib.parse.urlparse(responses.calls[0].request.url).query
+        )
+        assert sent_params["sort"][0] == SORT_BY_DATE
+
+    @responses.activate
     def test_search_api_error_raises_api_error(self, client: EuropePMCClient) -> None:
         """A non-200 response raises APIError with status code and body."""
         responses.add(responses.GET, SEARCH_URL, body="Internal Server Error", status=500)
 
         with pytest.raises(APIError) as exc_info:
-            client.search(query="depression", sort="relevance", page_size=10)
+            client.search(query="depression", page_size=10)
 
         assert exc_info.value.status_code == 500
         assert "500" in str(exc_info.value)
@@ -138,7 +163,7 @@ class TestSearch:
         """A 200 response with no results returns an empty result list."""
         responses.add(responses.GET, SEARCH_URL, json=EMPTY_SEARCH_RESPONSE, status=200)
 
-        result = client.search(query="xyzzy_no_match", sort="relevance", page_size=10)
+        result = client.search(query="xyzzy_no_match", page_size=10)
 
         assert result["hitCount"] == 0
         assert result["resultList"]["result"] == []
@@ -148,7 +173,7 @@ class TestSearch:
         """The cursorMark parameter is forwarded to the API."""
         responses.add(responses.GET, SEARCH_URL, json=SEARCH_RESPONSE, status=200)
 
-        client.search(query="depression", sort="relevance", page_size=10, cursor_mark="AoE=")
+        client.search(query="depression", page_size=10, cursor_mark="AoE=")
 
         sent_params = urllib.parse.parse_qs(
             urllib.parse.urlparse(responses.calls[0].request.url).query
@@ -183,14 +208,23 @@ class TestGetPdfUrl:
         assert url is None
 
     @responses.activate
-    def test_get_pdf_url_api_error_raises_api_error(self, client: EuropePMCClient) -> None:
-        """A non-200 response raises APIError."""
+    def test_get_pdf_url_returns_none_on_404(self, client: EuropePMCClient) -> None:
+        """A 404 response returns None (paper has no full-text links registered)."""
         responses.add(responses.GET, FULL_TEXT_URL, body="Not Found", status=404)
+
+        url = client.get_pdf_url(pmid=PMID, source=SOURCE)
+
+        assert url is None
+
+    @responses.activate
+    def test_get_pdf_url_api_error_raises_api_error(self, client: EuropePMCClient) -> None:
+        """A non-200, non-404 response raises APIError."""
+        responses.add(responses.GET, FULL_TEXT_URL, body="Internal Server Error", status=500)
 
         with pytest.raises(APIError) as exc_info:
             client.get_pdf_url(pmid=PMID, source=SOURCE)
 
-        assert exc_info.value.status_code == 404
+        assert exc_info.value.status_code == 500
 
     @responses.activate
     def test_get_pdf_url_default_source_is_med(self, client: EuropePMCClient) -> None:

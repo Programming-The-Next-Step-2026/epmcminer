@@ -12,6 +12,8 @@ RESULT_TYPE = "core"
 DEFAULT_SOURCE = "MED"
 DEFAULT_CURSOR_MARK = "*"
 PDF_DOCUMENT_STYLE = "pdf"
+SORT_BY_DATE = "P_PDATE_D desc"
+SORT_BY_CITATIONS = "CITED desc"
 
 
 class APIError(Exception):
@@ -49,8 +51,8 @@ class EuropePMCClient:
     def search(
         self,
         query: str,
-        sort: str,
         page_size: int,
+        sort: str | None = None,
         cursor_mark: str = DEFAULT_CURSOR_MARK,
     ) -> dict:
         """Query the Europe PMC search endpoint.
@@ -60,12 +62,13 @@ class EuropePMCClient:
 
         Args:
             query: The search query string.
-            sort: Sort order for results, e.g. ``"relevance"``, ``"date"``,
-                or ``"cited"``.
             page_size: Maximum number of results to return per page.
-            cursor_mark: Pagination cursor. Use ``"*"`` for the first page
-                and the ``nextCursorMark`` value from the previous response
-                for subsequent pages.
+            sort: API sort string, e.g. ``SORT_BY_DATE`` or
+                ``SORT_BY_CITATIONS``. Omit (or pass ``None``) to use
+                the default relevance ordering.
+            cursor_mark: Pagination cursor. Use ``DEFAULT_CURSOR_MARK``
+                for the first page and the ``nextCursorMark`` value from
+                the previous response for subsequent pages.
 
         Returns:
             The raw JSON response from the API as a dict.
@@ -75,14 +78,15 @@ class EuropePMCClient:
             ConnectionError: If the HTTP request cannot be completed.
         """
         full_query = f"({query}) AND ({FREE_FULL_TEXT_FILTER})"
-        params = {
+        params: dict = {
             "query": full_query,
             "format": RESPONSE_FORMAT,
             "resultType": RESULT_TYPE,
             "pageSize": page_size,
             "cursorMark": cursor_mark,
-            "sort": sort,
         }
+        if sort is not None:
+            params["sort"] = sort
         response = self._session.get(SEARCH_URL, params=params)
         if response.status_code != 200:
             raise APIError(response.status_code, response.text)
@@ -108,6 +112,8 @@ class EuropePMCClient:
         """
         url = FULL_TEXT_LINKS_URL.format(source=source, pmid=pmid)
         response = self._session.get(url, params={"format": RESPONSE_FORMAT})
+        if response.status_code == 404:
+            return None
         if response.status_code != 200:
             raise APIError(response.status_code, response.text)
         data = response.json()
