@@ -1,5 +1,9 @@
 """Integration tests for EuropePMCClient — hits the real Europe PMC API.
 
+This directory sits outside the unit-test tree defined in CLAUDE.md so that
+integration tests can be excluded from CI with ``-m "not integration"`` without
+touching the mirrored unit-test structure under tests/test_api/.
+
 Run with:
     pytest -m integration
 
@@ -154,13 +158,13 @@ class TestGetPdfUrlIntegration:
         else:
             pytest.skip("No papers with a PMID found in search result")
 
-    def test_get_pdf_url_raises_api_error_on_server_error(
+    def test_get_pdf_url_valid_pmid_does_not_raise(
         self, client: EuropePMCClient
     ) -> None:
-        """APIError is documented to be raised on non-200, non-404 responses.
+        """A valid PMID does not raise APIError regardless of whether a PDF exists.
 
-        This test cannot reliably trigger a 500 from the real API, so it
-        verifies the behaviour indirectly by confirming normal calls don't raise.
+        A 500 cannot be reliably triggered against the real API, so this test
+        confirms the happy path as an indirect guard against regression.
         """
         try:
             client.get_pdf_url(pmid=KNOWN_PMID)
