@@ -234,3 +234,54 @@ class TestGetPdfUrl:
         client.get_pdf_url(pmid=PMID)
 
         assert f"/{SOURCE}/" in responses.calls[0].request.url
+
+
+# ---------------------------------------------------------------------------
+# EuropePMCClient.download_pdf
+# ---------------------------------------------------------------------------
+
+
+class TestDownloadPdf:
+    """Tests for EuropePMCClient.download_pdf."""
+
+    PDF_URL = "https://europepmc.org/articles/PMC1234567?pdf=render"
+    PDF_BYTES = b"%PDF-1.4 test content"
+
+    @responses.activate
+    def test_successful_download_returns_bytes(self, client: EuropePMCClient) -> None:
+        """A 200 response returns the PDF content as bytes."""
+        responses.add(responses.GET, self.PDF_URL, body=self.PDF_BYTES, status=200)
+
+        result = client.download_pdf(url=self.PDF_URL)
+
+        assert result == self.PDF_BYTES
+
+    @responses.activate
+    def test_non_200_raises_api_error(self, client: EuropePMCClient) -> None:
+        """A non-200 response raises APIError with the correct status code."""
+        responses.add(responses.GET, self.PDF_URL, body="Not Found", status=404)
+
+        with pytest.raises(APIError) as exc_info:
+            client.download_pdf(url=self.PDF_URL)
+
+        assert exc_info.value.status_code == 404
+
+    @responses.activate
+    def test_server_error_raises_api_error(self, client: EuropePMCClient) -> None:
+        """A 500 response raises APIError."""
+        responses.add(responses.GET, self.PDF_URL, body="Server Error", status=500)
+
+        with pytest.raises(APIError) as exc_info:
+            client.download_pdf(url=self.PDF_URL)
+
+        assert exc_info.value.status_code == 500
+
+    @responses.activate
+    def test_api_error_includes_status_code_in_message(self, client: EuropePMCClient) -> None:
+        """The APIError message includes the HTTP status code."""
+        responses.add(responses.GET, self.PDF_URL, body="Forbidden", status=403)
+
+        with pytest.raises(APIError) as exc_info:
+            client.download_pdf(url=self.PDF_URL)
+
+        assert "403" in str(exc_info.value)

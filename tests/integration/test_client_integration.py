@@ -170,3 +170,39 @@ class TestGetPdfUrlIntegration:
             client.get_pdf_url(pmid=KNOWN_PMID)
         except APIError:
             pytest.fail("get_pdf_url raised APIError for a valid PMID")
+
+
+# ---------------------------------------------------------------------------
+# EuropePMCClient.download_pdf
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.integration
+class TestDownloadPdfIntegration:
+    """Integration tests for EuropePMCClient.download_pdf."""
+
+    def test_download_pdf_returns_bytes_for_oa_paper(self, client: EuropePMCClient) -> None:
+        """download_pdf returns non-empty bytes for a PDF URL from a live search result."""
+        result = client.search(query=COMMON_QUERY, page_size=SMALL_PAGE_SIZE)
+        for paper in result["resultList"]["result"]:
+            entries = paper.get("fullTextUrlList", {}).get("fullTextUrl", [])
+            for entry in entries:
+                if entry.get("documentStyle") == "pdf":
+                    pdf_bytes = client.download_pdf(url=entry["url"])
+                    assert len(pdf_bytes) > 0
+                    return
+        pytest.skip("No paper with an embedded PDF URL found in search results")
+
+    def test_download_pdf_content_starts_with_pdf_header(
+        self, client: EuropePMCClient
+    ) -> None:
+        """The downloaded bytes begin with the PDF magic bytes ``%PDF``."""
+        result = client.search(query=COMMON_QUERY, page_size=SMALL_PAGE_SIZE)
+        for paper in result["resultList"]["result"]:
+            entries = paper.get("fullTextUrlList", {}).get("fullTextUrl", [])
+            for entry in entries:
+                if entry.get("documentStyle") == "pdf":
+                    pdf_bytes = client.download_pdf(url=entry["url"])
+                    assert pdf_bytes[:4] == b"%PDF"
+                    return
+        pytest.skip("No paper with an embedded PDF URL found in search results")
