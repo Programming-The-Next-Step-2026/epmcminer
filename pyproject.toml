@@ -53,3 +53,6 @@ select = ["E", "F", "W", "I"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "integration: hits the real Europe PMC API (deselect with '-m \"not integration\"')",
+]
