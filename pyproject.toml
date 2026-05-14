@@ -24,6 +24,12 @@ classifiers = [
 license = "MIT"
 license-files = ["LICEN[CS]E*"]
 
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "pytest"
+]
+
 [project.urls]
 Homepage = "https://github.com/Programming-The-Next-Step-2026/epmcminer"
 Issues = "https://github.com/Programming-The-Next-Step-2026/epmcminer/issues"
