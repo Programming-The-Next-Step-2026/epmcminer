@@ -122,3 +122,21 @@ class EuropePMCClient:
             if entry.get("documentStyle") == PDF_DOCUMENT_STYLE:
                 return entry["url"]
         return None
+
+    def download_pdf(self, url: str) -> bytes:
+        """Download a PDF from a direct URL.
+
+        Args:
+            url: The direct URL to the open-access PDF file.
+
+        Returns:
+            The raw bytes of the PDF file.
+
+        Raises:
+            APIError: If the server returns a non-200 HTTP status code.
+            ConnectionError: If the HTTP request cannot be completed.
+        """
+        response = self._session.get(url)
+        if response.status_code != 200:
+            raise APIError(response.status_code, response.text)
+        return response.content
