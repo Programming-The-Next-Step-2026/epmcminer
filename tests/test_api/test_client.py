@@ -1,1 +1,202 @@
 """Tests for epmcminer.api.client."""
+
+import urllib.parse
+
+import pytest
+import responses
+
+from epmcminer.api.client import (
+    FREE_FULL_TEXT_FILTER,
+    FULL_TEXT_LINKS_URL,
+    SEARCH_URL,
+    APIError,
+    EuropePMCClient,
+)
+
+# ---------------------------------------------------------------------------
+# Fixtures
+# ---------------------------------------------------------------------------
+
+PMID = "12345678"
+SOURCE = "MED"
+FULL_TEXT_URL = FULL_TEXT_LINKS_URL.format(source=SOURCE, pmid=PMID)
+
+SEARCH_RESPONSE = {
+    "version": "6.8",
+    "hitCount": 2,
+    "nextCursorMark": "AoE=",
+    "resultList": {
+        "result": [
+            {
+                "id": "12345678",
+                "pmid": "12345678",
+                "title": "A study on depression",
+                "authorString": "Smith J, Jones A",
+                "journalTitle": "Journal of Psychiatry",
+                "pubYear": "2022",
+            }
+        ]
+    },
+}
+
+EMPTY_SEARCH_RESPONSE = {
+    "version": "6.8",
+    "hitCount": 0,
+    "nextCursorMark": "*",
+    "resultList": {"result": []},
+}
+
+FULL_TEXT_RESPONSE_WITH_PDF = {
+    "version": "6.8",
+    "hitCount": 1,
+    "fullTextUrlList": {
+        "fullTextUrl": [
+            {
+                "availability": "Open access",
+                "availabilityCode": "OA",
+                "documentStyle": "html",
+                "site": "Europe_PMC",
+                "url": "https://europepmc.org/articles/PMC1234567",
+            },
+            {
+                "availability": "Open access",
+                "availabilityCode": "OA",
+                "documentStyle": "pdf",
+                "site": "Europe_PMC",
+                "url": "https://europepmc.org/articles/PMC1234567?pdf=render",
+            },
+        ]
+    },
+}
+
+FULL_TEXT_RESPONSE_NO_PDF = {
+    "version": "6.8",
+    "hitCount": 1,
+    "fullTextUrlList": {
+        "fullTextUrl": [
+            {
+                "availability": "Open access",
+                "availabilityCode": "OA",
+                "documentStyle": "html",
+                "site": "Europe_PMC",
+                "url": "https://europepmc.org/articles/PMC1234567",
+            }
+        ]
+    },
+}
+
+
+@pytest.fixture()
+def client() -> EuropePMCClient:
+    """Return a fresh EuropePMCClient instance."""
+    return EuropePMCClient()
+
+
+# ---------------------------------------------------------------------------
+# EuropePMCClient.search
+# ---------------------------------------------------------------------------
+
+
+class TestSearch:
+    """Tests for EuropePMCClient.search."""
+
+    @responses.activate
+    def test_successful_search_returns_dict(self, client: EuropePMCClient) -> None:
+        """A 200 response is returned as a parsed dict."""
+        responses.add(responses.GET, SEARCH_URL, json=SEARCH_RESPONSE, status=200)
+
+        result = client.search(query="depression", sort="relevance", page_size=10)
+
+        assert result["hitCount"] == 2
+        assert result["resultList"]["result"][0]["pmid"] == "12345678"
+
+    @responses.activate
+    def test_search_appends_free_full_text_filter(self, client: EuropePMCClient) -> None:
+        """The free-full-text filter is always appended to the query."""
+        responses.add(responses.GET, SEARCH_URL, json=SEARCH_RESPONSE, status=200)
+
+        client.search(query="depression", sort="relevance", page_size=10)
+
+        sent_query = urllib.parse.parse_qs(
+            urllib.parse.urlparse(responses.calls[0].request.url).query
+        )["query"][0]
+        assert FREE_FULL_TEXT_FILTER in sent_query
+
+    @responses.activate
+    def test_search_api_error_raises_api_error(self, client: EuropePMCClient) -> None:
+        """A non-200 response raises APIError with status code and body."""
+        responses.add(responses.GET, SEARCH_URL, body="Internal Server Error", status=500)
+
+        with pytest.raises(APIError) as exc_info:
+            client.search(query="depression", sort="relevance", page_size=10)
+
+        assert exc_info.value.status_code == 500
+        assert "500" in str(exc_info.value)
+
+    @responses.activate
+    def test_search_empty_results(self, client: EuropePMCClient) -> None:
+        """A 200 response with no results returns an empty result list."""
+        responses.add(responses.GET, SEARCH_URL, json=EMPTY_SEARCH_RESPONSE, status=200)
+
+        result = client.search(query="xyzzy_no_match", sort="relevance", page_size=10)
+
+        assert result["hitCount"] == 0
+        assert result["resultList"]["result"] == []
+
+    @responses.activate
+    def test_search_passes_cursor_mark(self, client: EuropePMCClient) -> None:
+        """The cursorMark parameter is forwarded to the API."""
+        responses.add(responses.GET, SEARCH_URL, json=SEARCH_RESPONSE, status=200)
+
+        client.search(query="depression", sort="relevance", page_size=10, cursor_mark="AoE=")
+
+        sent_params = urllib.parse.parse_qs(
+            urllib.parse.urlparse(responses.calls[0].request.url).query
+        )
+        assert sent_params["cursorMark"][0] == "AoE="
+
+
+# ---------------------------------------------------------------------------
+# EuropePMCClient.get_pdf_url
+# ---------------------------------------------------------------------------
+
+
+class TestGetPdfUrl:
+    """Tests for EuropePMCClient.get_pdf_url."""
+
+    @responses.activate
+    def test_pdf_url_found(self, client: EuropePMCClient) -> None:
+        """Returns the PDF URL when a pdf documentStyle entry exists."""
+        responses.add(responses.GET, FULL_TEXT_URL, json=FULL_TEXT_RESPONSE_WITH_PDF, status=200)
+
+        url = client.get_pdf_url(pmid=PMID, source=SOURCE)
+
+        assert url == "https://europepmc.org/articles/PMC1234567?pdf=render"
+
+    @responses.activate
+    def test_pdf_url_not_found(self, client: EuropePMCClient) -> None:
+        """Returns None when no pdf documentStyle entry exists."""
+        responses.add(responses.GET, FULL_TEXT_URL, json=FULL_TEXT_RESPONSE_NO_PDF, status=200)
+
+        url = client.get_pdf_url(pmid=PMID, source=SOURCE)
+
+        assert url is None
+
+    @responses.activate
+    def test_get_pdf_url_api_error_raises_api_error(self, client: EuropePMCClient) -> None:
+        """A non-200 response raises APIError."""
+        responses.add(responses.GET, FULL_TEXT_URL, body="Not Found", status=404)
+
+        with pytest.raises(APIError) as exc_info:
+            client.get_pdf_url(pmid=PMID, source=SOURCE)
+
+        assert exc_info.value.status_code == 404
+
+    @responses.activate
+    def test_get_pdf_url_default_source_is_med(self, client: EuropePMCClient) -> None:
+        """The default source parameter is MED."""
+        responses.add(responses.GET, FULL_TEXT_URL, json=FULL_TEXT_RESPONSE_WITH_PDF, status=200)
+
+        client.get_pdf_url(pmid=PMID)
+
+        assert f"/{SOURCE}/" in responses.calls[0].request.url
