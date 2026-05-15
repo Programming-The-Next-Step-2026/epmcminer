@@ -210,7 +210,7 @@ class TestDownloadPdfIntegration:
                     return
             except APIError:
                 continue
-        pytest.skip("All candidate PDF URLs returned errors or non-PDF content — API may be degraded")
+        pytest.skip("All candidate PDF URLs returned errors or non-PDF content — API degraded")
 
     def test_download_pdf_content_starts_with_pdf_header(
         self, client: EuropePMCClient
@@ -231,4 +231,4 @@ class TestDownloadPdfIntegration:
                     return
             except APIError:
                 continue
-        pytest.skip("All candidate PDF URLs returned errors or non-PDF content — API may be degraded")
+        pytest.skip("All candidate PDF URLs returned errors or non-PDF content — API degraded")
