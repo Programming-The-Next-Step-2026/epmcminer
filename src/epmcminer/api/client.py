@@ -138,8 +138,9 @@ class EuropePMCClient:
     def download_pdf(self, url: str) -> bytes:
         """Download a PDF from a direct URL.
 
-        Retries up to ``_PDF_MAX_RETRIES`` times on connection errors with
-        exponential backoff. HTTP errors (e.g. 403) are not retried.
+        Retries up to ``_PDF_MAX_RETRIES`` times on connection errors and HTTP
+        5xx responses with exponential backoff. HTTP 4xx errors are not retried
+        as they indicate a client-side problem unlikely to resolve on retry.
 
         Args:
             url: The direct URL to the open-access PDF file.
@@ -148,15 +149,14 @@ class EuropePMCClient:
             The raw bytes of the PDF file.
 
         Raises:
-            APIError: If the server returns a non-200 HTTP status code.
+            APIError: If the server returns a non-retryable HTTP status code,
+                or if a 5xx error persists after all retry attempts.
             ConnectionError: If the connection fails on all retry attempts.
         """
         last_exc: Exception | None = None
         for attempt in range(_PDF_MAX_RETRIES):
             try:
                 response = self._session.get(url, timeout=REQUEST_TIMEOUT)
-                if response.status_code != 200:
-                    raise APIError(response.status_code, response.text)
             except requests.exceptions.ConnectionError as exc:
                 last_exc = exc
                 if attempt < _PDF_MAX_RETRIES - 1:
@@ -169,6 +169,24 @@ class EuropePMCClient:
                         exc,
                     )
                     time.sleep(delay)
+                continue
             else:
-                return response.content
-        raise ConnectionError(str(last_exc)) from last_exc
+                if response.status_code == 200:
+                    return response.content
+                if 400 <= response.status_code < 500:
+                    raise APIError(response.status_code, response.text)
+                # 5xx: treat as transient and retry
+                last_exc = APIError(response.status_code, response.text)
+                if attempt < _PDF_MAX_RETRIES - 1:
+                    delay = _PDF_RETRY_BACKOFF_BASE * (2 ** attempt)
+                    _logger.warning(
+                        "download_pdf HTTP %d (attempt %d/%d), retrying in %ds",
+                        response.status_code,
+                        attempt + 1,
+                        _PDF_MAX_RETRIES,
+                        delay,
+                    )
+                    time.sleep(delay)
+        if isinstance(last_exc, requests.exceptions.ConnectionError):
+            raise ConnectionError(str(last_exc)) from last_exc
+        raise last_exc if last_exc is not None else APIError(0, "unknown")
