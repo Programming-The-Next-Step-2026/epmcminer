@@ -1,6 +1,12 @@
 """Europe PMC API HTTP client — raw HTTP calls only, no business logic."""
 
+import time
+
 import requests
+
+from epmcminer.utils.logger import get_logger
+
+_logger = get_logger(__name__)
 
 SEARCH_URL = "https://www.ebi.ac.uk/europepmc/webservices/rest/search"
 FULL_TEXT_LINKS_URL = (
@@ -15,6 +21,9 @@ PDF_DOCUMENT_STYLE = "pdf"
 SORT_BY_DATE = "P_PDATE_D desc"
 SORT_BY_CITATIONS = "CITED desc"
 REQUEST_TIMEOUT = 30
+
+_PDF_MAX_RETRIES = 3
+_PDF_RETRY_BACKOFF_BASE = 1
 
 
 class APIError(Exception):
@@ -129,6 +138,9 @@ class EuropePMCClient:
     def download_pdf(self, url: str) -> bytes:
         """Download a PDF from a direct URL.
 
+        Retries up to ``_PDF_MAX_RETRIES`` times on connection errors with
+        exponential backoff. HTTP errors (e.g. 403) are not retried.
+
         Args:
             url: The direct URL to the open-access PDF file.
 
@@ -137,9 +149,25 @@ class EuropePMCClient:
 
         Raises:
             APIError: If the server returns a non-200 HTTP status code.
-            ConnectionError: If the HTTP request cannot be completed.
+            ConnectionError: If the connection fails on all retry attempts.
         """
-        response = self._session.get(url, timeout=REQUEST_TIMEOUT)
-        if response.status_code != 200:
-            raise APIError(response.status_code, response.text)
-        return response.content
+        last_exc: Exception | None = None
+        for attempt in range(_PDF_MAX_RETRIES):
+            try:
+                response = self._session.get(url, timeout=REQUEST_TIMEOUT)
+                if response.status_code != 200:
+                    raise APIError(response.status_code, response.text)
+                return response.content
+            except requests.exceptions.ConnectionError as exc:
+                last_exc = exc
+                if attempt < _PDF_MAX_RETRIES - 1:
+                    delay = _PDF_RETRY_BACKOFF_BASE * (2 ** attempt)
+                    _logger.warning(
+                        "download_pdf connection error (attempt %d/%d), retrying in %ds: %s",
+                        attempt + 1,
+                        _PDF_MAX_RETRIES,
+                        delay,
+                        exc,
+                    )
+                    time.sleep(delay)
+        raise ConnectionError(str(last_exc)) from last_exc

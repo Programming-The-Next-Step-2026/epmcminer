@@ -181,6 +181,14 @@ class DownloadService:
                 reason=str(exc.status_code),
                 file_path=None,
             )
+        except ConnectionError as exc:
+            _logger.warning("Connection error downloading %s: %s", pmid, exc)
+            return DownloadResult(
+                paper=paper,
+                status=_STATUS_FAILED,
+                reason="Connection error",
+                file_path=None,
+            )
 
         file_path.write_bytes(pdf_bytes)
         _logger.info("Downloaded %s to %s", pmid, file_path)
