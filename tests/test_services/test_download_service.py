@@ -2,7 +2,7 @@
 
 import threading
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -437,6 +437,27 @@ class TestDownload:
         assert "downloaded" in statuses
         assert "skipped" in statuses
         assert "failed" in statuses
+
+    def test_failed_download_on_write_error(
+        self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
+    ) -> None:
+        """An OSError writing the PDF to disk returns status='failed' instead of raising."""
+        mock_client.search.return_value = make_search_response(
+            [make_raw_paper()], next_cursor="*"
+        )
+        mock_client.download_pdf.return_value = _PDF_BYTES
+
+        with patch("epmcminer.services.download_service.Path.write_bytes",
+                   side_effect=OSError("no space left")):
+            results = service.download(
+                make_params(tmp_path, count=1),
+                progress_callback=lambda r: None,
+                cancel_event=threading.Event(),
+            )
+
+        assert len(results) == 1
+        assert results[0].status == "failed"
+        assert results[0].reason == "Write error"
 
     def test_uses_full_page_size_in_batch_mode(
         self, service: DownloadService, mock_client: MagicMock, tmp_path: Path

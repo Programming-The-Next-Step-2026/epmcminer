@@ -214,7 +214,13 @@ class DownloadService:
                 file_path=None,
             )
 
-        file_path.write_bytes(pdf_bytes)
+        try:
+            file_path.write_bytes(pdf_bytes)
+        except OSError as exc:
+            _logger.warning("Failed to write %s: %s", file_path, exc)
+            return DownloadResult(
+                paper=paper, status=_STATUS_FAILED, reason="Write error", file_path=None
+            )
         _logger.info("Downloaded %s to %s", pmid, file_path)
         return DownloadResult(
             paper=paper, status=_STATUS_DOWNLOADED, reason=None, file_path=file_path
