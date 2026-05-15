@@ -14,6 +14,7 @@ DEFAULT_CURSOR_MARK = "*"
 PDF_DOCUMENT_STYLE = "pdf"
 SORT_BY_DATE = "P_PDATE_D desc"
 SORT_BY_CITATIONS = "CITED desc"
+REQUEST_TIMEOUT = 30
 
 
 class APIError(Exception):
@@ -87,7 +88,7 @@ class EuropePMCClient:
         }
         if sort is not None:
             params["sort"] = sort
-        response = self._session.get(SEARCH_URL, params=params)
+        response = self._session.get(SEARCH_URL, params=params, timeout=REQUEST_TIMEOUT)
         if response.status_code != 200:
             raise APIError(response.status_code, response.text)
         return response.json()
@@ -111,7 +112,9 @@ class EuropePMCClient:
             ConnectionError: If the HTTP request cannot be completed.
         """
         url = FULL_TEXT_LINKS_URL.format(source=source, pmid=pmid)
-        response = self._session.get(url, params={"format": RESPONSE_FORMAT})
+        response = self._session.get(
+            url, params={"format": RESPONSE_FORMAT}, timeout=REQUEST_TIMEOUT
+        )
         if response.status_code == 404:
             return None
         if response.status_code != 200:
@@ -136,7 +139,7 @@ class EuropePMCClient:
             APIError: If the server returns a non-200 HTTP status code.
             ConnectionError: If the HTTP request cannot be completed.
         """
-        response = self._session.get(url)
+        response = self._session.get(url, timeout=REQUEST_TIMEOUT)
         if response.status_code != 200:
             raise APIError(response.status_code, response.text)
         return response.content

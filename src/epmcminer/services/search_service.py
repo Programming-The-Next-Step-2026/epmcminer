@@ -13,14 +13,14 @@ from epmcminer.api.models import Paper, SearchParams, SearchResult
 
 PREVIEW_PAGE_SIZE = 10
 
-_SORT_ORDER_MAP: dict[str, str | None] = {
+SORT_ORDER_MAP: dict[str, str | None] = {
     "relevance": None,
     "date": SORT_BY_DATE,
     "citations": SORT_BY_CITATIONS,
 }
 
 
-def _pdf_url_from_raw(raw: dict) -> str | None:
+def pdf_url_from_raw(raw: dict) -> str | None:
     """Extract the PDF URL from a raw core search result.
 
     The core search response embeds fullTextUrlList directly, avoiding a
@@ -112,13 +112,13 @@ class SearchService:
             ConnectionError: If the HTTP request cannot be completed.
         """
         query = self.build_query(params)
-        sort = _SORT_ORDER_MAP.get(params.sort_order)
+        sort = SORT_ORDER_MAP.get(params.sort_order)
         data = self._client.search(query=query, page_size=PREVIEW_PAGE_SIZE, sort=sort)
 
         papers: list[Paper] = []
         for raw in data.get("resultList", {}).get("result", []):
             pmid = raw.get("pmid") or raw.get("id", "")
-            pdf_url = _pdf_url_from_raw(raw)
+            pdf_url = pdf_url_from_raw(raw)
             papers.append(
                 Paper(
                     pmid=pmid,
