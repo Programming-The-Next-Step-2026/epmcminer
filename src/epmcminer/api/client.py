@@ -157,7 +157,6 @@ class EuropePMCClient:
                 response = self._session.get(url, timeout=REQUEST_TIMEOUT)
                 if response.status_code != 200:
                     raise APIError(response.status_code, response.text)
-                return response.content
             except requests.exceptions.ConnectionError as exc:
                 last_exc = exc
                 if attempt < _PDF_MAX_RETRIES - 1:
@@ -170,4 +169,6 @@ class EuropePMCClient:
                         exc,
                     )
                     time.sleep(delay)
+            else:
+                return response.content
         raise ConnectionError(str(last_exc)) from last_exc

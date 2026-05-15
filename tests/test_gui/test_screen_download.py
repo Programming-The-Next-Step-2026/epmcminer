@@ -397,3 +397,30 @@ class TestScreenDownloadCancel:
         w = _make_screen()
         w._cancel_btn.setEnabled(True)
         w._cancel_btn.click()  # should not raise
+
+
+# ---------------------------------------------------------------------------
+# TestScreenDownloadError
+# ---------------------------------------------------------------------------
+
+
+class TestScreenDownloadError:
+    """Tests for _on_error() called directly."""
+
+    def test_on_error_disables_cancel_button(self, qapp: QApplication) -> None:
+        """_on_error disables the cancel button."""
+        w = _make_screen()
+        w._cancel_btn.setEnabled(True)
+        with patch("epmcminer.gui.screens.screen_download.QMessageBox.critical"):
+            w._on_error("something went wrong")
+        assert not w._cancel_btn.isEnabled()
+
+    def test_on_error_shows_critical_dialog(self, qapp: QApplication) -> None:
+        """_on_error shows a QMessageBox.critical dialog with the error message."""
+        w = _make_screen()
+        with patch(
+            "epmcminer.gui.screens.screen_download.QMessageBox.critical"
+        ) as mock_critical:
+            w._on_error("connection timeout")
+        mock_critical.assert_called_once()
+        assert "connection timeout" in mock_critical.call_args.args[2]
