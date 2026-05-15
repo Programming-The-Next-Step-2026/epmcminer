@@ -192,7 +192,7 @@ class ScreenSummary(QWidget):
         self._stat_downloaded_lbl.setText(str(downloaded))
         self._stat_skipped_lbl.setText(str(not_downloaded))
         self._stat_total_lbl.setText(f"{total_found:,}")
-        self._stat_downloaded_sub.setText(f"of {params.count} requested")
+        self._stat_downloaded_sub.setText(f"of {len(results)} processed")
 
         self._populate_params(params)
         self._populate_skipped(results)
@@ -289,7 +289,7 @@ class ScreenSummary(QWidget):
         row.setSpacing(16)
 
         card_dl, self._stat_downloaded_lbl, self._stat_downloaded_sub = self._make_stat_card(
-            "Downloaded", "—", "of 0 requested", _ACCENT
+            "Downloaded", "—", "of 0 processed", _ACCENT
         )
         card_sk, self._stat_skipped_lbl, _ = self._make_stat_card(
             "Skipped", "—", "see reasons below", _DANGER

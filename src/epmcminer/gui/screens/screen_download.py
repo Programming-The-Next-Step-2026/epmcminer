@@ -421,13 +421,18 @@ class ScreenDownload(QWidget):
         """Append a completed-download row to the live log."""
         self._log_layout.addWidget(self._make_log_row(result))
 
+    def _downloaded_count(self) -> int:
+        """Return the number of successfully downloaded papers so far."""
+        return sum(1 for r in self._results if r.status == _STATUS_DOWNLOADED)
+
     def _eta_seconds(self) -> int | None:
-        """Estimate seconds remaining based on average time per download."""
-        if self._completed == 0:
+        """Estimate seconds remaining based on average time per successful download."""
+        downloaded = self._downloaded_count()
+        if downloaded == 0:
             return None
         elapsed = time.time() - self._start_time
-        avg = elapsed / self._completed
-        remaining = max(0, self._total - self._completed)
+        avg = elapsed / downloaded
+        remaining = max(0, self._total - downloaded)
         return round(avg * remaining) if remaining > 0 else None
 
     # ------------------------------------------------------------------
@@ -439,8 +444,8 @@ class ScreenDownload(QWidget):
         self._results.append(result)
         self._completed += 1
         self._progress.set_progress(
+            self._downloaded_count(),
             self._completed,
-            self._total,
             eta_seconds=self._eta_seconds(),
             thread_count=DownloadService.MAX_WORKERS,
         )
@@ -450,7 +455,7 @@ class ScreenDownload(QWidget):
         """Handle completion of the full download run."""
         self._cancel_btn.setEnabled(False)
         downloaded = sum(1 for r in results if r.status == _STATUS_DOWNLOADED)
-        self._progress.set_progress(downloaded, max(self._total, 1))
+        self._progress.set_progress(downloaded, max(self._completed, 1))
         if self._params is not None:
             try:
                 self._report_service.save_csv(
