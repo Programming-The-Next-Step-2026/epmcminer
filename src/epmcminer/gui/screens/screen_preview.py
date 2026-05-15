@@ -208,10 +208,14 @@ class ScreenPreview(QWidget):
         back_requested: Emitted when the user clicks "Back".
         download_requested: Emitted with a fully populated SearchParams when
             "Start download" is clicked.
+        result_loaded: Emitted with ``total_found`` (int) when a search result
+            arrives successfully. Used by MainWindow to pass the count to
+            ScreenSummary.
     """
 
     back_requested = pyqtSignal()
     download_requested = pyqtSignal(SearchParams)
+    result_loaded = pyqtSignal(int)  # emits total_found when a search result arrives
 
     def __init__(self, search_service: SearchService, parent: QWidget | None = None) -> None:
         """Initialise the preview screen.
@@ -612,6 +616,7 @@ class ScreenPreview(QWidget):
         self._progress.setVisible(False)
         self._error_widget.setVisible(False)
         self._content.setVisible(True)
+        self.result_loaded.emit(result.total_found)
 
     def _on_error(self, message: str) -> None:
         """Handle an error emitted by the worker."""
