@@ -1,6 +1,7 @@
 """Main application window managing screen navigation and the step indicator."""
 
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import QPoint, Qt
+from PyQt6.QtGui import QMouseEvent
 from PyQt6.QtWidgets import (
     QFrame,
     QHBoxLayout,
@@ -79,7 +80,7 @@ class _TitleBar(QWidget):
             f"background-color: {_TITLE_BAR_BG};"
             f" border-bottom: 1px solid {_BORDER};"
         )
-        self._drag_pos: object = None
+        self._drag_pos: QPoint | None = None
 
         self._circles: list[QLabel] = []
         self._step_texts: list[QLabel] = []
@@ -225,19 +226,19 @@ class _TitleBar(QWidget):
             else:
                 line.setStyleSheet("background-color: rgba(255,255,255,15); border: none;")
 
-    def mousePressEvent(self, event) -> None:  # type: ignore[override]
+    def mousePressEvent(self, event: QMouseEvent) -> None:
         if event.button() == Qt.MouseButton.LeftButton:
             self._drag_pos = (
                 event.globalPosition().toPoint() - self.window().frameGeometry().topLeft()
             )
             event.accept()
 
-    def mouseMoveEvent(self, event) -> None:  # type: ignore[override]
+    def mouseMoveEvent(self, event: QMouseEvent) -> None:
         if event.buttons() == Qt.MouseButton.LeftButton and self._drag_pos is not None:
             self.window().move(event.globalPosition().toPoint() - self._drag_pos)
             event.accept()
 
-    def mouseReleaseEvent(self, event) -> None:  # type: ignore[override]
+    def mouseReleaseEvent(self, event: QMouseEvent) -> None:
         self._drag_pos = None
 
 
