@@ -260,12 +260,12 @@ class TestMainWindowSignalWiring:
         mock_load.assert_called_once_with(results, params, 42)
 
     def test_download_complete_skips_load_when_params_none(self, qapp: QApplication) -> None:
-        """download_complete does not call load() if no params were stored."""
+        """download_complete does not call load() or navigate if no params were stored."""
         w = MainWindow()
         with patch.object(w._screen_summary, "load") as mock_load:
             w._screen_download.download_complete.emit([])
         mock_load.assert_not_called()
-        assert w._stack.currentIndex() == 3
+        assert w._stack.currentIndex() == 0
 
     def test_new_search_returns_to_search(self, qapp: QApplication) -> None:
         """new_search_requested from ScreenSummary navigates to screen 0."""

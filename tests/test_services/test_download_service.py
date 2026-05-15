@@ -441,7 +441,7 @@ class TestDownload:
     def test_failed_download_on_write_error(
         self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
     ) -> None:
-        """An OSError writing the PDF to disk returns status='failed' instead of raising."""
+        """OSError writing PDF to disk returns status='failed' instead of raising."""
         mock_client.search.return_value = make_search_response(
             [make_raw_paper()], next_cursor="*"
         )
@@ -462,7 +462,7 @@ class TestDownload:
     def test_uses_full_page_size_in_batch_mode(
         self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
     ) -> None:
-        """When remaining >= DOWNLOAD_PAGE_SIZE, search is called with page_size=DOWNLOAD_PAGE_SIZE."""
+        """Batch mode: search is called with page_size=DOWNLOAD_PAGE_SIZE when remaining >= it."""
         mock_client.search.return_value = make_search_response([], next_cursor="*")
 
         service.download(

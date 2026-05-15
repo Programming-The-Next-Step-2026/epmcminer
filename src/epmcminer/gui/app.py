@@ -358,7 +358,7 @@ class MainWindow(QMainWindow):
     def _on_download_complete(self, results: list) -> None:
         if self._last_params is not None:
             self._screen_summary.load(results, self._last_params, self._total_found)
-        self.navigate_to(3)
+            self.navigate_to(3)
 
     def _on_new_search_requested(self) -> None:
         self.navigate_to(0)
