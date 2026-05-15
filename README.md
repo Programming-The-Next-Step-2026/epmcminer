@@ -52,6 +52,18 @@ epmcminer only retrieves papers that are freely and legally available in full te
 <!-- TOC --><a name="usage"></a>
 ## Usage
 
+### System prerequisites (Linux only)
+
+PyQt6 requires two OpenGL/EGL system libraries that are not always present on minimal Linux installs:
+
+```bash
+sudo apt-get install -y libegl1 libgl1
+```
+
+macOS and Windows users do not need this step.
+
+### Install and run
+
 First, activate your virtual environment and install the package:
 
 ```bash
