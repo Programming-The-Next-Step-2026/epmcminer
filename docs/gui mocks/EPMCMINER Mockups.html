@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EPMCMINER — PyQt6 Mockups</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #f0eee9; font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
+  #root { width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="ui.jsx"></script>
+<script type="text/babel" src="screens-1-2.jsx"></script>
+<script type="text/babel" src="screens-3-4.jsx"></script>
+<script type="text/babel" src="handoff.jsx"></script>
+
+<script type="text/babel" data-presets="react">
+const { DesignCanvas, DCSection, DCArtboard, DCPostIt } = window;
+const { SearchScreen, PreviewScreen, DownloadScreen, SummaryScreen, TokensScreen, PyQtScreen } = window;
+
+function App() {
+  return (
+    <DesignCanvas>
+      <DCSection
+        id="screens"
+        title="EPMCMINER · Screen mockups"
+        subtitle="Faithful HTML recreations of the four PyQt6 screens. Each artboard mirrors a single window state — drag to reorder, click to focus."
+      >
+        <DCArtboard id="search"   label="01 · Search"   width={1080} height={1040}><SearchScreen   /></DCArtboard>
+        <DCArtboard id="preview"  label="02 · Preview"  width={1080} height={1280}><PreviewScreen  /></DCArtboard>
+        <DCArtboard id="download" label="03 · Download" width={1080} height={1180}><DownloadScreen /></DCArtboard>
+        <DCArtboard id="summary"  label="04 · Summary"  width={1080} height={1080}><SummaryScreen  /></DCArtboard>
+      </DCSection>
+
+      <DCSection
+        id="handoff"
+        title="Handoff for Claude Code"
+        subtitle="Design tokens + suggested PyQt6 widget mapping. Lift hex codes, sizes, and the starter stylesheet directly into your Qt project."
+      >
+        <DCArtboard id="tokens" label="Design tokens"   width={1080} height={920}><TokensScreen /></DCArtboard>
+        <DCArtboard id="pyqt"   label="PyQt6 mapping"   width={1080} height={1620}><PyQtScreen   /></DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

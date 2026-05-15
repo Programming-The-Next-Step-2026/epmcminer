@@ -33,3 +33,35 @@ Issues identified during code review that were **not** fixed in-branch, with con
 **Files:** `src/epmcminer/utils/file_utils.py`, `src/epmcminer/utils/logger.py`
 
 **Detail:** Same D413 rule as reported for `report_service.py`. Not in the project ruff config and not required by Google style. See the earlier entry for full context.
+
+---
+
+## Medium — Double free-text filter in search queries
+
+**Files:** `src/epmcminer/services/search_service.py:93`, `src/epmcminer/api/client.py:81`
+
+**Detail:** `FREE_FULL_TEXT_FILTER` is appended by both `SearchService.build_query()` and `EuropePMCClient.search()`. The final API query contains the clause twice: `(...AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)) AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)`. This doesn't break search results but wastes URL space and is confusing. To fix: decide which layer owns this rule (recommend removing it from `build_query()` since the client already handles it) and update `test_free_full_text_filter_always_present` accordingly.
+
+---
+
+## Medium — Module-level QStyleFactory creation in tag_input
+
+**Files:** `src/epmcminer/gui/widgets/tag_input.py:106`
+
+**Detail:** `_FUSION = QStyleFactory.create("Fusion")` runs at module import time. This is fragile if `tag_input` is ever imported before a `QApplication` is instantiated (e.g. in a non-GUI test or CLI context). Fix: use a lazy initializer — `_FUSION: QStyle | None = None` and a `_get_fusion_style()` helper that initializes on first call.
+
+---
+
+## Low — `SearchParams.output_folder` defaults to cwd
+
+**Files:** `src/epmcminer/api/search_params.py:36`
+
+**Detail:** `output_folder: Path = field(default_factory=Path)` creates `Path()` which resolves to the current working directory at runtime. If a caller omits this field, downloads silently land wherever the process was launched from. Fix: change to `output_folder: Path | None = None` with a `ValueError` raised in `__post_init__` if `None`, or require it as a positional argument with no default.
+
+---
+
+## Low — Cancellation latency in download page
+
+**Files:** `src/epmcminer/services/download_service.py:140`
+
+**Detail:** `_download_page()` submits all papers from one API page (up to 25) to a thread pool and waits for all futures before returning. `cancel_event` is only checked between pages, so cancellation can be delayed by up to 25 concurrent downloads. Fix: pass `cancel_event` into `_download_page`, check it before submitting each future, and use `executor.shutdown(cancel_futures=True)` on cancellation.

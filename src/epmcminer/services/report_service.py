@@ -43,9 +43,6 @@ class ReportService:
     thread; callers are responsible for offloading to a QThread worker.
     """
 
-    def __init__(self) -> None:
-        """Initialise ReportService."""
-
     def save_csv(
         self,
         results: list[DownloadResult],

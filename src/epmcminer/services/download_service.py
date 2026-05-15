@@ -7,49 +7,24 @@ from pathlib import Path
 
 from epmcminer.api.client import (
     DEFAULT_CURSOR_MARK,
-    PDF_DOCUMENT_STYLE,
-    SORT_BY_CITATIONS,
-    SORT_BY_DATE,
     APIError,
     EuropePMCClient,
 )
 from epmcminer.api.download_result import DownloadResult
 from epmcminer.api.models import Paper, SearchParams
-from epmcminer.services.search_service import SearchService
-from epmcminer.utils.file_utils import sanitise_filename
+from epmcminer.services.search_service import SORT_ORDER_MAP, SearchService, pdf_url_from_raw
+from epmcminer.utils.file_utils import build_pdf_filename
 from epmcminer.utils.logger import get_logger
 
 _logger = get_logger(__name__)
 
 DOWNLOAD_PAGE_SIZE = 25
 
-_SORT_ORDER_MAP: dict[str, str | None] = {
-    "relevance": None,
-    "date": SORT_BY_DATE,
-    "citations": SORT_BY_CITATIONS,
-}
-
 _STATUS_DOWNLOADED = "downloaded"
 _STATUS_SKIPPED = "skipped"
 _STATUS_FAILED = "failed"
 _REASON_NO_PDF = "PDF unavailable"
 _REASON_ALREADY_DOWNLOADED = "Already downloaded"
-
-
-def _pdf_url_from_raw(raw: dict) -> str | None:
-    """Extract the PDF URL from a raw core search result.
-
-    Args:
-        raw: A single result dict from the Europe PMC core search response.
-
-    Returns:
-        The PDF URL string, or None if no PDF link is present.
-    """
-    entries = raw.get("fullTextUrlList", {}).get("fullTextUrl", [])
-    for entry in entries:
-        if entry.get("documentStyle") == PDF_DOCUMENT_STYLE:
-            return entry["url"]
-    return None
 
 
 class DownloadService:
@@ -103,7 +78,7 @@ class DownloadService:
         pdfs_dir.mkdir(parents=True, exist_ok=True)
 
         query = self._search_service.build_query(params)
-        sort = _SORT_ORDER_MAP.get(params.sort_order)
+        sort = SORT_ORDER_MAP.get(params.sort_order)
 
         all_results: list[DownloadResult] = []
         success_count = 0
@@ -165,7 +140,7 @@ class DownloadService:
             A DownloadResult describing the outcome.
         """
         pmid = raw.get("pmid") or raw.get("id", "")
-        pdf_url = _pdf_url_from_raw(raw)
+        pdf_url = pdf_url_from_raw(raw)
         paper = Paper(
             pmid=pmid,
             doi=raw.get("doi", ""),
@@ -185,9 +160,7 @@ class DownloadService:
                 paper=paper, status=_STATUS_SKIPPED, reason=_REASON_NO_PDF, file_path=None
             )
 
-        doi_part = sanitise_filename(paper.doi) if paper.doi else "no_doi"
-        title_part = sanitise_filename(paper.title) if paper.title else "no_title"
-        file_path = pdfs_dir / f"{doi_part}_{title_part}.pdf"
+        file_path = pdfs_dir / build_pdf_filename(paper.doi, paper.title)
 
         if file_path.exists():
             _logger.info("Skipping %s: already downloaded at %s", pmid, file_path)
