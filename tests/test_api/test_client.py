@@ -1,8 +1,10 @@
 """Tests for epmcminer.api.client."""
 
 import urllib.parse
+from unittest.mock import patch
 
 import pytest
+import requests
 import responses
 
 from epmcminer.api.client import (
@@ -285,3 +287,67 @@ class TestDownloadPdf:
             client.download_pdf(url=self.PDF_URL)
 
         assert "403" in str(exc_info.value)
+
+    @responses.activate
+    def test_connection_error_is_retried_and_succeeds(self, client: EuropePMCClient) -> None:
+        """A transient ConnectionError is retried and succeeds on a later attempt."""
+        responses.add(
+            responses.GET, self.PDF_URL, body=requests.exceptions.ConnectionError("dropped")
+        )
+        responses.add(responses.GET, self.PDF_URL, body=self.PDF_BYTES, status=200)
+
+        with patch("epmcminer.api.client.time.sleep"):
+            result = client.download_pdf(url=self.PDF_URL)
+
+        assert result == self.PDF_BYTES
+        assert len(responses.calls) == 2
+
+    @responses.activate
+    def test_connection_error_exhausted_raises_connection_error(
+        self, client: EuropePMCClient
+    ) -> None:
+        """ConnectionError is raised (as built-in) after all retry attempts fail."""
+        for _ in range(3):
+            responses.add(
+                responses.GET,
+                self.PDF_URL,
+                body=requests.exceptions.ConnectionError("dropped"),
+            )
+
+        with patch("epmcminer.api.client.time.sleep"):
+            with pytest.raises(ConnectionError):
+                client.download_pdf(url=self.PDF_URL)
+
+        assert len(responses.calls) == 3
+
+    @responses.activate
+    def test_connection_error_retry_uses_exponential_backoff(
+        self, client: EuropePMCClient
+    ) -> None:
+        """Retry delays follow 1 s, 2 s exponential backoff."""
+        for _ in range(3):
+            responses.add(
+                responses.GET,
+                self.PDF_URL,
+                body=requests.exceptions.ConnectionError("dropped"),
+            )
+
+        with patch("epmcminer.api.client.time.sleep") as mock_sleep:
+            with pytest.raises(ConnectionError):
+                client.download_pdf(url=self.PDF_URL)
+
+        assert mock_sleep.call_count == 2
+        delays = [call.args[0] for call in mock_sleep.call_args_list]
+        assert delays == [1, 2]
+
+    @responses.activate
+    def test_http_error_not_retried(self, client: EuropePMCClient) -> None:
+        """A non-200 HTTP response raises APIError immediately without retrying."""
+        responses.add(responses.GET, self.PDF_URL, body="Forbidden", status=403)
+
+        with patch("epmcminer.api.client.time.sleep") as mock_sleep:
+            with pytest.raises(APIError):
+                client.download_pdf(url=self.PDF_URL)
+
+        mock_sleep.assert_not_called()
+        assert len(responses.calls) == 1

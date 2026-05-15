@@ -229,6 +229,26 @@ class TestDownload:
         assert results[0].reason == "503"
         assert results[0].file_path is None
 
+    def test_failed_download_on_connection_error(
+        self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
+    ) -> None:
+        """A ConnectionError from the client returns status='failed' instead of raising."""
+        mock_client.search.return_value = make_search_response(
+            [make_raw_paper()], next_cursor="*"
+        )
+        mock_client.download_pdf.side_effect = ConnectionError("Remote end closed connection")
+
+        results = service.download(
+            make_params(tmp_path, count=1),
+            progress_callback=lambda r: None,
+            cancel_event=threading.Event(),
+        )
+
+        assert len(results) == 1
+        assert results[0].status == "failed"
+        assert results[0].reason == "Connection error"
+        assert results[0].file_path is None
+
     def test_cancel_event_set_before_download_returns_empty(
         self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
     ) -> None:
