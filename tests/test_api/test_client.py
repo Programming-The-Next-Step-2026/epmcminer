@@ -269,14 +269,17 @@ class TestDownloadPdf:
         assert exc_info.value.status_code == 404
 
     @responses.activate
-    def test_server_error_raises_api_error(self, client: EuropePMCClient) -> None:
-        """A 500 response raises APIError."""
-        responses.add(responses.GET, self.PDF_URL, body="Server Error", status=500)
+    def test_server_error_raises_api_error_after_retries(self, client: EuropePMCClient) -> None:
+        """A persistent 500 response raises APIError after exhausting all retries."""
+        for _ in range(3):
+            responses.add(responses.GET, self.PDF_URL, body="Server Error", status=500)
 
-        with pytest.raises(APIError) as exc_info:
-            client.download_pdf(url=self.PDF_URL)
+        with patch("epmcminer.api.client.time.sleep"):
+            with pytest.raises(APIError) as exc_info:
+                client.download_pdf(url=self.PDF_URL)
 
         assert exc_info.value.status_code == 500
+        assert len(responses.calls) == 3
 
     @responses.activate
     def test_api_error_includes_status_code_in_message(self, client: EuropePMCClient) -> None:
@@ -287,6 +290,32 @@ class TestDownloadPdf:
             client.download_pdf(url=self.PDF_URL)
 
         assert "403" in str(exc_info.value)
+
+    @responses.activate
+    def test_5xx_is_retried_and_succeeds(self, client: EuropePMCClient) -> None:
+        """A transient 5xx error is retried and succeeds on a later attempt."""
+        responses.add(responses.GET, self.PDF_URL, body="Service Unavailable", status=503)
+        responses.add(responses.GET, self.PDF_URL, body=self.PDF_BYTES, status=200)
+
+        with patch("epmcminer.api.client.time.sleep"):
+            result = client.download_pdf(url=self.PDF_URL)
+
+        assert result == self.PDF_BYTES
+        assert len(responses.calls) == 2
+
+    @responses.activate
+    def test_5xx_retry_uses_exponential_backoff(self, client: EuropePMCClient) -> None:
+        """5xx retry delays follow 1 s, 2 s exponential backoff."""
+        for _ in range(3):
+            responses.add(responses.GET, self.PDF_URL, body="Server Error", status=500)
+
+        with patch("epmcminer.api.client.time.sleep") as mock_sleep:
+            with pytest.raises(APIError):
+                client.download_pdf(url=self.PDF_URL)
+
+        assert mock_sleep.call_count == 2
+        delays = [call.args[0] for call in mock_sleep.call_args_list]
+        assert delays == [1, 2]
 
     @responses.activate
     def test_connection_error_is_retried_and_succeeds(self, client: EuropePMCClient) -> None:
@@ -341,8 +370,8 @@ class TestDownloadPdf:
         assert delays == [1, 2]
 
     @responses.activate
-    def test_http_error_not_retried(self, client: EuropePMCClient) -> None:
-        """A non-200 HTTP response raises APIError immediately without retrying."""
+    def test_4xx_error_not_retried(self, client: EuropePMCClient) -> None:
+        """A 4xx HTTP response raises APIError immediately without retrying."""
         responses.add(responses.GET, self.PDF_URL, body="Forbidden", status=403)
 
         with patch("epmcminer.api.client.time.sleep") as mock_sleep:

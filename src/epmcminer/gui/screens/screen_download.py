@@ -8,6 +8,7 @@ from PyQt6.QtWidgets import (
     QFrame,
     QHBoxLayout,
     QLabel,
+    QMessageBox,
     QPushButton,
     QScrollArea,
     QStyleFactory,
@@ -48,6 +49,8 @@ _STATUS_FAILED = "failed"
 _LOG_HEIGHT = 520
 _DOT_SIZE = 26
 _DOT_RADIUS = _DOT_SIZE // 2
+_BYTES_PER_MB = 1_000_000
+_BYTES_PER_KB = 1_000
 
 _FUSION = QStyleFactory.create("Fusion")
 
@@ -118,7 +121,7 @@ class DownloadWorker(QThread):
         try:
             results = self._service.download(
                 self._params,
-                progress_callback=lambda r: self.progress_updated.emit(r),
+                progress_callback=self.progress_updated.emit,
                 cancel_event=self.cancel_event,
             )
             self.download_finished.emit(results)
@@ -353,8 +356,8 @@ class ScreenDownload(QWidget):
             try:
                 size = result.file_path.stat().st_size
                 size_str = (
-                    f"{size / 1_000_000:.1f} MB" if size >= 1_000_000
-                    else f"{size / 1_000:.0f} KB"
+                    f"{size / _BYTES_PER_MB:.1f} MB" if size >= _BYTES_PER_MB
+                    else f"{size / _BYTES_PER_KB:.0f} KB"
                 )
             except OSError:
                 size_str = ""
@@ -453,14 +456,15 @@ class ScreenDownload(QWidget):
                 self._report_service.save_csv(
                     results, self._params, self._params.output_folder
                 )
-            except Exception as exc:  # noqa: BLE001
-                _logger.error("Failed to save report.csv: %s", exc)
+            except Exception:  # noqa: BLE001
+                _logger.exception("Failed to save report.csv")
         self.download_complete.emit(results)
 
     def _on_error(self, message: str) -> None:
         """Handle an unrecoverable error from the worker."""
         _logger.error("Download worker error: %s", message)
         self._cancel_btn.setEnabled(False)
+        QMessageBox.critical(self, "Download error", message)
 
     def _on_cancel(self) -> None:
         """Request cancellation and disable the cancel button."""
