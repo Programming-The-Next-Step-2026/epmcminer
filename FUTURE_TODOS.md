@@ -65,3 +65,11 @@ Issues identified during code review that were **not** fixed in-branch, with con
 **Files:** `src/epmcminer/services/download_service.py:140`
 
 **Detail:** `_download_page()` submits all papers from one API page (up to 25) to a thread pool and waits for all futures before returning. `cancel_event` is only checked between pages, so cancellation can be delayed by up to 25 concurrent downloads. Fix: pass `cancel_event` into `_download_page`, check it before submitting each future, and use `executor.shutdown(cancel_futures=True)` on cancellation.
+
+---
+
+## Low — Dead production code: `ensure_output_structure`
+
+**Files:** `src/epmcminer/utils/file_utils.py:51`
+
+**Detail:** `ensure_output_structure(output_folder)` creates `pdfs/` and `logs/` subdirectories but is never called from any production code — `DownloadService` creates `pdfs/` itself inline. The function has tests that exercise it directly but those tests only confirm isolated behaviour, not actual usage. Cannot be deleted while the tests reference it. Fix: either wire it back into `DownloadService.__init__` / `download()` (and remove the duplicate `pdfs_dir.mkdir` inline), or remove it from both `file_utils.py` and `test_file_utils.py` after confirming the inline mkdir is sufficient.

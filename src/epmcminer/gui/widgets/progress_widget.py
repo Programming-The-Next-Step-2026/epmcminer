@@ -126,7 +126,7 @@ class ProgressWidget(QWidget):
 
         pct = round(100 * current / total) if total > 0 else 0
         self._pct_label.setText(f"{pct}%")
-        self._count_label.setText(f"{current} of {total} downloaded")
+        self._count_label.setText(f"{current} downloaded out of {total} processed papers")
 
         self._update_eta(eta_seconds)
         self._update_thread_dots(thread_count)

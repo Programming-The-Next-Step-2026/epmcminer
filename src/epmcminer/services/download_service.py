@@ -55,17 +55,20 @@ class DownloadService:
     ) -> list[DownloadResult]:
         """Download up to params.count PDFs matching the search parameters.
 
-        Fetches results in pages, downloads PDFs in parallel, and calls
-        progress_callback after each individual download attempt.
-        Stops early if cancel_event is set.
+        Uses two phases to minimise overshoot:
+        - Batch mode (remaining >= DOWNLOAD_PAGE_SIZE): fetches a full page and
+          downloads all papers in parallel.
+        - Single-paper mode (remaining < DOWNLOAD_PAGE_SIZE): fetches and
+          downloads one paper at a time so the loop can stop as soon as the
+          target is reached.
 
         Args:
             params: A SearchParams instance containing the search query,
                 filters, desired count, and output folder.
             progress_callback: Called once per download attempt with the
                 resulting DownloadResult (success, skip, or failure).
-            cancel_event: When set, the download loop stops cleanly after
-                the current page finishes.
+            cancel_event: When set, the download loop stops after the current
+                paper or page finishes.
 
         Returns:
             A list of DownloadResult objects, one per paper processed.
@@ -88,9 +91,12 @@ class DownloadService:
             if cancel_event.is_set():
                 break
 
+            remaining = params.count - success_count
+            page_size = DOWNLOAD_PAGE_SIZE if remaining >= DOWNLOAD_PAGE_SIZE else 1
+
             data = self._client.search(
                 query=query,
-                page_size=DOWNLOAD_PAGE_SIZE,
+                page_size=page_size,
                 sort=sort,
                 cursor_mark=cursor_mark,
             )
@@ -98,10 +104,16 @@ class DownloadService:
             if not raw_results:
                 break
 
-            page_results = self._download_page(raw_results, pdfs_dir)
-            for result in page_results:
-                all_results.append(result)
+            if page_size == DOWNLOAD_PAGE_SIZE:
+                page_results = self._download_page(raw_results, pdfs_dir, progress_callback)
+                for result in page_results:
+                    all_results.append(result)
+                    if result.status == _STATUS_DOWNLOADED:
+                        success_count += 1
+            else:
+                result = self._download_one(raw_results[0], pdfs_dir)
                 progress_callback(result)
+                all_results.append(result)
                 if result.status == _STATUS_DOWNLOADED:
                     success_count += 1
 
@@ -112,22 +124,34 @@ class DownloadService:
 
         return all_results
 
-    def _download_page(self, raw_results: list[dict], pdfs_dir: Path) -> list[DownloadResult]:
-        """Download papers from one API page in parallel.
+    def _download_page(
+        self,
+        raw_results: list[dict],
+        pdfs_dir: Path,
+        progress_callback: Callable[[DownloadResult], None],
+    ) -> list[DownloadResult]:
+        """Download papers from one API page in parallel, calling progress_callback
+        immediately as each individual download completes.
 
         Args:
             raw_results: List of raw result dicts from the API.
             pdfs_dir: Directory where PDFs are saved.
+            progress_callback: Called once per completed download.
 
         Returns:
             A list of DownloadResult objects in completion order.
         """
+        results: list[DownloadResult] = []
         with ThreadPoolExecutor(max_workers=self.MAX_WORKERS) as executor:
             futures = {
                 executor.submit(self._download_one, raw, pdfs_dir): raw
                 for raw in raw_results
             }
-            return [future.result() for future in as_completed(futures)]
+            for future in as_completed(futures):
+                result = future.result()
+                results.append(result)
+                progress_callback(result)
+        return results
 
     def _download_one(self, raw: dict, pdfs_dir: Path) -> DownloadResult:
         """Attempt to download a single paper's PDF.
@@ -190,7 +214,13 @@ class DownloadService:
                 file_path=None,
             )
 
-        file_path.write_bytes(pdf_bytes)
+        try:
+            file_path.write_bytes(pdf_bytes)
+        except OSError as exc:
+            _logger.warning("Failed to write %s: %s", file_path, exc)
+            return DownloadResult(
+                paper=paper, status=_STATUS_FAILED, reason="Write error", file_path=None
+            )
         _logger.info("Downloaded %s to %s", pmid, file_path)
         return DownloadResult(
             paper=paper, status=_STATUS_DOWNLOADED, reason=None, file_path=file_path

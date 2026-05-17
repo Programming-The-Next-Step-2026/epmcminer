@@ -2,14 +2,14 @@
 
 import threading
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 from epmcminer.api.client import APIError, EuropePMCClient
 from epmcminer.api.download_result import DownloadResult
 from epmcminer.api.models import SearchParams
-from epmcminer.services.download_service import DownloadService
+from epmcminer.services.download_service import DOWNLOAD_PAGE_SIZE, DownloadService
 from epmcminer.services.search_service import SearchService
 
 # ---------------------------------------------------------------------------
@@ -361,7 +361,7 @@ class TestDownload:
 
         calls: list[DownloadResult] = []
         service.download(
-            make_params(tmp_path, count=10),
+            make_params(tmp_path, count=DOWNLOAD_PAGE_SIZE),  # batch mode
             progress_callback=calls.append,
             cancel_event=threading.Event(),
         )
@@ -428,7 +428,7 @@ class TestDownload:
         mock_client.download_pdf.side_effect = [_PDF_BYTES, APIError(500, "Error")]
 
         results = service.download(
-            make_params(tmp_path, count=10),
+            make_params(tmp_path, count=DOWNLOAD_PAGE_SIZE),  # batch mode
             progress_callback=lambda r: None,
             cancel_event=threading.Event(),
         )
@@ -437,6 +437,110 @@ class TestDownload:
         assert "downloaded" in statuses
         assert "skipped" in statuses
         assert "failed" in statuses
+
+    def test_failed_download_on_write_error(
+        self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
+    ) -> None:
+        """OSError writing PDF to disk returns status='failed' instead of raising."""
+        mock_client.search.return_value = make_search_response(
+            [make_raw_paper()], next_cursor="*"
+        )
+        mock_client.download_pdf.return_value = _PDF_BYTES
+
+        with patch("epmcminer.services.download_service.Path.write_bytes",
+                   side_effect=OSError("no space left")):
+            results = service.download(
+                make_params(tmp_path, count=1),
+                progress_callback=lambda r: None,
+                cancel_event=threading.Event(),
+            )
+
+        assert len(results) == 1
+        assert results[0].status == "failed"
+        assert results[0].reason == "Write error"
+
+    def test_uses_full_page_size_in_batch_mode(
+        self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
+    ) -> None:
+        """Batch mode: search is called with page_size=DOWNLOAD_PAGE_SIZE when remaining >= it."""
+        mock_client.search.return_value = make_search_response([], next_cursor="*")
+
+        service.download(
+            make_params(tmp_path, count=DOWNLOAD_PAGE_SIZE),
+            progress_callback=lambda r: None,
+            cancel_event=threading.Event(),
+        )
+
+        _, kwargs = mock_client.search.call_args
+        assert kwargs["page_size"] == DOWNLOAD_PAGE_SIZE
+
+    def test_uses_page_size_one_in_single_paper_mode(
+        self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
+    ) -> None:
+        """When remaining < DOWNLOAD_PAGE_SIZE, search is called with page_size=1."""
+        mock_client.search.return_value = make_search_response([], next_cursor="*")
+
+        service.download(
+            make_params(tmp_path, count=DOWNLOAD_PAGE_SIZE - 1),
+            progress_callback=lambda r: None,
+            cancel_event=threading.Event(),
+        )
+
+        _, kwargs = mock_client.search.call_args
+        assert kwargs["page_size"] == 1
+
+    def test_single_paper_mode_stops_at_exact_count(
+        self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
+    ) -> None:
+        """In single-paper mode, the loop exits as soon as success_count reaches params.count."""
+        papers = [
+            make_raw_paper(pmid=str(i), doi=f"10.1/{i:04d}", title=f"Paper {i}")
+            for i in range(3)
+        ]
+        mock_client.search.side_effect = [
+            make_search_response([papers[0]], next_cursor="c1"),
+            make_search_response([papers[1]], next_cursor="c2"),
+            make_search_response([papers[2]], next_cursor="c3"),
+        ]
+        mock_client.download_pdf.return_value = _PDF_BYTES
+
+        results = service.download(
+            make_params(tmp_path, count=3),
+            progress_callback=lambda r: None,
+            cancel_event=threading.Event(),
+        )
+
+        assert mock_client.search.call_count == 3
+        assert sum(1 for r in results if r.status == "downloaded") == 3
+
+    def test_switches_to_single_paper_mode_after_batch(
+        self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
+    ) -> None:
+        """After batch phase fills most of the quota, single-paper mode handles the remainder."""
+        batch_papers = [
+            make_raw_paper(pmid=str(i), doi=f"10.1/{i:04d}", title=f"Paper {i}")
+            for i in range(DOWNLOAD_PAGE_SIZE)
+        ]
+        final_paper = make_raw_paper(
+            pmid=str(DOWNLOAD_PAGE_SIZE),
+            doi=f"10.1/{DOWNLOAD_PAGE_SIZE:04d}",
+            title="Final Paper",
+        )
+        mock_client.search.side_effect = [
+            make_search_response(batch_papers, next_cursor="after_batch"),
+            make_search_response([final_paper], next_cursor="*"),
+        ]
+        mock_client.download_pdf.return_value = _PDF_BYTES
+
+        results = service.download(
+            make_params(tmp_path, count=DOWNLOAD_PAGE_SIZE + 1),
+            progress_callback=lambda r: None,
+            cancel_event=threading.Event(),
+        )
+
+        page_sizes = [call.kwargs["page_size"] for call in mock_client.search.call_args_list]
+        assert page_sizes == [DOWNLOAD_PAGE_SIZE, 1]
+        assert sum(1 for r in results if r.status == "downloaded") == DOWNLOAD_PAGE_SIZE + 1
 
     def test_build_query_is_called_with_params(
         self,

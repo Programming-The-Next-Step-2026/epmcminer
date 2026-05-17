@@ -143,10 +143,10 @@ class TestProgressWidgetProgressState:
         assert w._pct_label.text() == "46%"
 
     def test_set_progress_count_label(self, qapp: QApplication) -> None:
-        """Count label shows 'X of Y downloaded'."""
+        """Count label shows 'X downloaded out of Y processed papers'."""
         w = ProgressWidget()
         w.set_progress(23, 50)
-        assert w._count_label.text() == "23 of 50 downloaded"
+        assert w._count_label.text() == "23 downloaded out of 50 processed papers"
 
     def test_set_progress_percentage_zero(self, qapp: QApplication) -> None:
         """Percentage is 0% when current is 0."""
@@ -166,7 +166,7 @@ class TestProgressWidgetProgressState:
         w.set_progress(10, 50)
         w.set_progress(30, 50)
         assert w._pct_label.text() == "60%"
-        assert w._count_label.text() == "30 of 50 downloaded"
+        assert w._count_label.text() == "30 downloaded out of 50 processed papers"
 
 
 # ---------------------------------------------------------------------------

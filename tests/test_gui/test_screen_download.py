@@ -319,6 +319,28 @@ class TestScreenDownloadProgress:
         w._on_progress(_make_download_result("failed"))
         assert w._log_layout.count() == 1
 
+    def test_downloaded_count_only_counts_successful(self, qapp: QApplication) -> None:
+        """_downloaded_count returns only results with status 'downloaded'."""
+        w = _make_screen()
+        w._total = 5
+        w._on_progress(_make_download_result("downloaded"))
+        w._on_progress(_make_download_result("skipped"))
+        w._on_progress(_make_download_result("failed"))
+        assert w._downloaded_count() == 1
+
+    def test_progress_reflects_successful_downloads_not_total_attempts(
+        self, qapp: QApplication
+    ) -> None:
+        """Progress bar tracks successful downloads, not total attempts including failures."""
+        w = _make_screen()
+        w._total = 5
+        w._on_progress(_make_download_result("failed"))
+        w._on_progress(_make_download_result("failed"))
+        w._on_progress(_make_download_result("downloaded"))
+        # _completed is 3 (total attempts), but downloaded count is 1
+        assert w._completed == 3
+        assert w._downloaded_count() == 1
+
 
 # ---------------------------------------------------------------------------
 # TestScreenDownloadFinished

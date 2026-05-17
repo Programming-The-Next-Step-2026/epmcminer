@@ -194,11 +194,13 @@ class TestScreenSummaryLoad:
         w.load([_make_downloaded()], _make_params(), 1247)
         assert w._stat_total_lbl.text() == "1,247"
 
-    def test_downloaded_sub_shows_requested_count(self, qapp: QApplication) -> None:
-        """Downloaded card sub-text references the requested count from params."""
+    def test_downloaded_sub_shows_processed_count(self, qapp: QApplication) -> None:
+        """Downloaded card sub-text shows the total number of papers processed, not requested."""
         w = _make_screen()
-        w.load([_make_downloaded()], _make_params(count=50), 100)
-        assert "50" in w._stat_downloaded_sub.text()
+        results = [_make_downloaded(), _make_skipped(), _make_skipped()]
+        w.load(results, _make_params(count=50), 100)
+        assert "3" in w._stat_downloaded_sub.text()
+        assert "processed" in w._stat_downloaded_sub.text()
 
     def test_params_query_shown(self, qapp: QApplication) -> None:
         """Query value label shows the search query from params."""
