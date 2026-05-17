@@ -67,6 +67,28 @@ class SearchService:
 
         Returns:
             A complete Europe PMC query string ready to pass to the API.
+
+        Examples:
+            Keyword-only query with a date range:
+
+            >>> from unittest.mock import MagicMock
+            >>> from epmcminer.api.search_params import SearchParams
+            >>> service = SearchService(client=MagicMock())
+            >>> params = SearchParams(query="depression", date_from="2020-01-01", date_to="2024-12-31")
+            >>> service.build_query(params)
+            'depression AND (FIRST_PDATE:[2020-01-01 TO 2024-12-31]) AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)'
+
+            With publication type and license filters added:
+
+            >>> params = SearchParams(
+            ...     query="memory AND sleep",
+            ...     date_from="2021-01-01",
+            ...     date_to="2023-12-31",
+            ...     publication_types=["Review"],
+            ...     licenses=["CC-BY"],
+            ... )
+            >>> service.build_query(params)
+            'memory AND sleep AND (FIRST_PDATE:[2021-01-01 TO 2023-12-31]) AND (PUB_TYPE:("Review")) AND (LICENSE:"CC-BY") AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)'
         """
         parts: list[str] = []
 

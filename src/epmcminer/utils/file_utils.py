@@ -24,6 +24,16 @@ def sanitise_filename(text: str, max_length: int = MAX_FILENAME_COMPONENT_LENGTH
     Returns:
         A sanitised string safe to use as a filename component. Returns
         ``"_"`` if the input is empty or contains only invalid characters.
+
+    Examples:
+        >>> sanitise_filename("10.1000/my:paper?")
+        '10.1000_my_paper_'
+        >>> sanitise_filename("two  spaces")
+        'two_spaces'
+        >>> sanitise_filename("")
+        '_'
+        >>> sanitise_filename("long title that gets cut", max_length=10)
+        'long_title'
     """
     sanitised = _INVALID_CHARS.sub("_", text)
     sanitised = re.sub(r"\s+", "_", sanitised)
