@@ -8,9 +8,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from PyQt6.QtWidgets import QApplication
 
-from epmcminer.api.download_result import DownloadResult
-from epmcminer.api.models import Paper, SearchParams
 from epmcminer.gui.screens.screen_summary import ExportWorker, ScreenSummary
+from epmcminer.services.models import DownloadResult, Paper, SearchParams
 from epmcminer.services.report_service import ReportService
 
 # ---------------------------------------------------------------------------

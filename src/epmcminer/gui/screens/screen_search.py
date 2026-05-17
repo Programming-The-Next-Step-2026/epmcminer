@@ -6,20 +6,20 @@ from PyQt6.QtCore import QDate, Qt, pyqtSignal
 from PyQt6.QtWidgets import (
     QDateEdit,
     QFileDialog,
-    QFrame,
     QHBoxLayout,
     QLabel,
     QLineEdit,
     QPushButton,
     QScrollArea,
     QSizePolicy,
-    QStyleFactory,
     QVBoxLayout,
     QWidget,
 )
 
-from epmcminer.api.models import SearchParams
+import epmcminer.gui.theme as theme
+from epmcminer.gui.widgets.card import make_card, make_section_label
 from epmcminer.gui.widgets.tag_input import TagInput
+from epmcminer.services.models import SearchParams
 
 DEFAULT_PUBLICATION_TYPES: list[str] = [
     "Review",
@@ -50,33 +50,11 @@ _AVAILABLE_LICENSES: list[str] = [
     "CC-BY-NC-ND",
 ]
 
-# Design tokens — single source of truth for this screen's QSS.
-# Qt rgba() alpha is 0-255; 0.07×255≈18, 0.16×255≈41, 0.55×255≈140.
-_APP_BG = "#0b0b0d"
-_CARD_BG = "#1c1c1f"
-_CARD_INNER = "#242427"
-_BORDER = "rgba(255, 255, 255, 18)"
-_ACCENT = "#ff7a3d"
-_TEXT_PRIMARY = "#ededed"
-_TEXT_BODY = "#cfcfcf"
-_TEXT_MUTED = "#8a8a8d"
-
-_CARD_STYLE = f"""
-    QFrame#card {{
-        background-color: {_CARD_BG};
-        border: 1px solid {_BORDER};
-        border-radius: 16px;
-    }}
-    QFrame#card QWidget {{
-        background-color: {_CARD_BG};
-    }}
-"""
-
 _QUERY_INPUT_STYLE = f"""
     QLineEdit {{
-        background-color: {_CARD_INNER};
-        color: {_TEXT_PRIMARY};
-        border: 1px solid {_BORDER};
+        background-color: {theme.CARD_INNER};
+        color: {theme.TEXT_PRIMARY};
+        border: 1px solid {theme.BORDER};
         border-radius: 12px;
         padding: 14px 16px;
         font-size: 18px;
@@ -88,9 +66,9 @@ _QUERY_INPUT_STYLE = f"""
 
 _FOLDER_INPUT_STYLE = f"""
     QLineEdit {{
-        background-color: {_CARD_INNER};
-        color: {_TEXT_PRIMARY};
-        border: 1px solid {_BORDER};
+        background-color: {theme.CARD_INNER};
+        color: {theme.TEXT_PRIMARY};
+        border: 1px solid {theme.BORDER};
         border-radius: 12px;
         padding: 14px 16px;
         font-size: 15px;
@@ -99,9 +77,9 @@ _FOLDER_INPUT_STYLE = f"""
 
 _DATE_EDIT_STYLE = f"""
     QDateEdit {{
-        background-color: {_CARD_INNER};
-        color: {_TEXT_PRIMARY};
-        border: 1px solid {_BORDER};
+        background-color: {theme.CARD_INNER};
+        color: {theme.TEXT_PRIMARY};
+        border: 1px solid {theme.BORDER};
         border-radius: 12px;
         padding: 14px 16px;
         font-size: 16px;
@@ -118,8 +96,8 @@ _DATE_EDIT_STYLE = f"""
 _CONTINUE_BTN_STYLE = f"""
     QPushButton {{
         background-color: transparent;
-        color: {_TEXT_PRIMARY};
-        border: 1px solid rgba(255, 255, 255, 41);
+        color: {theme.TEXT_PRIMARY};
+        border: 1px solid {theme.BORDER_STRONG};
         border-radius: 12px;
         padding: 12px 22px;
         font-size: 17px;
@@ -129,16 +107,16 @@ _CONTINUE_BTN_STYLE = f"""
         background-color: rgba(255, 255, 255, 10);
     }}
     QPushButton:disabled {{
-        color: {_TEXT_MUTED};
-        border-color: {_BORDER};
+        color: {theme.TEXT_MUTED};
+        border-color: {theme.BORDER};
     }}
 """
 
 _BROWSE_BTN_STYLE = f"""
     QPushButton {{
         background-color: transparent;
-        color: {_TEXT_PRIMARY};
-        border: 1px solid rgba(255, 255, 255, 41);
+        color: {theme.TEXT_PRIMARY};
+        border: 1px solid {theme.BORDER_STRONG};
         border-radius: 12px;
         padding: 14px 18px;
         font-size: 15px;
@@ -149,9 +127,7 @@ _BROWSE_BTN_STYLE = f"""
     }}
 """
 
-_HINT_STYLE = f"color: {_TEXT_MUTED}; font-size: 13px;"
-
-_FUSION = QStyleFactory.create("Fusion")
+_HINT_STYLE = f"color: {theme.TEXT_MUTED}; font-size: 13px;"
 
 
 class ScreenSearch(QWidget):
@@ -177,7 +153,7 @@ class ScreenSearch(QWidget):
             parent: Optional parent widget.
         """
         super().__init__(parent)
-        self.setStyleSheet(f"background-color: {_APP_BG};")
+        self.setStyleSheet(f"background-color: {theme.APP_BG};")
         self._build_ui()
         self._connect_signals()
         self._validate()
@@ -215,11 +191,11 @@ class ScreenSearch(QWidget):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setStyleSheet(
-            f"QScrollArea {{ background-color: {_APP_BG}; border: none; }}"
+            f"QScrollArea {{ background-color: {theme.APP_BG}; border: none; }}"
         )
 
         content = QWidget()
-        content.setStyleSheet(f"background-color: {_APP_BG};")
+        content.setStyleSheet(f"background-color: {theme.APP_BG};")
         layout = QVBoxLayout(content)
         layout.setContentsMargins(22, 22, 22, 22)
         layout.setSpacing(18)
@@ -240,43 +216,12 @@ class ScreenSearch(QWidget):
         self._query_edit.textChanged.connect(self._validate)
         self._pub_types.tags_changed.connect(self._validate)
 
-    def _make_card(self, padding: int = 22) -> tuple[QFrame, QVBoxLayout]:
-        frame = QFrame()
-        frame.setObjectName("card")
-        frame.setStyleSheet(_CARD_STYLE)
-        layout = QVBoxLayout(frame)
-        layout.setContentsMargins(padding, padding, padding, padding)
-        layout.setSpacing(14)
-        return frame, layout
-
-    def _make_section_label(self, text: str) -> QWidget:
-        row = QWidget()
-        row_layout = QHBoxLayout(row)
-        row_layout.setContentsMargins(0, 0, 0, 0)
-        row_layout.setSpacing(10)
-
-        bar = QFrame()
-        bar.setFixedSize(3, 14)
-        bar.setStyleSheet(
-            f"background-color: {_ACCENT}; border-radius: 2px; border: none;"
-        )
-        row_layout.addWidget(bar)
-
-        lbl = QLabel(text.upper())
-        lbl.setStyleSheet(
-            f"color: {_TEXT_PRIMARY}; font-size: 11px;"
-            f" letter-spacing: 1.6px; font-weight: 600;"
-        )
-        row_layout.addWidget(lbl)
-        row_layout.addStretch()
-        return row
-
-    def _make_query_card(self) -> QFrame:
-        card, layout = self._make_card()
-        layout.addWidget(self._make_section_label("Search query"))
+    def _make_query_card(self) -> QWidget:
+        card, layout = make_card()
+        layout.addWidget(make_section_label("Search query"))
 
         self._query_edit = QLineEdit()
-        self._query_edit.setStyle(_FUSION)
+        self._query_edit.setStyle(theme.get_fusion_style())
         self._query_edit.setStyleSheet(_QUERY_INPUT_STYLE)
         self._query_edit.setPlaceholderText("e.g. depression AND therapy")
         layout.addWidget(self._query_edit)
@@ -286,9 +231,9 @@ class ScreenSearch(QWidget):
         layout.addWidget(hint)
         return card
 
-    def _make_orcids_card(self) -> QFrame:
-        card, layout = self._make_card()
-        layout.addWidget(self._make_section_label("Author ORCIDs"))
+    def _make_orcids_card(self) -> QWidget:
+        card, layout = make_card()
+        layout.addWidget(make_section_label("Author ORCIDs"))
 
         self._orcids = TagInput(add_label="+ Add ORCID")
         layout.addWidget(self._orcids)
@@ -298,9 +243,9 @@ class ScreenSearch(QWidget):
         layout.addWidget(hint)
         return card
 
-    def _make_pub_types_card(self) -> QFrame:
-        card, layout = self._make_card()
-        layout.addWidget(self._make_section_label("Publication types"))
+    def _make_pub_types_card(self) -> QWidget:
+        card, layout = make_card()
+        layout.addWidget(make_section_label("Publication types"))
 
         self._pub_types = TagInput(
             available_options=DEFAULT_PUBLICATION_TYPES, add_label="+ Add type"
@@ -311,7 +256,7 @@ class ScreenSearch(QWidget):
 
     def _make_two_col_row(self) -> QWidget:
         row = QWidget()
-        row.setStyleSheet(f"background-color: {_APP_BG}; border: none;")
+        row.setStyleSheet(f"background-color: {theme.APP_BG}; border: none;")
         layout = QHBoxLayout(row)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(18)
@@ -319,18 +264,18 @@ class ScreenSearch(QWidget):
         layout.addWidget(self._make_date_card())
         return row
 
-    def _make_license_card(self) -> QFrame:
-        card, layout = self._make_card()
-        layout.addWidget(self._make_section_label("License"))
+    def _make_license_card(self) -> QWidget:
+        card, layout = make_card()
+        layout.addWidget(make_section_label("License"))
 
         self._license = TagInput(available_options=_AVAILABLE_LICENSES, add_label="+ Add")
         self._license.set_tags(["CC-BY"])
         layout.addWidget(self._license)
         return card
 
-    def _make_date_card(self) -> QFrame:
-        card, layout = self._make_card()
-        layout.addWidget(self._make_section_label("Date range"))
+    def _make_date_card(self) -> QWidget:
+        card, layout = make_card()
+        layout.addWidget(make_section_label("Date range"))
 
         today = QDate.currentDate()
         five_years_ago = today.addYears(-5)
@@ -341,7 +286,7 @@ class ScreenSearch(QWidget):
         date_layout.setSpacing(10)
 
         self._date_from = QDateEdit()
-        self._date_from.setStyle(_FUSION)
+        self._date_from.setStyle(theme.get_fusion_style())
         self._date_from.setStyleSheet(_DATE_EDIT_STYLE)
         self._date_from.setCalendarPopup(True)
         self._date_from.setDate(five_years_ago)
@@ -352,11 +297,11 @@ class ScreenSearch(QWidget):
 
         arrow = QLabel("→")
         arrow.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        arrow.setStyleSheet(f"color: {_TEXT_MUTED}; font-size: 16px;")
+        arrow.setStyleSheet(f"color: {theme.TEXT_MUTED}; font-size: 16px;")
         date_layout.addWidget(arrow)
 
         self._date_to = QDateEdit()
-        self._date_to.setStyle(_FUSION)
+        self._date_to.setStyle(theme.get_fusion_style())
         self._date_to.setStyleSheet(_DATE_EDIT_STYLE)
         self._date_to.setCalendarPopup(True)
         self._date_to.setDate(today)
@@ -367,9 +312,9 @@ class ScreenSearch(QWidget):
         layout.addWidget(date_row)
         return card
 
-    def _make_folder_card(self) -> QFrame:
-        card, layout = self._make_card()
-        layout.addWidget(self._make_section_label("Output folder"))
+    def _make_folder_card(self) -> QWidget:
+        card, layout = make_card()
+        layout.addWidget(make_section_label("Output folder"))
 
         folder_row = QWidget()
         folder_layout = QHBoxLayout(folder_row)
@@ -377,14 +322,14 @@ class ScreenSearch(QWidget):
         folder_layout.setSpacing(10)
 
         self._folder_edit = QLineEdit()
-        self._folder_edit.setStyle(_FUSION)
+        self._folder_edit.setStyle(theme.get_fusion_style())
         self._folder_edit.setStyleSheet(_FOLDER_INPUT_STYLE)
         self._folder_edit.setPlaceholderText("/path/to/output")
         self._folder_edit.setReadOnly(True)
         folder_layout.addWidget(self._folder_edit, 1)
 
         browse_btn = QPushButton("Browse")
-        browse_btn.setStyle(_FUSION)
+        browse_btn.setStyle(theme.get_fusion_style())
         browse_btn.setStyleSheet(_BROWSE_BTN_STYLE)
         browse_btn.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         browse_btn.clicked.connect(self._browse_folder)
@@ -397,18 +342,18 @@ class ScreenSearch(QWidget):
         bar = QWidget()
         bar.setFixedHeight(72)
         bar.setStyleSheet(
-            f"background-color: {_APP_BG}; border-top: 1px solid {_BORDER};"
+            f"background-color: {theme.APP_BG}; border-top: 1px solid {theme.BORDER};"
         )
         bar_layout = QHBoxLayout(bar)
         bar_layout.setContentsMargins(22, 0, 22, 0)
 
         lock_lbl = QLabel("🔒  Open-access papers only")
-        lock_lbl.setStyleSheet(f"color: {_TEXT_BODY}; font-size: 15px;")
+        lock_lbl.setStyleSheet(f"color: {theme.TEXT_BODY}; font-size: 15px;")
         bar_layout.addWidget(lock_lbl)
         bar_layout.addStretch()
 
         self._continue_btn = QPushButton("Continue to preview  →")
-        self._continue_btn.setStyle(_FUSION)
+        self._continue_btn.setStyle(theme.get_fusion_style())
         self._continue_btn.setStyleSheet(_CONTINUE_BTN_STYLE)
         self._continue_btn.clicked.connect(self._on_continue)
         bar_layout.addWidget(self._continue_btn)

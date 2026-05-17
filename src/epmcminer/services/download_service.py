@@ -14,15 +14,12 @@ from epmcminer.api.download_result import DownloadResult
 from epmcminer.api.models import Paper, SearchParams
 from epmcminer.services.search_service import SORT_ORDER_MAP, SearchService, pdf_url_from_raw
 from epmcminer.utils.file_utils import build_pdf_filename
-from epmcminer.utils.logger import get_logger
+from epmcminer.utils.logger import get_logger, setup_logger
 
 _logger = get_logger(__name__)
 
-DOWNLOAD_PAGE_SIZE = 25
+DOWNLOAD_PAGE_SIZE = 10
 
-_STATUS_DOWNLOADED = "downloaded"
-_STATUS_SKIPPED = "skipped"
-_STATUS_FAILED = "failed"
 _REASON_NO_PDF = "PDF unavailable"
 _REASON_ALREADY_DOWNLOADED = "Already downloaded"
 
@@ -77,6 +74,8 @@ class DownloadService:
             APIError: If the Europe PMC search API returns a non-200 response.
             ConnectionError: If an HTTP request cannot be completed.
         """
+        setup_logger(params.output_folder)
+
         pdfs_dir = params.output_folder / "pdfs"
         pdfs_dir.mkdir(parents=True, exist_ok=True)
 
@@ -108,13 +107,13 @@ class DownloadService:
                 page_results = self._download_page(raw_results, pdfs_dir, progress_callback)
                 for result in page_results:
                     all_results.append(result)
-                    if result.status == _STATUS_DOWNLOADED:
+                    if result.status == DownloadResult.STATUS_DOWNLOADED:
                         success_count += 1
             else:
                 result = self._download_one(raw_results[0], pdfs_dir)
                 progress_callback(result)
                 all_results.append(result)
-                if result.status == _STATUS_DOWNLOADED:
+                if result.status == DownloadResult.STATUS_DOWNLOADED:
                     success_count += 1
 
             next_cursor: str = data.get("nextCursorMark", "")
@@ -181,7 +180,10 @@ class DownloadService:
         if pdf_url is None:
             _logger.info("Skipping %s: PDF unavailable", pmid)
             return DownloadResult(
-                paper=paper, status=_STATUS_SKIPPED, reason=_REASON_NO_PDF, file_path=None
+                paper=paper,
+                status=DownloadResult.STATUS_SKIPPED,
+                reason=_REASON_NO_PDF,
+                file_path=None,
             )
 
         file_path = pdfs_dir / build_pdf_filename(paper.doi, paper.title)
@@ -190,7 +192,7 @@ class DownloadService:
             _logger.info("Skipping %s: already downloaded at %s", pmid, file_path)
             return DownloadResult(
                 paper=paper,
-                status=_STATUS_SKIPPED,
+                status=DownloadResult.STATUS_SKIPPED,
                 reason=_REASON_ALREADY_DOWNLOADED,
                 file_path=file_path,
             )
@@ -201,7 +203,7 @@ class DownloadService:
             _logger.warning("Failed to download %s: HTTP %s", pmid, exc.status_code)
             return DownloadResult(
                 paper=paper,
-                status=_STATUS_FAILED,
+                status=DownloadResult.STATUS_FAILED,
                 reason=str(exc.status_code),
                 file_path=None,
             )
@@ -209,7 +211,7 @@ class DownloadService:
             _logger.warning("Connection error downloading %s: %s", pmid, exc)
             return DownloadResult(
                 paper=paper,
-                status=_STATUS_FAILED,
+                status=DownloadResult.STATUS_FAILED,
                 reason="Connection error",
                 file_path=None,
             )
@@ -219,9 +221,9 @@ class DownloadService:
         except OSError as exc:
             _logger.warning("Failed to write %s: %s", file_path, exc)
             return DownloadResult(
-                paper=paper, status=_STATUS_FAILED, reason="Write error", file_path=None
+                paper=paper, status=DownloadResult.STATUS_FAILED, reason="Write error", file_path=None
             )
         _logger.info("Downloaded %s to %s", pmid, file_path)
         return DownloadResult(
-            paper=paper, status=_STATUS_DOWNLOADED, reason=None, file_path=file_path
+            paper=paper, status=DownloadResult.STATUS_DOWNLOADED, reason=None, file_path=file_path
         )

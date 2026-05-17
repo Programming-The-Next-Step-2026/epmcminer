@@ -8,9 +8,8 @@ from unittest.mock import patch
 import pytest
 from PyQt6.QtWidgets import QApplication
 
-from epmcminer.api.download_result import DownloadResult
-from epmcminer.api.models import Paper, SearchParams
 from epmcminer.gui.app import APP_TITLE, MINIMUM_HEIGHT, MINIMUM_WIDTH, MainWindow
+from epmcminer.services.models import DownloadResult, Paper, SearchParams
 
 # ---------------------------------------------------------------------------
 # Helpers

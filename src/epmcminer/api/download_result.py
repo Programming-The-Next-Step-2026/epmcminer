@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import ClassVar, Literal
 
 from epmcminer.api.paper import Paper
 
@@ -20,7 +21,11 @@ class DownloadResult:
             the paper was not downloaded.
     """
 
+    STATUS_DOWNLOADED: ClassVar[str] = "downloaded"
+    STATUS_SKIPPED: ClassVar[str] = "skipped"
+    STATUS_FAILED: ClassVar[str] = "failed"
+
     paper: Paper
-    status: str
+    status: Literal["downloaded", "skipped", "failed"]
     reason: str | None
     file_path: Path | None

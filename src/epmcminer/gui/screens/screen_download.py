@@ -11,40 +11,29 @@ from PyQt6.QtWidgets import (
     QMessageBox,
     QPushButton,
     QScrollArea,
-    QStyleFactory,
     QVBoxLayout,
     QWidget,
 )
 
-from epmcminer.api.download_result import DownloadResult
-from epmcminer.api.models import SearchParams
+import epmcminer.gui.theme as theme
+from epmcminer.gui.widgets.card import make_card, make_section_label
 from epmcminer.gui.widgets.progress_widget import ProgressWidget
 from epmcminer.services.download_service import DownloadService
+from epmcminer.services.models import DownloadResult, SearchParams
 from epmcminer.services.report_service import ReportService
 from epmcminer.utils.logger import get_logger
 
 _logger = get_logger(__name__)
 
 # ---------------------------------------------------------------------------
-# Design tokens
+# Screen-local constants
 # ---------------------------------------------------------------------------
-_APP_BG = "#0b0b0d"
-_CARD_BG = "#1c1c1f"
-_BORDER = "rgba(255, 255, 255, 18)"
-_BORDER_STRONG = "rgba(255, 255, 255, 41)"
-_DIVIDER = "rgba(255, 255, 255, 10)"
-_ACCENT = "#ff7a3d"
-_TEXT_PRIMARY = "#ededed"
-_TEXT_BODY = "#cfcfcf"
-_TEXT_MUTED = "#8a8a8d"
 _SUCCESS_BG = "#1a3d1a"
 _SUCCESS = "#4ade80"
 _DANGER_BG = "#3a1a1a"
 _DANGER = "#f87171"
 _SKIPPED_BG = "rgba(255, 122, 61, 20)"
-
-_STATUS_DOWNLOADED = "downloaded"
-_STATUS_FAILED = "failed"
+_DIVIDER = theme.BORDER_FAINT
 
 _LOG_HEIGHT = 520
 _DOT_SIZE = 26
@@ -52,24 +41,11 @@ _DOT_RADIUS = _DOT_SIZE // 2
 _BYTES_PER_MB = 1_000_000
 _BYTES_PER_KB = 1_000
 
-_FUSION = QStyleFactory.create("Fusion")
-
-_CARD_STYLE = f"""
-    QFrame#card {{
-        background-color: {_CARD_BG};
-        border: 1px solid {_BORDER};
-        border-radius: 16px;
-    }}
-    QFrame#card QWidget {{
-        background-color: {_CARD_BG};
-    }}
-"""
-
 _CANCEL_BTN_STYLE = f"""
     QPushButton {{
         background-color: transparent;
-        color: {_TEXT_PRIMARY};
-        border: 1px solid {_BORDER_STRONG};
+        color: {theme.TEXT_PRIMARY};
+        border: 1px solid {theme.BORDER_STRONG};
         border-radius: 12px;
         padding: 12px 22px;
         font-size: 17px;
@@ -79,8 +55,8 @@ _CANCEL_BTN_STYLE = f"""
         background-color: rgba(255, 255, 255, 10);
     }}
     QPushButton:disabled {{
-        color: {_TEXT_MUTED};
-        border-color: {_BORDER};
+        color: {theme.TEXT_MUTED};
+        border-color: {theme.BORDER};
     }}
 """
 
@@ -169,7 +145,7 @@ class ScreenDownload(QWidget):
         self._completed: int = 0
         self._total: int = 0
         self._start_time: float = 0.0
-        self.setStyleSheet(f"background-color: {_APP_BG};")
+        self.setStyleSheet(f"background-color: {theme.APP_BG};")
         self._build_ui()
 
     # ------------------------------------------------------------------
@@ -218,11 +194,11 @@ class ScreenDownload(QWidget):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setStyleSheet(
-            f"QScrollArea {{ background-color: {_APP_BG}; border: none; }}"
+            f"QScrollArea {{ background-color: {theme.APP_BG}; border: none; }}"
         )
 
         content_widget = QWidget()
-        content_widget.setStyleSheet(f"background-color: {_APP_BG};")
+        content_widget.setStyleSheet(f"background-color: {theme.APP_BG};")
         layout = QVBoxLayout(content_widget)
         layout.setContentsMargins(22, 22, 22, 22)
         layout.setSpacing(18)
@@ -235,60 +211,30 @@ class ScreenDownload(QWidget):
         root.addWidget(scroll)
         root.addWidget(self._make_action_bar())
 
-    def _make_card(self, padding: int = 22) -> tuple[QFrame, QVBoxLayout]:
-        frame = QFrame()
-        frame.setObjectName("card")
-        frame.setStyleSheet(_CARD_STYLE)
-        inner = QVBoxLayout(frame)
-        inner.setContentsMargins(padding, padding, padding, padding)
-        inner.setSpacing(14)
-        return frame, inner
-
-    def _make_section_label(self, text: str) -> QWidget:
-        row = QWidget()
-        row_layout = QHBoxLayout(row)
-        row_layout.setContentsMargins(0, 0, 0, 0)
-        row_layout.setSpacing(10)
-
-        bar = QFrame()
-        bar.setFixedSize(3, 14)
-        bar.setStyleSheet(
-            f"background-color: {_ACCENT}; border-radius: 2px; border: none;"
-        )
-        row_layout.addWidget(bar)
-
-        lbl = QLabel(text.upper())
-        lbl.setStyleSheet(
-            f"color: {_TEXT_PRIMARY}; font-size: 11px; letter-spacing: 1.6px; font-weight: 600;"
-        )
-        row_layout.addWidget(lbl)
-        row_layout.addStretch()
-        return row
-
-    def _make_progress_card(self) -> QFrame:
-        card, layout = self._make_card(padding=26)
-        layout.addWidget(self._make_section_label("Download progress"))
+    def _make_progress_card(self) -> QWidget:
+        card, layout = make_card(padding=26)
+        layout.addWidget(make_section_label("Download progress"))
         self._progress = ProgressWidget()
         layout.addWidget(self._progress)
         return card
 
-    def _make_log_card(self) -> QFrame:
-        card, layout = self._make_card()
-        layout.addWidget(self._make_section_label("Live status"))
+    def _make_log_card(self) -> QWidget:
+        card, layout = make_card()
+        layout.addWidget(make_section_label("Live status"))
 
         self._log_scroll = QScrollArea()
         self._log_scroll.setWidgetResizable(True)
         self._log_scroll.setFixedHeight(_LOG_HEIGHT)
         self._log_scroll.setStyleSheet(
-            f"QScrollArea {{ background-color: {_CARD_BG}; border: none; }}"
-            f"QScrollArea > QWidget > QWidget {{ background-color: {_CARD_BG}; }}"
+            f"QScrollArea {{ background-color: {theme.CARD_BG}; border: none; }}"
+            f"QScrollArea > QWidget > QWidget {{ background-color: {theme.CARD_BG}; }}"
         )
         self._log_scroll.verticalScrollBar().rangeChanged.connect(
             lambda _, max_val: self._log_scroll.verticalScrollBar().setValue(max_val)
         )
 
         log_container = QWidget()
-        log_container.setStyleSheet(f"background-color: {_CARD_BG};")
+        log_container.setStyleSheet(f"background-color: {theme.CARD_BG};")
         self._log_layout = QVBoxLayout(log_container)
         self._log_layout.setContentsMargins(0, 0, 0, 0)
         self._log_layout.setSpacing(0)
@@ -301,18 +247,18 @@ class ScreenDownload(QWidget):
         bar = QWidget()
         bar.setFixedHeight(72)
         bar.setStyleSheet(
-            f"background-color: {_APP_BG}; border-top: 1px solid {_BORDER};"
+            f"background-color: {theme.APP_BG}; border-top: 1px solid {theme.BORDER};"
         )
         bar_layout = QHBoxLayout(bar)
         bar_layout.setContentsMargins(22, 0, 22, 0)
 
         self._folder_label = QLabel("")
-        self._folder_label.setStyleSheet(f"color: {_TEXT_BODY}; font-size: 15px;")
+        self._folder_label.setStyleSheet(f"color: {theme.TEXT_BODY}; font-size: 15px;")
         bar_layout.addWidget(self._folder_label)
         bar_layout.addStretch()
 
         self._cancel_btn = QPushButton("✕  Cancel")
-        self._cancel_btn.setStyle(_FUSION)
+        self._cancel_btn.setStyle(theme.get_fusion_style())
         self._cancel_btn.setStyleSheet(_CANCEL_BTN_STYLE)
         self._cancel_btn.setEnabled(False)
         self._cancel_btn.clicked.connect(self._on_cancel)
@@ -326,12 +272,12 @@ class ScreenDownload(QWidget):
 
     def _make_status_dot(self, status: str) -> QLabel:
         """Return a circular status indicator for a download row."""
-        if status == _STATUS_DOWNLOADED:
+        if status == DownloadResult.STATUS_DOWNLOADED:
             bg, fg, symbol = _SUCCESS_BG, _SUCCESS, "✓"
-        elif status == _STATUS_FAILED:
+        elif status == DownloadResult.STATUS_FAILED:
             bg, fg, symbol = _DANGER_BG, _DANGER, "✗"
         else:
-            bg, fg, symbol = _SKIPPED_BG, _ACCENT, "–"
+            bg, fg, symbol = _SKIPPED_BG, theme.ACCENT, "–"
 
         dot = QLabel(symbol)
         dot.setFixedSize(_DOT_SIZE, _DOT_SIZE)
@@ -352,7 +298,7 @@ class ScreenDownload(QWidget):
 
     def _sub_text_for(self, result: DownloadResult) -> tuple[str, str]:
         """Return (text, css_color) for the sub-label of a log row."""
-        if result.status == _STATUS_DOWNLOADED and result.file_path is not None:
+        if result.status == DownloadResult.STATUS_DOWNLOADED and result.file_path is not None:
             try:
                 size = result.file_path.stat().st_size
                 size_str = (
@@ -361,15 +307,15 @@ class ScreenDownload(QWidget):
                 )
             except OSError:
                 size_str = ""
-            return f"Saved · {size_str}".rstrip(" ·"), _TEXT_MUTED
-        if result.status == _STATUS_FAILED:
+            return f"Saved · {size_str}".rstrip(" ·"), theme.TEXT_MUTED
+        if result.status == DownloadResult.STATUS_FAILED:
             return result.reason or "Download failed", _DANGER
-        return result.reason or "Skipped", _TEXT_MUTED
+        return result.reason or "Skipped", theme.TEXT_MUTED
 
     def _make_log_row(self, result: DownloadResult) -> QWidget:
         """Build one row widget for the live log."""
         row = QWidget()
-        row.setStyleSheet(f"background-color: {_CARD_BG};")
+        row.setStyleSheet(f"background-color: {theme.CARD_BG};")
         layout = QHBoxLayout(row)
         layout.setContentsMargins(0, 14, 0, 0)
         layout.setSpacing(16)
@@ -378,7 +324,7 @@ class ScreenDownload(QWidget):
         layout.addWidget(self._make_status_dot(result.status))
 
         text_col = QWidget()
-        text_col.setStyleSheet(f"background-color: {_CARD_BG};")
+        text_col.setStyleSheet(f"background-color: {theme.CARD_BG};")
         text_layout = QVBoxLayout(text_col)
         text_layout.setContentsMargins(0, 0, 0, 0)
         text_layout.setSpacing(4)
@@ -386,7 +332,7 @@ class ScreenDownload(QWidget):
         filename_lbl = QLabel(self._filename_for(result))
         filename_lbl.setWordWrap(True)
         filename_lbl.setStyleSheet(
-            f"color: {_TEXT_PRIMARY}; font-size: 14px; font-weight: 600;"
+            f"color: {theme.TEXT_PRIMARY}; font-size: 14px; font-weight: 600;"
             f" font-family: monospace; letter-spacing: -0.2px;"
         )
         text_layout.addWidget(filename_lbl)
@@ -423,7 +369,7 @@ class ScreenDownload(QWidget):
 
     def _downloaded_count(self) -> int:
         """Return the number of successfully downloaded papers so far."""
-        return sum(1 for r in self._results if r.status == _STATUS_DOWNLOADED)
+        return sum(1 for r in self._results if r.status == DownloadResult.STATUS_DOWNLOADED)
 
     def _eta_seconds(self) -> int | None:
         """Estimate seconds remaining based on average time per successful download."""
@@ -454,7 +400,7 @@ class ScreenDownload(QWidget):
     def _on_finished(self, results: list[DownloadResult]) -> None:
         """Handle completion of the full download run."""
         self._cancel_btn.setEnabled(False)
-        downloaded = sum(1 for r in results if r.status == _STATUS_DOWNLOADED)
+        downloaded = sum(1 for r in results if r.status == DownloadResult.STATUS_DOWNLOADED)
         self._progress.set_progress(downloaded, max(self._completed, 1))
         if self._params is not None:
             try:

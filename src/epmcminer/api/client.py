@@ -9,9 +9,6 @@ from epmcminer.utils.logger import get_logger
 _logger = get_logger(__name__)
 
 SEARCH_URL = "https://www.ebi.ac.uk/europepmc/webservices/rest/search"
-FULL_TEXT_LINKS_URL = (
-    "https://www.ebi.ac.uk/europepmc/webservices/rest/{source}/{pmid}/fullTextLinks"
-)
 FREE_FULL_TEXT_FILTER = "HAS_FT:Y OR HAS_FREE_FULLTEXT:Y"
 RESPONSE_FORMAT = "json"
 RESULT_TYPE = "core"
@@ -101,39 +98,6 @@ class EuropePMCClient:
         if response.status_code != 200:
             raise APIError(response.status_code, response.text)
         return response.json()
-
-    def get_pdf_url(self, pmid: str, source: str = DEFAULT_SOURCE) -> str | None:
-        """Resolve the full-text PDF URL for a given paper.
-
-        Queries the Europe PMC full-text links endpoint and returns the
-        first entry whose ``documentStyle`` is ``"pdf"``.
-
-        Args:
-            pmid: The PubMed identifier of the paper.
-            source: The Europe PMC source database. Defaults to ``"MED"``
-                (MEDLINE/PubMed).
-
-        Returns:
-            The PDF URL string, or ``None`` if no PDF link is available.
-
-        Raises:
-            APIError: If the API returns a non-200 HTTP status code.
-            ConnectionError: If the HTTP request cannot be completed.
-        """
-        url = FULL_TEXT_LINKS_URL.format(source=source, pmid=pmid)
-        response = self._session.get(
-            url, params={"format": RESPONSE_FORMAT}, timeout=REQUEST_TIMEOUT
-        )
-        if response.status_code == 404:
-            return None
-        if response.status_code != 200:
-            raise APIError(response.status_code, response.text)
-        data = response.json()
-        entries = data.get("fullTextUrlList", {}).get("fullTextUrl", [])
-        for entry in entries:
-            if entry.get("documentStyle") == PDF_DOCUMENT_STYLE:
-                return entry["url"]
-        return None
 
     def download_pdf(self, url: str) -> bytes:
         """Download a PDF from a direct URL.

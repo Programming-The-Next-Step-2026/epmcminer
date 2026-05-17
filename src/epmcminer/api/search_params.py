@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Literal
 
 
 @dataclass
@@ -31,7 +32,7 @@ class SearchParams:
     publication_types: list[str] = field(default_factory=list)
     licenses: list[str] = field(default_factory=list)
     author_orcids: list[str] = field(default_factory=list)
-    sort_order: str = "relevance"
+    sort_order: Literal["relevance", "date", "citations"] = "relevance"
     count: int = 10
     output_folder: Path = field(default_factory=Path)
 

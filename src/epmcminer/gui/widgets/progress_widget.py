@@ -7,10 +7,11 @@ from PyQt6.QtWidgets import (
     QLabel,
     QProgressBar,
     QSizePolicy,
-    QStyleFactory,
     QVBoxLayout,
     QWidget,
 )
+
+import epmcminer.gui.theme as theme
 
 # Colour tokens from ui.jsx / handoff.jsx.
 # Qt QSS rgba() uses 0-255 integer alpha; 0.06×255≈15.
@@ -51,8 +52,6 @@ _DOT_SIZE = 6
 _LOADING_DOT_COUNT = 3
 _MAX_THREAD_DOTS = len(_THREAD_DOT_STYLES)
 _ANIM_INTERVAL_MS = 500
-
-_FUSION = QStyleFactory.create("Fusion")
 
 
 class ProgressWidget(QWidget):
@@ -172,7 +171,7 @@ class ProgressWidget(QWidget):
 
     def _make_bar(self) -> QProgressBar:
         bar = QProgressBar()
-        bar.setStyle(_FUSION)
+        bar.setStyle(theme.get_fusion_style())
         bar.setStyleSheet(_PROGRESS_BAR_STYLE)
         bar.setTextVisible(False)
         bar.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)

@@ -6,7 +6,6 @@ from pathlib import Path
 from PyQt6.QtCore import QPoint, Qt, QThread, pyqtSignal
 from PyQt6.QtWidgets import (
     QFileDialog,
-    QFrame,
     QHBoxLayout,
     QLabel,
     QLineEdit,
@@ -15,54 +14,32 @@ from PyQt6.QtWidgets import (
     QScrollArea,
     QSizePolicy,
     QSpinBox,
-    QStyleFactory,
     QVBoxLayout,
     QWidget,
 )
 
-from epmcminer.api.models import Paper, SearchParams, SearchResult
+import epmcminer.gui.theme as theme
+from epmcminer.gui.widgets.card import make_card, make_section_label
 from epmcminer.gui.widgets.progress_widget import ProgressWidget
+from epmcminer.services.models import Paper, SearchParams, SearchResult
 from epmcminer.services.search_service import SORT_ORDER_MAP, SearchService
 
 # ---------------------------------------------------------------------------
-# Design tokens
+# Screen-local constants
 # ---------------------------------------------------------------------------
-_APP_BG = "#0b0b0d"
-_CARD_BG = "#1c1c1f"
-_CARD_INNER = "#242427"
-_BORDER = "rgba(255, 255, 255, 18)"
-_BORDER_STRONG = "rgba(255, 255, 255, 41)"
-_DIVIDER = "rgba(255, 255, 255, 10)"
-_ACCENT = "#ff7a3d"
-_TEXT_PRIMARY = "#ededed"
-_TEXT_BODY = "#cfcfcf"
-_TEXT_MUTED = "#8a8a8d"
-
 _SORT_OPTIONS: list[str] = list(SORT_ORDER_MAP.keys())  # ["relevance", "date", "citations"]
 _SORT_LABELS: dict[str, str] = {"relevance": "Relevance", "date": "Date", "citations": "Citations"}
 _DEFAULT_COUNT = 50
 _COUNT_MIN = 1
 _COUNT_MAX = 10_000
 _PAPER_LIST_HEIGHT = 380
-
-_FUSION = QStyleFactory.create("Fusion")
-
-_CARD_STYLE = f"""
-    QFrame#card {{
-        background-color: {_CARD_BG};
-        border: 1px solid {_BORDER};
-        border-radius: 16px;
-    }}
-    QFrame#card QWidget {{
-        background-color: {_CARD_BG};
-    }}
-"""
+_DIVIDER = theme.BORDER_FAINT
 
 _ACTION_BTN_STYLE = f"""
     QPushButton {{
         background-color: transparent;
-        color: {_TEXT_PRIMARY};
-        border: 1px solid {_BORDER_STRONG};
+        color: {theme.TEXT_PRIMARY};
+        border: 1px solid {theme.BORDER_STRONG};
         border-radius: 12px;
         padding: 12px 22px;
         font-size: 17px;
@@ -72,16 +49,16 @@ _ACTION_BTN_STYLE = f"""
         background-color: rgba(255, 255, 255, 10);
     }}
     QPushButton:disabled {{
-        color: {_TEXT_MUTED};
-        border-color: {_BORDER};
+        color: {theme.TEXT_MUTED};
+        border-color: {theme.BORDER};
     }}
 """
 
 _SORT_BTN_STYLE = f"""
     QPushButton {{
-        background-color: {_CARD_INNER};
-        color: {_TEXT_PRIMARY};
-        border: 1px solid {_BORDER_STRONG};
+        background-color: {theme.CARD_INNER};
+        color: {theme.TEXT_PRIMARY};
+        border: 1px solid {theme.BORDER_STRONG};
         border-radius: 14px;
         padding: 6px 14px;
         font-size: 14px;
@@ -94,17 +71,17 @@ _SORT_BTN_STYLE = f"""
 
 _SORT_MENU_STYLE = f"""
     QMenu {{
-        background-color: {_CARD_BG};
+        background-color: {theme.CARD_BG};
         border: 1px solid rgba(255, 255, 255, 46);
         border-radius: 10px;
         padding: 5px;
         font-size: 14px;
-        color: {_TEXT_PRIMARY};
+        color: {theme.TEXT_PRIMARY};
     }}
     QMenu::item {{
         padding: 9px 18px;
         border-radius: 6px;
-        color: {_TEXT_PRIMARY};
+        color: {theme.TEXT_PRIMARY};
         font-size: 14px;
         font-weight: 400;
     }}
@@ -116,9 +93,9 @@ _SORT_MENU_STYLE = f"""
 
 _SPIN_STYLE = f"""
     QSpinBox {{
-        background-color: {_CARD_INNER};
-        color: {_TEXT_PRIMARY};
-        border: 1px solid {_BORDER};
+        background-color: {theme.CARD_INNER};
+        color: {theme.TEXT_PRIMARY};
+        border: 1px solid {theme.BORDER};
         border-radius: 12px;
         padding: 12px 16px;
         font-size: 16px;
@@ -131,9 +108,9 @@ _SPIN_STYLE = f"""
 
 _FOLDER_INPUT_STYLE = f"""
     QLineEdit {{
-        background-color: {_CARD_INNER};
-        color: {_TEXT_PRIMARY};
-        border: 1px solid {_BORDER};
+        background-color: {theme.CARD_INNER};
+        color: {theme.TEXT_PRIMARY};
+        border: 1px solid {theme.BORDER};
         border-radius: 12px;
         padding: 12px 16px;
         font-size: 15px;
@@ -143,8 +120,8 @@ _FOLDER_INPUT_STYLE = f"""
 _BROWSE_BTN_STYLE = f"""
     QPushButton {{
         background-color: transparent;
-        color: {_TEXT_PRIMARY};
-        border: 1px solid {_BORDER_STRONG};
+        color: {theme.TEXT_PRIMARY};
+        border: 1px solid {theme.BORDER_STRONG};
         border-radius: 12px;
         padding: 12px 18px;
         font-size: 15px;
@@ -229,7 +206,7 @@ class ScreenPreview(QWidget):
         self._params: SearchParams | None = None
         self._worker: PreviewWorker | None = None
         self._sort_index: int = 0
-        self.setStyleSheet(f"background-color: {_APP_BG};")
+        self.setStyleSheet(f"background-color: {theme.APP_BG};")
         self._build_ui()
         self._connect_signals()
         self._validate()
@@ -280,11 +257,11 @@ class ScreenPreview(QWidget):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setStyleSheet(
-            f"QScrollArea {{ background-color: {_APP_BG}; border: none; }}"
+            f"QScrollArea {{ background-color: {theme.APP_BG}; border: none; }}"
         )
 
         content_widget = QWidget()
-        content_widget.setStyleSheet(f"background-color: {_APP_BG};")
+        content_widget.setStyleSheet(f"background-color: {theme.APP_BG};")
         layout = QVBoxLayout(content_widget)
         layout.setContentsMargins(22, 22, 22, 22)
         layout.setSpacing(18)
@@ -309,7 +286,7 @@ class ScreenPreview(QWidget):
 
     def _make_error_widget(self) -> QWidget:
         widget = QWidget()
-        widget.setStyleSheet(f"background-color: {_APP_BG};")
+        widget.setStyleSheet(f"background-color: {theme.APP_BG};")
         layout = QVBoxLayout(widget)
         layout.setContentsMargins(0, 40, 0, 0)
         layout.setSpacing(18)
@@ -318,11 +295,11 @@ class ScreenPreview(QWidget):
         self._error_label = QLabel("")
         self._error_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._error_label.setWordWrap(True)
-        self._error_label.setStyleSheet(f"color: {_TEXT_BODY}; font-size: 15px;")
+        self._error_label.setStyleSheet(f"color: {theme.TEXT_BODY}; font-size: 15px;")
         layout.addWidget(self._error_label)
 
         self._try_again_btn = QPushButton("Try again")
-        self._try_again_btn.setStyle(_FUSION)
+        self._try_again_btn.setStyle(theme.get_fusion_style())
         self._try_again_btn.setStyleSheet(_ACTION_BTN_STYLE)
         self._try_again_btn.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self._try_again_btn.clicked.connect(self._on_try_again)
@@ -332,7 +309,7 @@ class ScreenPreview(QWidget):
 
     def _make_content(self) -> QWidget:
         widget = QWidget()
-        widget.setStyleSheet(f"background-color: {_APP_BG};")
+        widget.setStyleSheet(f"background-color: {theme.APP_BG};")
         layout = QVBoxLayout(widget)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(18)
@@ -343,59 +320,29 @@ class ScreenPreview(QWidget):
 
         return widget
 
-    def _make_card(self, padding: int = 22) -> tuple[QFrame, QVBoxLayout]:
-        frame = QFrame()
-        frame.setObjectName("card")
-        frame.setStyleSheet(_CARD_STYLE)
-        inner = QVBoxLayout(frame)
-        inner.setContentsMargins(padding, padding, padding, padding)
-        inner.setSpacing(14)
-        return frame, inner
-
-    def _make_section_label(self, text: str) -> QWidget:
-        row = QWidget()
-        row_layout = QHBoxLayout(row)
-        row_layout.setContentsMargins(0, 0, 0, 0)
-        row_layout.setSpacing(10)
-
-        bar = QFrame()
-        bar.setFixedSize(3, 14)
-        bar.setStyleSheet(
-            f"background-color: {_ACCENT}; border-radius: 2px; border: none;"
-        )
-        row_layout.addWidget(bar)
-
-        lbl = QLabel(text.upper())
-        lbl.setStyleSheet(
-            f"color: {_TEXT_PRIMARY}; font-size: 11px; letter-spacing: 1.6px; font-weight: 600;"
-        )
-        row_layout.addWidget(lbl)
-        row_layout.addStretch()
-        return row
-
-    def _make_stat_tile(self, label: str, sub: str) -> tuple[QFrame, QLabel]:
+    def _make_stat_tile(self, label: str, sub: str) -> tuple[QWidget, QLabel]:
         """Build a single stat tile. Returns (frame, value_label)."""
-        card, layout = self._make_card(padding=22)
+        card, layout = make_card(padding=22)
 
         lbl = QLabel(label)
-        lbl.setStyleSheet(f"color: {_TEXT_BODY}; font-size: 15px; font-weight: 500;")
+        lbl.setStyleSheet(f"color: {theme.TEXT_BODY}; font-size: 15px; font-weight: 500;")
         layout.addWidget(lbl)
 
         value_lbl = QLabel("—")
         value_lbl.setStyleSheet(
-            f"color: {_ACCENT}; font-size: 32px; font-weight: 600; line-height: 1;"
+            f"color: {theme.ACCENT}; font-size: 32px; font-weight: 600; line-height: 1;"
         )
         layout.addWidget(value_lbl)
 
         sub_lbl = QLabel(sub)
-        sub_lbl.setStyleSheet(f"color: {_TEXT_MUTED}; font-size: 13px;")
+        sub_lbl.setStyleSheet(f"color: {theme.TEXT_MUTED}; font-size: 13px;")
         layout.addWidget(sub_lbl)
 
         return card, value_lbl
 
     def _make_stat_row(self) -> QWidget:
         row = QWidget()
-        row.setStyleSheet(f"background-color: {_APP_BG}; border: none;")
+        row.setStyleSheet(f"background-color: {theme.APP_BG}; border: none;")
         layout = QHBoxLayout(row)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(16)
@@ -415,14 +362,14 @@ class ScreenPreview(QWidget):
         layout.addWidget(tile_prev)
         return row
 
-    def _make_results_card(self) -> QFrame:
-        card, layout = self._make_card()
+    def _make_results_card(self) -> QWidget:
+        card, layout = make_card()
 
         header_row = QWidget()
         header_layout = QHBoxLayout(header_row)
         header_layout.setContentsMargins(0, 0, 0, 0)
         header_layout.setSpacing(12)
-        header_layout.addWidget(self._make_section_label("Results preview"))
+        header_layout.addWidget(make_section_label("Results preview"))
 
         sort_group = QWidget()
         sort_layout = QHBoxLayout(sort_group)
@@ -430,11 +377,11 @@ class ScreenPreview(QWidget):
         sort_layout.setSpacing(10)
 
         sort_lbl = QLabel("Sort by")
-        sort_lbl.setStyleSheet(f"color: {_TEXT_BODY}; font-size: 14px;")
+        sort_lbl.setStyleSheet(f"color: {theme.TEXT_BODY}; font-size: 14px;")
         sort_layout.addWidget(sort_lbl)
 
         self._sort_btn = QPushButton(_SORT_LABELS[_SORT_OPTIONS[0]] + "  ▾")
-        self._sort_btn.setStyle(_FUSION)
+        self._sort_btn.setStyle(theme.get_fusion_style())
         self._sort_btn.setStyleSheet(_SORT_BTN_STYLE)
         self._sort_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._sort_btn.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
@@ -456,12 +403,12 @@ class ScreenPreview(QWidget):
         paper_scroll.setWidgetResizable(True)
         paper_scroll.setFixedHeight(_PAPER_LIST_HEIGHT)
         paper_scroll.setStyleSheet(
-            f"QScrollArea {{ background-color: {_CARD_BG}; border: none; }}"
-            f"QScrollArea > QWidget > QWidget {{ background-color: {_CARD_BG}; }}"
+            f"QScrollArea {{ background-color: {theme.CARD_BG}; border: none; }}"
+            f"QScrollArea > QWidget > QWidget {{ background-color: {theme.CARD_BG}; }}"
         )
 
         paper_container = QWidget()
-        paper_container.setStyleSheet(f"background-color: {_CARD_BG};")
+        paper_container.setStyleSheet(f"background-color: {theme.CARD_BG};")
         self._paper_list_layout = QVBoxLayout(paper_container)
         self._paper_list_layout.setContentsMargins(0, 0, 0, 0)
         self._paper_list_layout.setSpacing(0)
@@ -473,8 +420,10 @@ class ScreenPreview(QWidget):
         return card
 
     def _make_paper_row(self, paper: Paper) -> QWidget:
+        from PyQt6.QtWidgets import QFrame
+
         row = QWidget()
-        row.setStyleSheet(f"background-color: {_CARD_BG};")
+        row.setStyleSheet(f"background-color: {theme.CARD_BG};")
         layout = QVBoxLayout(row)
         layout.setContentsMargins(0, 16, 0, 0)
         layout.setSpacing(6)
@@ -482,18 +431,18 @@ class ScreenPreview(QWidget):
         title_lbl = QLabel(paper.title)
         title_lbl.setWordWrap(True)
         title_lbl.setStyleSheet(
-            f"color: {_TEXT_PRIMARY}; font-size: 16px; font-weight: 600;"
+            f"color: {theme.TEXT_PRIMARY}; font-size: 16px; font-weight: 600;"
         )
         layout.addWidget(title_lbl)
 
         authors_lbl = QLabel(paper.authors)
         authors_lbl.setWordWrap(True)
-        authors_lbl.setStyleSheet(f"color: {_TEXT_BODY}; font-size: 13px;")
+        authors_lbl.setStyleSheet(f"color: {theme.TEXT_BODY}; font-size: 13px;")
         layout.addWidget(authors_lbl)
 
         meta_lbl = QLabel(f"{paper.journal}  ·  {paper.year}  ·  {paper.doi}")
         meta_lbl.setWordWrap(True)
-        meta_lbl.setStyleSheet(f"color: {_TEXT_MUTED}; font-size: 13px;")
+        meta_lbl.setStyleSheet(f"color: {theme.TEXT_MUTED}; font-size: 13px;")
         layout.addWidget(meta_lbl)
 
         separator = QFrame()
@@ -505,9 +454,9 @@ class ScreenPreview(QWidget):
 
         return row
 
-    def _make_download_settings_card(self) -> QFrame:
-        card, layout = self._make_card()
-        layout.addWidget(self._make_section_label("Download settings"))
+    def _make_download_settings_card(self) -> QWidget:
+        card, layout = make_card()
+        layout.addWidget(make_section_label("Download settings"))
 
         fields_row = QWidget()
         fields_layout = QHBoxLayout(fields_row)
@@ -519,10 +468,10 @@ class ScreenPreview(QWidget):
         count_layout.setContentsMargins(0, 0, 0, 0)
         count_layout.setSpacing(8)
         count_lbl = QLabel("Count")
-        count_lbl.setStyleSheet(f"color: {_TEXT_BODY}; font-size: 14px; font-weight: 500;")
+        count_lbl.setStyleSheet(f"color: {theme.TEXT_BODY}; font-size: 14px; font-weight: 500;")
         count_layout.addWidget(count_lbl)
         self._count_spin = QSpinBox()
-        self._count_spin.setStyle(_FUSION)
+        self._count_spin.setStyle(theme.get_fusion_style())
         self._count_spin.setStyleSheet(_SPIN_STYLE)
         self._count_spin.setRange(_COUNT_MIN, _COUNT_MAX)
         self._count_spin.setValue(_DEFAULT_COUNT)
@@ -536,10 +485,10 @@ class ScreenPreview(QWidget):
         folder_layout.setContentsMargins(0, 0, 0, 0)
         folder_layout.setSpacing(8)
         folder_lbl = QLabel("Output folder")
-        folder_lbl.setStyleSheet(f"color: {_TEXT_BODY}; font-size: 14px; font-weight: 500;")
+        folder_lbl.setStyleSheet(f"color: {theme.TEXT_BODY}; font-size: 14px; font-weight: 500;")
         folder_layout.addWidget(folder_lbl)
         self._folder_edit = QLineEdit()
-        self._folder_edit.setStyle(_FUSION)
+        self._folder_edit.setStyle(theme.get_fusion_style())
         self._folder_edit.setStyleSheet(_FOLDER_INPUT_STYLE)
         self._folder_edit.setPlaceholderText("/path/to/output")
         self._folder_edit.setReadOnly(True)
@@ -547,7 +496,7 @@ class ScreenPreview(QWidget):
         fields_layout.addWidget(folder_col, 1)
 
         browse_btn = QPushButton("Browse")
-        browse_btn.setStyle(_FUSION)
+        browse_btn.setStyle(theme.get_fusion_style())
         browse_btn.setStyleSheet(_BROWSE_BTN_STYLE)
         browse_btn.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         browse_btn.clicked.connect(self._browse_folder)
@@ -556,7 +505,7 @@ class ScreenPreview(QWidget):
         layout.addWidget(fields_row)
 
         hint = QLabel("Skipped papers and reasons will be shown on the summary screen")
-        hint.setStyleSheet(f"color: {_TEXT_MUTED}; font-size: 13px;")
+        hint.setStyleSheet(f"color: {theme.TEXT_MUTED}; font-size: 13px;")
         layout.addWidget(hint)
 
         return card
@@ -565,13 +514,13 @@ class ScreenPreview(QWidget):
         bar = QWidget()
         bar.setFixedHeight(72)
         bar.setStyleSheet(
-            f"background-color: {_APP_BG}; border-top: 1px solid {_BORDER};"
+            f"background-color: {theme.APP_BG}; border-top: 1px solid {theme.BORDER};"
         )
         bar_layout = QHBoxLayout(bar)
         bar_layout.setContentsMargins(22, 0, 22, 0)
 
         self._back_btn = QPushButton("← Back")
-        self._back_btn.setStyle(_FUSION)
+        self._back_btn.setStyle(theme.get_fusion_style())
         self._back_btn.setStyleSheet(_ACTION_BTN_STYLE)
         self._back_btn.clicked.connect(self.back_requested.emit)
         bar_layout.addWidget(self._back_btn)
@@ -579,7 +528,7 @@ class ScreenPreview(QWidget):
         bar_layout.addStretch()
 
         self._start_btn = QPushButton("Start download  →")
-        self._start_btn.setStyle(_FUSION)
+        self._start_btn.setStyle(theme.get_fusion_style())
         self._start_btn.setStyleSheet(_ACTION_BTN_STYLE)
         self._start_btn.clicked.connect(self._on_start_download)
         bar_layout.addWidget(self._start_btn)

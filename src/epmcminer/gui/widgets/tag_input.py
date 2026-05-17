@@ -9,9 +9,10 @@ from PyQt6.QtWidgets import (
     QMenu,
     QPushButton,
     QSizePolicy,
-    QStyleFactory,
     QWidget,
 )
+
+import epmcminer.gui.theme as theme
 
 # Colour tokens from ui.jsx / handoff.jsx.
 # Qt QSS uses 0-255 integer alpha in rgba(), not CSS 0.0-1.0 floats.
@@ -102,9 +103,6 @@ _MENU_STYLE = """
     }
 """
 
-# Module-level Fusion style instance; avoids recreating on every widget.
-_FUSION = QStyleFactory.create("Fusion")
-
 
 class _FlowLayout(QLayout):
     """Arranges child widgets in a wrapping row, like words in a paragraph."""
@@ -181,7 +179,7 @@ class _TagPill(QPushButton):
     def __init__(self, tag: str, parent: QWidget | None = None) -> None:
         super().__init__(f"{tag}  ×", parent)
         self._tag = tag
-        self.setStyle(_FUSION)
+        self.setStyle(theme.get_fusion_style())
         self.setStyleSheet(_PILL_STYLE)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
@@ -233,7 +231,7 @@ class _InputSlot(QWidget):
         layout.setSpacing(6)
 
         self._add_btn = QPushButton(add_label)
-        self._add_btn.setStyle(_FUSION)
+        self._add_btn.setStyle(theme.get_fusion_style())
         self._add_btn.setStyleSheet(_ADD_BUTTON_STYLE)
         self._add_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._add_btn.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
@@ -245,7 +243,7 @@ class _InputSlot(QWidget):
             self._add_btn.clicked.connect(self._show_menu)
         else:
             self._input = QLineEdit()
-            self._input.setStyle(_FUSION)
+            self._input.setStyle(theme.get_fusion_style())
             self._input.setPlaceholderText("Add…")
             self._input.setStyleSheet(_INLINE_INPUT_STYLE)
             self._input.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
@@ -254,7 +252,7 @@ class _InputSlot(QWidget):
             layout.addWidget(self._input)
 
             self._confirm_btn = QPushButton("✓")
-            self._confirm_btn.setStyle(_FUSION)
+            self._confirm_btn.setStyle(theme.get_fusion_style())
             self._confirm_btn.setStyleSheet(_INLINE_CONFIRM_STYLE)
             self._confirm_btn.setCursor(Qt.CursorShape.PointingHandCursor)
             self._confirm_btn.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)

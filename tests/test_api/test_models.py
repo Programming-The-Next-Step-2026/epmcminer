@@ -11,7 +11,7 @@ from epmcminer.api.models import DownloadResult, Paper, SearchParams, SearchResu
 # ---------------------------------------------------------------------------
 
 
-@pytest.fixture()
+@pytest.fixture
 def valid_search_params() -> SearchParams:
     """Return a fully-populated, valid SearchParams instance."""
     return SearchParams(
@@ -27,7 +27,7 @@ def valid_search_params() -> SearchParams:
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def valid_paper() -> Paper:
     """Return a fully-populated Paper instance."""
     return Paper(
@@ -42,7 +42,7 @@ def valid_paper() -> Paper:
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def valid_search_result(valid_paper: Paper) -> SearchResult:
     """Return a SearchResult with one paper."""
     return SearchResult(

@@ -9,7 +9,6 @@ import responses
 
 from epmcminer.api.client import (
     FREE_FULL_TEXT_FILTER,
-    FULL_TEXT_LINKS_URL,
     SEARCH_URL,
     SORT_BY_DATE,
     APIError,
@@ -19,10 +18,6 @@ from epmcminer.api.client import (
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
-
-PMID = "12345678"
-SOURCE = "MED"
-FULL_TEXT_URL = FULL_TEXT_LINKS_URL.format(source=SOURCE, pmid=PMID)
 
 SEARCH_RESPONSE = {
     "version": "6.8",
@@ -49,47 +44,8 @@ EMPTY_SEARCH_RESPONSE = {
     "resultList": {"result": []},
 }
 
-FULL_TEXT_RESPONSE_WITH_PDF = {
-    "version": "6.8",
-    "hitCount": 1,
-    "fullTextUrlList": {
-        "fullTextUrl": [
-            {
-                "availability": "Open access",
-                "availabilityCode": "OA",
-                "documentStyle": "html",
-                "site": "Europe_PMC",
-                "url": "https://europepmc.org/articles/PMC1234567",
-            },
-            {
-                "availability": "Open access",
-                "availabilityCode": "OA",
-                "documentStyle": "pdf",
-                "site": "Europe_PMC",
-                "url": "https://europepmc.org/articles/PMC1234567?pdf=render",
-            },
-        ]
-    },
-}
 
-FULL_TEXT_RESPONSE_NO_PDF = {
-    "version": "6.8",
-    "hitCount": 1,
-    "fullTextUrlList": {
-        "fullTextUrl": [
-            {
-                "availability": "Open access",
-                "availabilityCode": "OA",
-                "documentStyle": "html",
-                "site": "Europe_PMC",
-                "url": "https://europepmc.org/articles/PMC1234567",
-            }
-        ]
-    },
-}
-
-
-@pytest.fixture()
+@pytest.fixture
 def client() -> EuropePMCClient:
     """Return a fresh EuropePMCClient instance."""
     return EuropePMCClient()
@@ -181,61 +137,6 @@ class TestSearch:
             urllib.parse.urlparse(responses.calls[0].request.url).query
         )
         assert sent_params["cursorMark"][0] == "AoE="
-
-
-# ---------------------------------------------------------------------------
-# EuropePMCClient.get_pdf_url
-# ---------------------------------------------------------------------------
-
-
-class TestGetPdfUrl:
-    """Tests for EuropePMCClient.get_pdf_url."""
-
-    @responses.activate
-    def test_pdf_url_found(self, client: EuropePMCClient) -> None:
-        """Returns the PDF URL when a pdf documentStyle entry exists."""
-        responses.add(responses.GET, FULL_TEXT_URL, json=FULL_TEXT_RESPONSE_WITH_PDF, status=200)
-
-        url = client.get_pdf_url(pmid=PMID, source=SOURCE)
-
-        assert url == "https://europepmc.org/articles/PMC1234567?pdf=render"
-
-    @responses.activate
-    def test_pdf_url_not_found(self, client: EuropePMCClient) -> None:
-        """Returns None when no pdf documentStyle entry exists."""
-        responses.add(responses.GET, FULL_TEXT_URL, json=FULL_TEXT_RESPONSE_NO_PDF, status=200)
-
-        url = client.get_pdf_url(pmid=PMID, source=SOURCE)
-
-        assert url is None
-
-    @responses.activate
-    def test_get_pdf_url_returns_none_on_404(self, client: EuropePMCClient) -> None:
-        """A 404 response returns None (paper has no full-text links registered)."""
-        responses.add(responses.GET, FULL_TEXT_URL, body="Not Found", status=404)
-
-        url = client.get_pdf_url(pmid=PMID, source=SOURCE)
-
-        assert url is None
-
-    @responses.activate
-    def test_get_pdf_url_api_error_raises_api_error(self, client: EuropePMCClient) -> None:
-        """A non-200, non-404 response raises APIError."""
-        responses.add(responses.GET, FULL_TEXT_URL, body="Internal Server Error", status=500)
-
-        with pytest.raises(APIError) as exc_info:
-            client.get_pdf_url(pmid=PMID, source=SOURCE)
-
-        assert exc_info.value.status_code == 500
-
-    @responses.activate
-    def test_get_pdf_url_default_source_is_med(self, client: EuropePMCClient) -> None:
-        """The default source parameter is MED."""
-        responses.add(responses.GET, FULL_TEXT_URL, json=FULL_TEXT_RESPONSE_WITH_PDF, status=200)
-
-        client.get_pdf_url(pmid=PMID)
-
-        assert f"/{SOURCE}/" in responses.calls[0].request.url
 
 
 # ---------------------------------------------------------------------------

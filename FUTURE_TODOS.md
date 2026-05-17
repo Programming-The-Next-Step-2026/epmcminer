@@ -68,6 +68,14 @@ Issues identified during code review that were **not** fixed in-branch, with con
 
 ---
 
+## Medium — Silent report.csv save failure in ScreenDownload
+
+**Files:** `src/epmcminer/gui/screens/screen_download.py:406`
+
+**Detail:** `_on_finished()` wraps `report_service.save_csv()` in a bare `except Exception` that only logs the error; no dialog is shown to the user. If saving the CSV fails (e.g. permissions issue, full disk), the user sees nothing and loses their report silently. Fix: display a `QMessageBox.warning()` inside the except block so the user is informed and can retry or choose a different output location.
+
+---
+
 ## Low — Dead production code: `ensure_output_structure`
 
 **Files:** `src/epmcminer/utils/file_utils.py:51`

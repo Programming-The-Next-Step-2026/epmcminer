@@ -118,62 +118,6 @@ class TestSearchIntegration:
 
 
 # ---------------------------------------------------------------------------
-# EuropePMCClient.get_pdf_url
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.integration
-class TestGetPdfUrlIntegration:
-    """Integration tests for EuropePMCClient.get_pdf_url."""
-
-    def test_get_pdf_url_returns_string_or_none(self, client: EuropePMCClient) -> None:
-        """get_pdf_url returns a str or None — never raises for a valid PMID."""
-        url = client.get_pdf_url(pmid=KNOWN_PMID)
-
-        assert url is None or isinstance(url, str)
-
-    def test_get_pdf_url_string_is_https(self, client: EuropePMCClient) -> None:
-        """When a PDF URL is returned it starts with https://."""
-        url = client.get_pdf_url(pmid=KNOWN_PMID)
-
-        if url is not None:
-            assert url.startswith("https://")
-
-    def test_get_pdf_url_unknown_pmid_returns_none(self, client: EuropePMCClient) -> None:
-        """An unknown PMID (404 from the API) returns None rather than raising."""
-        url = client.get_pdf_url(pmid="00000000")
-
-        assert url is None
-
-    def test_get_pdf_url_from_search_result(self, client: EuropePMCClient) -> None:
-        """PDF URL lookup works for PMIDs taken directly from a search result."""
-        result = client.search(query=COMMON_QUERY, page_size=SMALL_PAGE_SIZE)
-        papers = result["resultList"]["result"]
-
-        for paper in papers:
-            pmid = paper.get("pmid") or paper.get("id")
-            if pmid:
-                url = client.get_pdf_url(pmid=str(pmid))
-                assert url is None or isinstance(url, str)
-                break
-        else:
-            pytest.skip("No papers with a PMID found in search result")
-
-    def test_get_pdf_url_valid_pmid_does_not_raise(
-        self, client: EuropePMCClient
-    ) -> None:
-        """A valid PMID does not raise APIError regardless of whether a PDF exists.
-
-        A 500 cannot be reliably triggered against the real API, so this test
-        confirms the happy path as an indirect guard against regression.
-        """
-        try:
-            client.get_pdf_url(pmid=KNOWN_PMID)
-        except APIError:
-            pytest.fail("get_pdf_url raised APIError for a valid PMID")
-
-
-# ---------------------------------------------------------------------------
 # EuropePMCClient.download_pdf
 # ---------------------------------------------------------------------------
 

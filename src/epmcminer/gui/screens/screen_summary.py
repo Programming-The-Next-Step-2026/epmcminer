@@ -12,57 +12,34 @@ from PyQt6.QtWidgets import (
     QMessageBox,
     QPushButton,
     QScrollArea,
-    QStyleFactory,
     QVBoxLayout,
     QWidget,
 )
 
-from epmcminer.api.download_result import DownloadResult
-from epmcminer.api.models import SearchParams
+import epmcminer.gui.theme as theme
+from epmcminer.gui.widgets.card import make_card, make_section_label
+from epmcminer.services.models import DownloadResult, SearchParams
 from epmcminer.services.report_service import ReportService
 from epmcminer.utils.logger import get_logger
 
 _logger = get_logger(__name__)
 
 # ---------------------------------------------------------------------------
-# Design tokens
+# Screen-local constants
 # ---------------------------------------------------------------------------
-_APP_BG = "#0b0b0d"
-_CARD_BG = "#1c1c1f"
-_BORDER = "rgba(255, 255, 255, 18)"
-_BORDER_STRONG = "rgba(255, 255, 255, 41)"
-_DIVIDER = "rgba(255, 255, 255, 10)"
-_ACCENT = "#ff7a3d"
-_TEXT_PRIMARY = "#ededed"
-_TEXT_BODY = "#cfcfcf"
-_TEXT_MUTED = "#8a8a8d"
 _DANGER = "#f87171"
 _DANGER_BG = "#3a1a1a"
-
-_STATUS_DOWNLOADED = "downloaded"
+_DIVIDER = theme.BORDER_FAINT
 
 _SKIPPED_LIST_HEIGHT = 220
 _DOT_SIZE = 26
 _DOT_RADIUS = _DOT_SIZE // 2
 
-_FUSION = QStyleFactory.create("Fusion")
-
-_CARD_STYLE = f"""
-    QFrame#card {{
-        background-color: {_CARD_BG};
-        border: 1px solid {_BORDER};
-        border-radius: 16px;
-    }}
-    QFrame#card QWidget {{
-        background-color: {_CARD_BG};
-    }}
-"""
-
 _GHOST_BTN_STYLE = f"""
     QPushButton {{
         background-color: transparent;
-        color: {_TEXT_PRIMARY};
-        border: 1px solid {_BORDER_STRONG};
+        color: {theme.TEXT_PRIMARY};
+        border: 1px solid {theme.BORDER_STRONG};
         border-radius: 12px;
         padding: 12px 22px;
         font-size: 17px;
@@ -75,7 +52,7 @@ _GHOST_BTN_STYLE = f"""
 
 _PRIMARY_BTN_STYLE = f"""
     QPushButton {{
-        background-color: {_ACCENT};
+        background-color: {theme.ACCENT};
         color: #000000;
         border: none;
         border-radius: 12px;
@@ -163,7 +140,7 @@ class ScreenSummary(QWidget):
         self._param_query_lbl: QLabel | None = None
         self._param_sort_lbl: QLabel | None = None
         self._param_date_lbl: QLabel | None = None
-        self.setStyleSheet(f"background-color: {_APP_BG};")
+        self.setStyleSheet(f"background-color: {theme.APP_BG};")
         self._build_ui()
 
     # ------------------------------------------------------------------
@@ -186,7 +163,7 @@ class ScreenSummary(QWidget):
         self._results = results
         self._params = params
 
-        downloaded = sum(1 for r in results if r.status == _STATUS_DOWNLOADED)
+        downloaded = sum(1 for r in results if r.status == DownloadResult.STATUS_DOWNLOADED)
         not_downloaded = len(results) - downloaded
 
         self._stat_downloaded_lbl.setText(str(downloaded))
@@ -209,11 +186,11 @@ class ScreenSummary(QWidget):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setStyleSheet(
-            f"QScrollArea {{ background-color: {_APP_BG}; border: none; }}"
+            f"QScrollArea {{ background-color: {theme.APP_BG}; border: none; }}"
         )
 
         content_widget = QWidget()
-        content_widget.setStyleSheet(f"background-color: {_APP_BG};")
+        content_widget.setStyleSheet(f"background-color: {theme.APP_BG};")
         layout = QVBoxLayout(content_widget)
         layout.setContentsMargins(22, 22, 22, 22)
         layout.setSpacing(18)
@@ -229,47 +206,17 @@ class ScreenSummary(QWidget):
         root.addWidget(scroll)
         root.addWidget(self._make_action_bar())
 
-    def _make_card(self, padding: int = 22) -> tuple[QFrame, QVBoxLayout]:
-        frame = QFrame()
-        frame.setObjectName("card")
-        frame.setStyleSheet(_CARD_STYLE)
-        inner = QVBoxLayout(frame)
-        inner.setContentsMargins(padding, padding, padding, padding)
-        inner.setSpacing(14)
-        return frame, inner
-
-    def _make_section_label(self, text: str) -> QWidget:
-        row = QWidget()
-        row_layout = QHBoxLayout(row)
-        row_layout.setContentsMargins(0, 0, 0, 0)
-        row_layout.setSpacing(10)
-
-        bar = QFrame()
-        bar.setFixedSize(3, 14)
-        bar.setStyleSheet(
-            f"background-color: {_ACCENT}; border-radius: 2px; border: none;"
-        )
-        row_layout.addWidget(bar)
-
-        lbl = QLabel(text.upper())
-        lbl.setStyleSheet(
-            f"color: {_TEXT_PRIMARY}; font-size: 11px; letter-spacing: 1.6px; font-weight: 600;"
-        )
-        row_layout.addWidget(lbl)
-        row_layout.addStretch()
-        return row
-
     def _make_stat_card(
         self,
         label: str,
         initial_value: str,
         sub_text: str,
         value_color: str,
-    ) -> tuple[QFrame, QLabel, QLabel]:
-        card, layout = self._make_card()
+    ) -> tuple[QWidget, QLabel, QLabel]:
+        card, layout = make_card()
 
         label_lbl = QLabel(label)
-        label_lbl.setStyleSheet(f"color: {_TEXT_BODY}; font-size: 15px; font-weight: 500;")
+        label_lbl.setStyleSheet(f"color: {theme.TEXT_BODY}; font-size: 15px; font-weight: 500;")
         layout.addWidget(label_lbl)
 
         value_lbl = QLabel(initial_value)
@@ -279,7 +226,7 @@ class ScreenSummary(QWidget):
         layout.addWidget(value_lbl)
 
         sub_lbl = QLabel(sub_text)
-        sub_lbl.setStyleSheet(f"color: {_TEXT_MUTED}; font-size: 13px;")
+        sub_lbl.setStyleSheet(f"color: {theme.TEXT_MUTED}; font-size: 13px;")
         layout.addWidget(sub_lbl)
 
         return card, value_lbl, sub_lbl
@@ -289,13 +236,13 @@ class ScreenSummary(QWidget):
         row.setSpacing(16)
 
         card_dl, self._stat_downloaded_lbl, self._stat_downloaded_sub = self._make_stat_card(
-            "Downloaded", "—", "of 0 processed", _ACCENT
+            "Downloaded", "—", "of 0 processed", theme.ACCENT
         )
         card_sk, self._stat_skipped_lbl, _ = self._make_stat_card(
             "Skipped", "—", "see reasons below", _DANGER
         )
         card_tot, self._stat_total_lbl, _ = self._make_stat_card(
-            "Total results", "—", "found in Europe PMC", _ACCENT
+            "Total results", "—", "found in Europe PMC", theme.ACCENT
         )
 
         row.addWidget(card_dl)
@@ -303,12 +250,12 @@ class ScreenSummary(QWidget):
         row.addWidget(card_tot)
         return row
 
-    def _make_params_card(self) -> QFrame:
-        card, layout = self._make_card()
-        layout.addWidget(self._make_section_label("Search parameters"))
+    def _make_params_card(self) -> QWidget:
+        card, layout = make_card()
+        layout.addWidget(make_section_label("Search parameters"))
 
         params_container = QWidget()
-        params_container.setStyleSheet(f"background-color: {_CARD_BG};")
+        params_container.setStyleSheet(f"background-color: {theme.CARD_BG};")
         self._param_pairs_layout = QVBoxLayout(params_container)
         self._param_pairs_layout.setContentsMargins(0, 4, 0, 0)
         self._param_pairs_layout.setSpacing(14)
@@ -316,20 +263,20 @@ class ScreenSummary(QWidget):
         layout.addWidget(params_container)
         return card
 
-    def _make_skipped_card(self) -> QFrame:
-        card, layout = self._make_card()
-        layout.addWidget(self._make_section_label("Skipped papers"))
+    def _make_skipped_card(self) -> QWidget:
+        card, layout = make_card()
+        layout.addWidget(make_section_label("Skipped papers"))
 
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFixedHeight(_SKIPPED_LIST_HEIGHT)
         scroll.setStyleSheet(
-            f"QScrollArea {{ background-color: {_CARD_BG}; border: none; }}"
-            f"QScrollArea > QWidget > QWidget {{ background-color: {_CARD_BG}; }}"
+            f"QScrollArea {{ background-color: {theme.CARD_BG}; border: none; }}"
+            f"QScrollArea > QWidget > QWidget {{ background-color: {theme.CARD_BG}; }}"
         )
 
         list_container = QWidget()
-        list_container.setStyleSheet(f"background-color: {_CARD_BG};")
+        list_container.setStyleSheet(f"background-color: {theme.CARD_BG};")
         self._skipped_list_layout = QVBoxLayout(list_container)
         self._skipped_list_layout.setContentsMargins(0, 0, 0, 0)
         self._skipped_list_layout.setSpacing(0)
@@ -342,27 +289,27 @@ class ScreenSummary(QWidget):
         bar = QWidget()
         bar.setFixedHeight(72)
         bar.setStyleSheet(
-            f"background-color: {_APP_BG}; border-top: 1px solid {_BORDER};"
+            f"background-color: {theme.APP_BG}; border-top: 1px solid {theme.BORDER};"
         )
         bar_layout = QHBoxLayout(bar)
         bar_layout.setContentsMargins(22, 0, 22, 0)
         bar_layout.setSpacing(12)
 
         self._new_search_btn = QPushButton("＋  New search")
-        self._new_search_btn.setStyle(_FUSION)
+        self._new_search_btn.setStyle(theme.get_fusion_style())
         self._new_search_btn.setStyleSheet(_GHOST_BTN_STYLE)
         self._new_search_btn.clicked.connect(self._on_new_search)
         bar_layout.addWidget(self._new_search_btn)
         bar_layout.addStretch()
 
         self._export_excel_btn = QPushButton("Export Excel")
-        self._export_excel_btn.setStyle(_FUSION)
+        self._export_excel_btn.setStyle(theme.get_fusion_style())
         self._export_excel_btn.setStyleSheet(_GHOST_BTN_STYLE)
         self._export_excel_btn.clicked.connect(self._on_export_excel)
         bar_layout.addWidget(self._export_excel_btn)
 
         self._export_pdf_btn = QPushButton("Export PDF")
-        self._export_pdf_btn.setStyle(_FUSION)
+        self._export_pdf_btn.setStyle(theme.get_fusion_style())
         self._export_pdf_btn.setStyleSheet(_PRIMARY_BTN_STYLE)
         self._export_pdf_btn.clicked.connect(self._on_export_pdf)
         bar_layout.addWidget(self._export_pdf_btn)
@@ -384,18 +331,18 @@ class ScreenSummary(QWidget):
             Tuple of (the containing widget, the value QLabel).
         """
         widget = QWidget()
-        widget.setStyleSheet(f"background-color: {_CARD_BG};")
+        widget.setStyleSheet(f"background-color: {theme.CARD_BG};")
         h = QHBoxLayout(widget)
         h.setContentsMargins(0, 0, 0, 0)
         h.setSpacing(8)
 
         label_lbl = QLabel(label)
-        label_lbl.setStyleSheet(f"color: {_TEXT_MUTED}; font-size: 15px;")
+        label_lbl.setStyleSheet(f"color: {theme.TEXT_MUTED}; font-size: 15px;")
         h.addWidget(label_lbl)
 
         value_lbl = QLabel(value)
         value_lbl.setStyleSheet(
-            f"color: {_TEXT_PRIMARY}; font-size: 15px; font-weight: 600;"
+            f"color: {theme.TEXT_PRIMARY}; font-size: 15px; font-weight: 600;"
         )
         h.addWidget(value_lbl)
         return widget, value_lbl
@@ -410,7 +357,7 @@ class ScreenSummary(QWidget):
             Tuple of (the row widget, list of value QLabels in order).
         """
         row = QWidget()
-        row.setStyleSheet(f"background-color: {_CARD_BG};")
+        row.setStyleSheet(f"background-color: {theme.CARD_BG};")
         h = QHBoxLayout(row)
         h.setContentsMargins(0, 0, 0, 0)
         h.setSpacing(36)
@@ -453,7 +400,7 @@ class ScreenSummary(QWidget):
             self._param_pairs_layout.addWidget(row2)
 
     def _populate_skipped(self, results: list[DownloadResult]) -> None:
-        not_downloaded = [r for r in results if r.status != _STATUS_DOWNLOADED]
+        not_downloaded = [r for r in results if r.status != DownloadResult.STATUS_DOWNLOADED]
         self._skipped_card.setVisible(bool(not_downloaded))
 
         while self._skipped_list_layout.count():
@@ -467,7 +414,7 @@ class ScreenSummary(QWidget):
 
     def _make_skipped_row(self, result: DownloadResult, *, last: bool) -> QWidget:
         row = QWidget()
-        row.setStyleSheet(f"background-color: {_CARD_BG};")
+        row.setStyleSheet(f"background-color: {theme.CARD_BG};")
         row_layout = QHBoxLayout(row)
         row_layout.setContentsMargins(0, 16, 0, 0)
         row_layout.setSpacing(16)
@@ -484,7 +431,7 @@ class ScreenSummary(QWidget):
         row_layout.addWidget(dot)
 
         text_col = QWidget()
-        text_col.setStyleSheet(f"background-color: {_CARD_BG};")
+        text_col.setStyleSheet(f"background-color: {theme.CARD_BG};")
         text_layout = QVBoxLayout(text_col)
         text_layout.setContentsMargins(0, 0, 0, 0)
         text_layout.setSpacing(4)
@@ -492,7 +439,7 @@ class ScreenSummary(QWidget):
         title_lbl = QLabel(result.paper.title)
         title_lbl.setWordWrap(True)
         title_lbl.setStyleSheet(
-            f"color: {_TEXT_PRIMARY}; font-size: 16px; font-weight: 600;"
+            f"color: {theme.TEXT_PRIMARY}; font-size: 16px; font-weight: 600;"
         )
         text_layout.addWidget(title_lbl)
 
@@ -500,7 +447,7 @@ class ScreenSummary(QWidget):
         meta_str = " · ".join(p for p in meta_parts if p)
         meta_lbl = QLabel(meta_str)
         meta_lbl.setWordWrap(True)
-        meta_lbl.setStyleSheet(f"color: {_TEXT_MUTED}; font-size: 14px;")
+        meta_lbl.setStyleSheet(f"color: {theme.TEXT_MUTED}; font-size: 14px;")
         text_layout.addWidget(meta_lbl)
 
         reason_lbl = QLabel(result.reason or "Unknown reason")

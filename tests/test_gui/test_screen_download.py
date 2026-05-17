@@ -9,9 +9,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from PyQt6.QtWidgets import QApplication
 
-from epmcminer.api.download_result import DownloadResult
-from epmcminer.api.models import Paper, SearchParams
 from epmcminer.gui.screens.screen_download import DownloadWorker, ScreenDownload
+from epmcminer.services.models import DownloadResult, Paper, SearchParams
 
 # ---------------------------------------------------------------------------
 # Helpers

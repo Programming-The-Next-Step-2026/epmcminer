@@ -1,5 +1,6 @@
 """Main application window managing screen navigation and the step indicator."""
 
+import epmcminer.gui.theme as theme
 from PyQt6.QtCore import QPoint, Qt
 from PyQt6.QtGui import QMouseEvent
 from PyQt6.QtWidgets import (
@@ -13,15 +14,12 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from epmcminer.api.client import EuropePMCClient
-from epmcminer.api.models import SearchParams
 from epmcminer.gui.screens.screen_download import ScreenDownload
 from epmcminer.gui.screens.screen_preview import ScreenPreview
 from epmcminer.gui.screens.screen_search import ScreenSearch
 from epmcminer.gui.screens.screen_summary import ScreenSummary
-from epmcminer.services.download_service import DownloadService
-from epmcminer.services.report_service import ReportService
-from epmcminer.services.search_service import SearchService
+from epmcminer.services import create_application_services
+from epmcminer.services.models import SearchParams
 
 APP_TITLE = "epmcminer"
 MINIMUM_WIDTH = 820
@@ -29,14 +27,6 @@ MINIMUM_HEIGHT = 600
 DEFAULT_WIDTH = 960
 DEFAULT_HEIGHT = 700
 
-# ---------------------------------------------------------------------------
-# Design tokens (match the palette used across all screens)
-# ---------------------------------------------------------------------------
-_APP_BG = "#0b0b0d"
-_TITLE_BAR_BG = "#111114"
-_BORDER = "rgba(255, 255, 255, 10)"
-_ACCENT = "#ff7a3d"
-_TEXT_MUTED = "#8a8a8d"
 
 # Step indicator geometry
 _STEP_LABELS = ["Search", "Preview", "Download", "Summary"]
@@ -77,8 +67,8 @@ class _TitleBar(QWidget):
         super().__init__(parent)
         self.setFixedHeight(_TITLE_BAR_HEIGHT)
         self.setStyleSheet(
-            f"background-color: {_TITLE_BAR_BG};"
-            f" border-bottom: 1px solid {_BORDER};"
+            f"background-color: {theme.TITLE_BAR_BG};"
+            f" border-bottom: 1px solid {theme.BORDER_FAINT};"
         )
         self._drag_pos: QPoint | None = None
 
@@ -136,7 +126,7 @@ class _TitleBar(QWidget):
 
         for i, label in enumerate(_STEP_LABELS):
             step_w = QWidget()
-            step_w.setStyleSheet(f"background-color: {_TITLE_BAR_BG};")
+            step_w.setStyleSheet(f"background-color: {theme.TITLE_BAR_BG};")
             step_layout = QVBoxLayout(step_w)
             step_layout.setContentsMargins(0, _STEP_TOP_MARGIN, 0, 0)
             step_layout.setSpacing(5)
@@ -157,7 +147,7 @@ class _TitleBar(QWidget):
 
             if i < _STEP_COUNT - 1:
                 line_w = QWidget()
-                line_w.setStyleSheet(f"background-color: {_TITLE_BAR_BG};")
+                line_w.setStyleSheet(f"background-color: {theme.TITLE_BAR_BG};")
                 line_layout = QVBoxLayout(line_w)
                 line_layout.setContentsMargins(0, 0, 0, 0)
                 line_layout.setSpacing(0)
@@ -186,43 +176,43 @@ class _TitleBar(QWidget):
                 circle.setText("✓")
                 circle.setStyleSheet(
                     f"background-color: rgba(255,122,61,20);"
-                    f" color: {_ACCENT};"
+                    f" color: {theme.ACCENT};"
                     f" border-radius: {_CIRCLE_RADIUS}px;"
                     f" font-size: 13px; font-weight: 700;"
-                    f" border: 1.5px solid {_ACCENT};"
+                    f" border: 1.5px solid {theme.ACCENT};"
                 )
                 text.setStyleSheet(
-                    f"color: {_TEXT_MUTED}; font-size: {_STEP_FONT_SIZE}px;"
+                    f"color: {theme.TEXT_MUTED}; font-size: {_STEP_FONT_SIZE}px;"
                 )
             elif i == active:
                 circle.setText(str(i + 1))
                 circle.setStyleSheet(
-                    f"background-color: {_ACCENT};"
+                    f"background-color: {theme.ACCENT};"
                     f" color: white;"
                     f" border-radius: {_CIRCLE_RADIUS}px;"
                     f" font-size: 13px; font-weight: 700;"
                     f" border: none;"
                 )
                 text.setStyleSheet(
-                    f"color: {_ACCENT};"
+                    f"color: {theme.ACCENT};"
                     f" font-size: {_STEP_FONT_SIZE}px; font-weight: 600;"
                 )
             else:
                 circle.setText(str(i + 1))
                 circle.setStyleSheet(
                     f"background-color: transparent;"
-                    f" color: {_TEXT_MUTED};"
+                    f" color: {theme.TEXT_MUTED};"
                     f" border-radius: {_CIRCLE_RADIUS}px;"
                     f" font-size: 13px;"
-                    f" border: 1.5px solid {_TEXT_MUTED};"
+                    f" border: 1.5px solid {theme.TEXT_MUTED};"
                 )
                 text.setStyleSheet(
-                    f"color: {_TEXT_MUTED}; font-size: {_STEP_FONT_SIZE}px;"
+                    f"color: {theme.TEXT_MUTED}; font-size: {_STEP_FONT_SIZE}px;"
                 )
 
         for i, line in enumerate(self._connector_lines):
             if i < active:
-                line.setStyleSheet(f"background-color: {_ACCENT}; border: none;")
+                line.setStyleSheet(f"background-color: {theme.ACCENT}; border: none;")
             else:
                 line.setStyleSheet("background-color: rgba(255,255,255,15); border: none;")
 
@@ -264,10 +254,7 @@ class MainWindow(QMainWindow):
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.Window)
 
         # Services — created once and injected; never re-created on navigation
-        client = EuropePMCClient()
-        search_service = SearchService(client=client)
-        download_service = DownloadService(client=client, search_service=search_service)
-        report_service = ReportService()
+        search_service, download_service, report_service = create_application_services()
 
         # Screens
         self._screen_search = ScreenSearch()
@@ -309,7 +296,7 @@ class MainWindow(QMainWindow):
 
     def _build_ui(self) -> None:
         central = QWidget()
-        central.setStyleSheet(f"background-color: {_APP_BG};")
+        central.setStyleSheet(f"background-color: {theme.APP_BG};")
         self.setCentralWidget(central)
 
         root = QVBoxLayout(central)

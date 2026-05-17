@@ -92,9 +92,23 @@ source .venv/bin/activate
 pip install -e .
 ```
 
+Useful commands for testing
+```
+# run all tests
+pytest
+
+# only run unit tests
+pytest -m "not integration"
+
+# only run integration tests
+pytest -m "integration"
+```
+
 <!-- TOC --><a name="screenshots"></a>
 ## Screenshots
 Note: these are early mockups and may not reflect the final design, screenshots will be added once the UI is implemented.
+
+TODO: update with actual screenshots from the app once the UI is implemented and explain them.
 
 <!-- TOC --><a name="screen-1-search-and-filter-configuration"></a>
 ### Screen 1 - Search and filter configuration

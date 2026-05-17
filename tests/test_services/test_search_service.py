@@ -120,13 +120,13 @@ EMPTY_SEARCH_RESPONSE = {
 # ---------------------------------------------------------------------------
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_client(mocker) -> MagicMock:
     """Return a mock EuropePMCClient."""
     return mocker.MagicMock()
 
 
-@pytest.fixture()
+@pytest.fixture
 def service(mock_client: MagicMock) -> SearchService:
     """Return a SearchService with a mock client."""
     return SearchService(client=mock_client)
