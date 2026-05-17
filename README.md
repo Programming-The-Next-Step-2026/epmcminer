@@ -6,6 +6,7 @@
 
 - [Overview](#overview)
 - [Usage](#usage)
+- [Python API](#python-api)
 - [Development](#development)
 - [Screenshots](#screenshots)
   * [Screen 1 - Search and filter configuration](#screen-1-search-and-filter-configuration)
@@ -79,6 +80,69 @@ python -m epmcminer
 
 # via the installed script
 epmcminer
+```
+
+<!-- TOC --><a name="python-api"></a>
+## Python API
+
+epmcminer can be used as a library without launching the GUI. All public classes and functions are importable directly from the top-level package.
+
+### Available exports
+
+| Name | What it is |
+|---|---|
+| `SearchParams` | Input model — configure your query, filters, and output folder |
+| `SearchResult` | Output model returned by `SearchService.preview()` |
+| `Paper` | A single paper with title, authors, DOI, PDF URL, etc. |
+| `DownloadResult` | Outcome of one download attempt (downloaded / skipped / failed) |
+| `SearchService` | Searches Europe PMC and returns `SearchResult` |
+| `DownloadService` | Downloads PDFs in parallel and returns `list[DownloadResult]` |
+| `ReportService` | Saves `report.csv`, Excel, or PDF exports from results |
+| `create_application_services` | Factory that wires up all three services in one call |
+
+### Example: search and preview results
+
+```python
+import threading
+from pathlib import Path
+import epmcminer
+
+search, download, report = epmcminer.create_application_services()
+
+params = epmcminer.SearchParams(
+    query="depression AND therapy",
+    date_from="2020-01-01",
+    date_to="2024-12-31",
+    publication_types=["Review", "Meta analysis"],
+    licenses=["CC-BY"],
+    count=10,
+    output_folder=Path("/tmp/papers"),
+)
+
+result = search.preview(params)
+print(f"{result.total_found} total results, ~{result.estimated_downloadable} with PDFs")
+for paper in result.papers:
+    print(paper.title, "—", paper.authors)
+```
+
+### Example: download PDFs
+
+```python
+results = download.download(
+    params,
+    progress_callback=lambda r: print(r.status, r.paper.title),
+    cancel_event=threading.Event(),
+)
+
+downloaded = [r for r in results if r.status == epmcminer.DownloadResult.STATUS_DOWNLOADED]
+print(f"Downloaded {len(downloaded)} PDFs to {params.output_folder}/pdfs/")
+```
+
+### Example: save a report
+
+```python
+report.save_csv(results, params, params.output_folder)
+# report.csv is now in /tmp/papers/report.csv
 ```
 
 <!-- TOC --><a name="development"></a>

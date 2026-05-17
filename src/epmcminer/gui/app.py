@@ -1,6 +1,5 @@
 """Main application window managing screen navigation and the step indicator."""
 
-import epmcminer.gui.theme as theme
 from PyQt6.QtCore import QPoint, Qt
 from PyQt6.QtGui import QMouseEvent
 from PyQt6.QtWidgets import (
@@ -14,6 +13,7 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+import epmcminer.gui.theme as theme
 from epmcminer.gui.screens.screen_download import ScreenDownload
 from epmcminer.gui.screens.screen_preview import ScreenPreview
 from epmcminer.gui.screens.screen_search import ScreenSearch

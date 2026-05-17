@@ -221,7 +221,10 @@ class DownloadService:
         except OSError as exc:
             _logger.warning("Failed to write %s: %s", file_path, exc)
             return DownloadResult(
-                paper=paper, status=DownloadResult.STATUS_FAILED, reason="Write error", file_path=None
+                paper=paper,
+                status=DownloadResult.STATUS_FAILED,
+                reason="Write error",
+                file_path=None,
             )
         _logger.info("Downloaded %s to %s", pmid, file_path)
         return DownloadResult(

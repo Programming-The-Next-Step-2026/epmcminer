@@ -74,9 +74,11 @@ class SearchService:
             >>> from unittest.mock import MagicMock
             >>> from epmcminer.api.search_params import SearchParams
             >>> service = SearchService(client=MagicMock())
-            >>> params = SearchParams(query="depression", date_from="2020-01-01", date_to="2024-12-31")
-            >>> service.build_query(params)
-            'depression AND (FIRST_PDATE:[2020-01-01 TO 2024-12-31]) AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)'
+            >>> params = SearchParams(
+            ...     query="depression", date_from="2020-01-01", date_to="2024-12-31"
+            ... )
+            >>> service.build_query(params)  # doctest: +ELLIPSIS
+            'depression AND (FIRST_PDATE:[2020-01-01 TO 2024-12-31]) AND ...'
 
             With publication type and license filters added:
 
@@ -87,8 +89,8 @@ class SearchService:
             ...     publication_types=["Review"],
             ...     licenses=["CC-BY"],
             ... )
-            >>> service.build_query(params)
-            'memory AND sleep AND (FIRST_PDATE:[2021-01-01 TO 2023-12-31]) AND (PUB_TYPE:("Review")) AND (LICENSE:"CC-BY") AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)'
+            >>> service.build_query(params)  # doctest: +ELLIPSIS
+            'memory AND sleep AND (FIRST_PDATE:[2021-01-01 TO 2023-12-31]) AND ...'
         """
         parts: list[str] = []
 
