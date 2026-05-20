@@ -42,6 +42,7 @@ _DOT_DIM = "background-color: rgba(255, 122, 61, 46); border-radius: 3px;"
 
 _DOT_SIZE = 6
 _LOADING_DOT_COUNT = 3
+_THREAD_DOT_COUNT = 3
 _MAX_THREAD_DOTS = 4
 _ANIM_INTERVAL_MS = 500
 
@@ -250,7 +251,7 @@ class ProgressWidget(QWidget):
         dot_layout.setSpacing(5)
 
         dots: list[QFrame] = []
-        for _ in range(_MAX_THREAD_DOTS):
+        for _ in range(_THREAD_DOT_COUNT):
             dot = QFrame()
             dot.setFixedSize(_DOT_SIZE, _DOT_SIZE)
             dot.setStyleSheet(_DOT_DIM)
@@ -304,9 +305,6 @@ class ProgressWidget(QWidget):
         if not self._thread_row.isVisible():
             self._dot_phase = 0
         self._thread_row.setVisible(True)
-        n = min(thread_count, _MAX_THREAD_DOTS)
-        for i, dot in enumerate(self._thread_dots):
-            dot.setVisible(i < n)
         self._thread_label.setText(
             "1 thread running" if thread_count == 1 else f"{thread_count} threads running"
         )
@@ -315,12 +313,10 @@ class ProgressWidget(QWidget):
         if self._loading_row.isVisible():
             self._dot_phase = (self._dot_phase + 1) % _LOADING_DOT_COUNT
             self._update_loading_dots()
-        else:
-            visible = [d for d in self._thread_dots if d.isVisible()]
-            if visible:
-                self._dot_phase = (self._dot_phase + 1) % len(visible)
-                for i, dot in enumerate(visible):
-                    dot.setStyleSheet(_DOT_BRIGHT if i == self._dot_phase else _DOT_DIM)
+        elif self._thread_row.isVisible():
+            self._dot_phase = (self._dot_phase + 1) % _THREAD_DOT_COUNT
+            for i, dot in enumerate(self._thread_dots):
+                dot.setStyleSheet(_DOT_BRIGHT if i == self._dot_phase else _DOT_DIM)
 
     def _update_loading_dots(self) -> None:
         for i, dot in enumerate(self._loading_dot_frames):

@@ -253,12 +253,12 @@ class TestProgressWidgetThreadDots:
         w.set_progress(10, 50, thread_count=3)
         assert w._thread_label.text() == "3 threads running"
 
-    def test_thread_dots_count(self, qapp: QApplication) -> None:
-        """Visible thread dots match thread_count (up to the max)."""
+    def test_thread_dots_always_three(self, qapp: QApplication) -> None:
+        """All 3 thread dots are always visible regardless of thread_count."""
         w = ProgressWidget()
-        w.set_progress(10, 50, thread_count=2)
-        visible = [d for d in w._thread_dots if not d.isHidden()]
-        assert len(visible) == 2
+        w.set_progress(10, 50, thread_count=1)
+        assert len(w._thread_dots) == 3
+        assert all(not d.isHidden() for d in w._thread_dots)
 
     def test_thread_row_hidden_after_none_call(self, qapp: QApplication) -> None:
         """Thread row is hidden when set_progress is called with thread_count=None."""
