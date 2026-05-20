@@ -1,16 +1,12 @@
 """Screen 1 — search query and filter inputs."""
 
-from pathlib import Path
-
 from PyQt6.QtCore import QDate, Qt, pyqtSignal
 from PyQt6.QtWidgets import (
-    QFileDialog,
     QHBoxLayout,
     QLabel,
     QLineEdit,
     QPushButton,
     QScrollArea,
-    QSizePolicy,
     QVBoxLayout,
     QWidget,
 )
@@ -64,18 +60,6 @@ _QUERY_INPUT_STYLE = f"""
     }}
 """
 
-_FOLDER_INPUT_STYLE = f"""
-    QLineEdit {{
-        background-color: {theme.CARD_INNER};
-        color: {theme.TEXT_PRIMARY};
-        border: 1px solid {theme.BORDER};
-        border-radius: 12px;
-        padding: 14px 16px;
-        font-size: 15px;
-    }}
-"""
-
-
 _CONTINUE_BTN_STYLE = f"""
     QPushButton {{
         background-color: transparent;
@@ -92,21 +76,6 @@ _CONTINUE_BTN_STYLE = f"""
     QPushButton:disabled {{
         color: {theme.TEXT_MUTED};
         border-color: {theme.BORDER};
-    }}
-"""
-
-_BROWSE_BTN_STYLE = f"""
-    QPushButton {{
-        background-color: transparent;
-        color: {theme.TEXT_PRIMARY};
-        border: 1px solid {theme.BORDER_STRONG};
-        border-radius: 12px;
-        padding: 14px 18px;
-        font-size: 15px;
-        font-weight: 500;
-    }}
-    QPushButton:hover {{
-        background-color: rgba(255, 255, 255, 10);
     }}
 """
 
@@ -151,7 +120,6 @@ class ScreenSearch(QWidget):
         Returns:
             A SearchParams built from the current widget state.
         """
-        folder_text = self._folder_edit.text().strip()
         return SearchParams(
             query=self._query_edit.text().strip(),
             date_from=self._date_from.date().toString("yyyy-MM-dd"),
@@ -159,7 +127,6 @@ class ScreenSearch(QWidget):
             publication_types=self._pub_types.get_tags(),
             licenses=self._license.get_tags(),
             author_orcids=self._orcids.get_tags(),
-            output_folder=Path(folder_text) if folder_text else Path(),
         )
 
     # ------------------------------------------------------------------
@@ -187,7 +154,6 @@ class ScreenSearch(QWidget):
         layout.addWidget(self._make_orcids_card())
         layout.addWidget(self._make_pub_types_card())
         layout.addWidget(self._make_two_col_row())
-        layout.addWidget(self._make_folder_card())
         layout.addStretch()
 
         scroll.setWidget(content)
@@ -290,32 +256,6 @@ class ScreenSearch(QWidget):
         layout.addWidget(date_row)
         return card
 
-    def _make_folder_card(self) -> QWidget:
-        card, layout = make_card()
-        layout.addWidget(make_section_label("Output folder"))
-
-        folder_row = QWidget()
-        folder_layout = QHBoxLayout(folder_row)
-        folder_layout.setContentsMargins(0, 0, 0, 0)
-        folder_layout.setSpacing(10)
-
-        self._folder_edit = QLineEdit()
-        self._folder_edit.setStyle(theme.get_fusion_style())
-        self._folder_edit.setStyleSheet(_FOLDER_INPUT_STYLE)
-        self._folder_edit.setPlaceholderText("/path/to/output")
-        self._folder_edit.setReadOnly(True)
-        folder_layout.addWidget(self._folder_edit, 1)
-
-        browse_btn = QPushButton("Browse")
-        browse_btn.setStyle(theme.get_fusion_style())
-        browse_btn.setStyleSheet(_BROWSE_BTN_STYLE)
-        browse_btn.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-        browse_btn.clicked.connect(self._browse_folder)
-        folder_layout.addWidget(browse_btn)
-
-        layout.addWidget(folder_row)
-        return card
-
     def _make_action_bar(self) -> QWidget:
         bar = QWidget()
         bar.setFixedHeight(72)
@@ -358,8 +298,3 @@ class ScreenSearch(QWidget):
 
     def _on_continue(self) -> None:
         self.search_requested.emit(self.get_params())
-
-    def _browse_folder(self) -> None:
-        folder = QFileDialog.getExistingDirectory(self, "Select output folder")
-        if folder:
-            self._folder_edit.setText(folder)

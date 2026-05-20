@@ -77,10 +77,6 @@ class TestScreenSearchDefaults:
         today = QDate.currentDate()
         assert ScreenSearch()._date_to.maximumDate() == today
 
-    def test_folder_empty_initially(self, qapp: QApplication) -> None:
-        """Output folder field is empty on creation."""
-        assert ScreenSearch()._folder_edit.text() == ""
-
 
 # ---------------------------------------------------------------------------
 # TestScreenSearchValidation
@@ -199,25 +195,6 @@ class TestScreenSearchGetParams:
         w._query_edit.setText("q")
         w._orcids.add_tag("0000-0001-2345-6789")
         assert w.get_params().author_orcids == ["0000-0001-2345-6789"]
-
-    def test_get_params_output_folder_empty_gives_default_path(
-        self, qapp: QApplication
-    ) -> None:
-        """An empty folder field produces the default Path() in SearchParams."""
-        from pathlib import Path
-
-        w = ScreenSearch()
-        w._query_edit.setText("q")
-        assert w.get_params().output_folder == Path()
-
-    def test_get_params_output_folder_set(self, qapp: QApplication) -> None:
-        """A filled folder field is reflected in output_folder."""
-        from pathlib import Path
-
-        w = ScreenSearch()
-        w._query_edit.setText("q")
-        w._folder_edit.setText("/tmp/papers")
-        assert w.get_params().output_folder == Path("/tmp/papers")
 
 
 # ---------------------------------------------------------------------------

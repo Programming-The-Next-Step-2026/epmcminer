@@ -466,24 +466,6 @@ class TestScreenPreviewSortChange:
         w = ScreenPreview(_make_service())
         assert w._sort_index == 0
 
-    def test_load_prefills_folder_from_absolute_params(self, qapp: QApplication) -> None:
-        """load() pre-populates the folder field when params.output_folder is absolute."""
-        w = ScreenPreview(_make_service())
-        with patch("epmcminer.gui.screens.screen_preview.PreviewWorker") as MockWorker:
-            MockWorker.return_value.isRunning.return_value = False
-            w.load(_make_params(output_folder=Path("/tmp/papers")))
-        assert w._folder_edit.text() == "/tmp/papers"
-
-    def test_load_does_not_prefill_folder_from_relative_params(
-        self, qapp: QApplication
-    ) -> None:
-        """load() leaves the folder field blank when params.output_folder is relative."""
-        w = ScreenPreview(_make_service())
-        with patch("epmcminer.gui.screens.screen_preview.PreviewWorker") as MockWorker:
-            MockWorker.return_value.isRunning.return_value = False
-            w.load(_make_params(output_folder=Path()))  # Path() = Path('.')
-        assert w._folder_edit.text() == ""
-
     def test_sort_synced_on_load(self, qapp: QApplication) -> None:
         """load() syncs _sort_index to params.sort_order without triggering a second load."""
         svc = _make_service()

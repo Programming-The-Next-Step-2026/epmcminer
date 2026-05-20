@@ -231,9 +231,6 @@ class ScreenPreview(QWidget):
         self._sort_index = sort_idx
         self._sort_btn.setText(_SORT_LABELS[_SORT_OPTIONS[sort_idx]] + "  ▾")
 
-        if params.output_folder.is_absolute():
-            self._folder_edit.setText(str(params.output_folder))
-
         self._show_loading()
 
         if self._worker is not None and self._worker.isRunning():
