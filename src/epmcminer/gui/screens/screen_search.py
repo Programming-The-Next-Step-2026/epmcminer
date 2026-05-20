@@ -4,7 +4,6 @@ from pathlib import Path
 
 from PyQt6.QtCore import QDate, Qt, pyqtSignal
 from PyQt6.QtWidgets import (
-    QDateEdit,
     QFileDialog,
     QHBoxLayout,
     QLabel,
@@ -18,6 +17,7 @@ from PyQt6.QtWidgets import (
 
 import epmcminer.gui.theme as theme
 from epmcminer.gui.widgets.card import make_card, make_section_label
+from epmcminer.gui.widgets.date_picker import DatePicker
 from epmcminer.gui.widgets.tag_input import TagInput
 from epmcminer.services.models import SearchParams
 
@@ -75,23 +75,6 @@ _FOLDER_INPUT_STYLE = f"""
     }}
 """
 
-_DATE_EDIT_STYLE = f"""
-    QDateEdit {{
-        background-color: {theme.CARD_INNER};
-        color: {theme.TEXT_PRIMARY};
-        border: 1px solid {theme.BORDER};
-        border-radius: 12px;
-        padding: 14px 16px;
-        font-size: 16px;
-    }}
-    QDateEdit:focus {{
-        border-color: rgba(255, 122, 61, 140);
-    }}
-    QDateEdit::drop-down {{
-        border: none;
-        width: 0px;
-    }}
-"""
 
 _CONTINUE_BTN_STYLE = f"""
     QPushButton {{
@@ -285,10 +268,7 @@ class ScreenSearch(QWidget):
         date_layout.setContentsMargins(0, 0, 0, 0)
         date_layout.setSpacing(10)
 
-        self._date_from = QDateEdit()
-        self._date_from.setStyle(theme.get_fusion_style())
-        self._date_from.setStyleSheet(_DATE_EDIT_STYLE)
-        self._date_from.setCalendarPopup(True)
+        self._date_from = DatePicker()
         self._date_from.setDate(five_years_ago)
         self._date_from.setMinimumDate(QDate(2000, 1, 1))
         self._date_from.setMaximumDate(today)
@@ -300,13 +280,11 @@ class ScreenSearch(QWidget):
         arrow.setStyleSheet(f"color: {theme.TEXT_MUTED}; font-size: 16px;")
         date_layout.addWidget(arrow)
 
-        self._date_to = QDateEdit()
-        self._date_to.setStyle(theme.get_fusion_style())
-        self._date_to.setStyleSheet(_DATE_EDIT_STYLE)
-        self._date_to.setCalendarPopup(True)
+        self._date_to = DatePicker()
         self._date_to.setDate(today)
         self._date_to.setMinimumDate(five_years_ago)
         self._date_to.setMaximumDate(today)
+        self._date_to.dateChanged.connect(self._on_date_to_changed)
         date_layout.addWidget(self._date_to)
 
         layout.addWidget(date_row)
@@ -373,6 +351,10 @@ class ScreenSearch(QWidget):
         if self._date_to.date() < new_from:
             self._date_to.setDate(new_from)
         self._date_to.setMinimumDate(new_from)
+
+    def _on_date_to_changed(self, new_to: QDate) -> None:
+        """Enforce start ≤ end by constraining the start date maximum."""
+        self._date_from.setMaximumDate(new_to)
 
     def _on_continue(self) -> None:
         self.search_requested.emit(self.get_params())
