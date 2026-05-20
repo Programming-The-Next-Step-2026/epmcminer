@@ -331,4 +331,11 @@ pyrightconfig.json
 pyvenv.cfg
 pip-selfcheck.json
 
+# SonarQube
+.sonarwork
+
 # End of https://www.toptal.com/developers/gitignore/api/python,macos,pycharm,venv
+
+temp/
+temp.py
+out

@@ -6,6 +6,7 @@
 
 - [Overview](#overview)
 - [Usage](#usage)
+- [Python API](#python-api)
 - [Development](#development)
 - [Screenshots](#screenshots)
   * [Screen 1 - Search and filter configuration](#screen-1-search-and-filter-configuration)
@@ -34,7 +35,7 @@
 <!-- TOC --><a name="overview"></a>
 ## Overview
 
-A desktop application for researchers that automates the retrieval of academic literature from the Europe PubMed Central (Europe PMC) API. It allows users to define a search query and a set of filters, preview matching results, and download up to a specified number of open-access papers — including their PDFs and metadata — into a structured local folder.
+A desktop application for researchers that automates the retrieval of academic literature from the [Europe PubMed Central (Europe PMC) API](https://europepmc.org/RestfulWebService). It allows users to define a search query and a set of filters, preview matching results, and download up to a specified number of open-access papers — including their PDFs and metadata — into a structured local folder.
 
 epmcminer is designed for researchers in psychology and adjacent fields who need to systematically collect literature without manual searching and downloading. It requires no programming knowledge and provides a clean, step-by-step interface that guides the user from query construction to a downloadable report of results.
 
@@ -51,7 +52,98 @@ epmcminer only retrieves papers that are freely and legally available in full te
 
 <!-- TOC --><a name="usage"></a>
 ## Usage
-TODO add in the future
+
+### System prerequisites (Linux only)
+
+PyQt6 requires two OpenGL/EGL system libraries that are not always present on minimal Linux installs:
+
+```bash
+sudo apt-get install -y libegl1 libgl1
+```
+
+macOS and Windows users do not need this step.
+
+### Install and run
+
+First, activate your virtual environment and install the package:
+
+```bash
+source venv/bin/activate
+pip install -e ".[dev]"
+```
+
+Then launch the application using either of the following:
+
+```bash
+# as a module
+python -m epmcminer
+
+# via the installed script
+epmcminer
+```
+
+<!-- TOC --><a name="python-api"></a>
+## Python API
+
+epmcminer can be used as a library without launching the GUI. All public classes and functions are importable directly from the top-level package.
+
+### Available exports
+
+| Name | What it is |
+|---|---|
+| `SearchParams` | Input model — configure your query, filters, and output folder |
+| `SearchResult` | Output model returned by `SearchService.preview()` |
+| `Paper` | A single paper with title, authors, DOI, PDF URL, etc. |
+| `DownloadResult` | Outcome of one download attempt (downloaded / skipped / failed) |
+| `SearchService` | Searches Europe PMC and returns `SearchResult` |
+| `DownloadService` | Downloads PDFs in parallel and returns `list[DownloadResult]` |
+| `ReportService` | Saves `report.csv`, Excel, or PDF exports from results |
+| `create_application_services` | Factory that wires up all three services in one call |
+
+### Example: search and preview results
+
+```python
+import threading
+from pathlib import Path
+import epmcminer
+
+search, download, report = epmcminer.create_application_services()
+
+params = epmcminer.SearchParams(
+    query="depression AND therapy",
+    date_from="2020-01-01",
+    date_to="2024-12-31",
+    publication_types=["Review", "Meta analysis"],
+    licenses=["CC-BY"],
+    count=10,
+    output_folder=Path("/tmp/papers"),
+)
+
+result = search.preview(params)
+print(f"{result.total_found} total results, ~{result.estimated_downloadable} with PDFs")
+for paper in result.papers:
+    print(paper.title, "—", paper.authors)
+```
+
+### Example: download PDFs
+
+```python
+results = download.download(
+    params,
+    progress_callback=lambda r: print(r.status, r.paper.title),
+    cancel_event=threading.Event(),
+)
+
+downloaded = [r for r in results if r.status == epmcminer.DownloadResult.STATUS_DOWNLOADED]
+print(f"Downloaded {len(downloaded)} PDFs to {params.output_folder}/pdfs/")
+```
+
+### Example: save a report
+
+```python
+report.save_csv(results, params, params.output_folder)
+# report.csv is now in /tmp/papers/report.csv
+```
 
 <!-- TOC --><a name="development"></a>
 ## Development
@@ -64,9 +156,23 @@ source .venv/bin/activate
 pip install -e .
 ```
 
+Useful commands for testing
+```
+# run all tests
+pytest
+
+# only run unit tests
+pytest -m "not integration"
+
+# only run integration tests
+pytest -m "integration"
+```
+
 <!-- TOC --><a name="screenshots"></a>
 ## Screenshots
 Note: these are early mockups and may not reflect the final design, screenshots will be added once the UI is implemented.
+
+TODO: update with actual screenshots from the app once the UI is implemented and explain them.
 
 <!-- TOC --><a name="screen-1-search-and-filter-configuration"></a>
 ### Screen 1 - Search and filter configuration
