@@ -4,6 +4,7 @@ import sys
 
 from PyQt6.QtWidgets import QApplication
 
+import epmcminer.gui.theme as theme
 from epmcminer.gui.app import MainWindow
 
 
@@ -14,6 +15,7 @@ def main() -> None:
     and enters the Qt event loop.
     """
     app = QApplication(sys.argv)
+    app.setStyleSheet(theme.SCROLLBAR_STYLE)
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
