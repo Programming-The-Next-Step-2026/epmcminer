@@ -141,11 +141,21 @@ class DownloadService:
             A list of DownloadResult objects in completion order.
         """
         results: list[DownloadResult] = []
+        active = 0
+        lock = threading.Lock()
+
+        def run_one(raw: dict) -> DownloadResult:
+            nonlocal active
+            with lock:
+                active += 1
+            result = self._download_one(raw, pdfs_dir)
+            with lock:
+                active -= 1
+                result.active_threads = active
+            return result
+
         with ThreadPoolExecutor(max_workers=self.MAX_WORKERS) as executor:
-            futures = {
-                executor.submit(self._download_one, raw, pdfs_dir): raw
-                for raw in raw_results
-            }
+            futures = {executor.submit(run_one, raw): raw for raw in raw_results}
             for future in as_completed(futures):
                 result = future.result()
                 results.append(result)

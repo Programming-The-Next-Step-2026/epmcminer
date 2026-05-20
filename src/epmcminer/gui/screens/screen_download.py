@@ -393,7 +393,7 @@ class ScreenDownload(QWidget):
             self._downloaded_count(),
             self._total,
             eta_seconds=self._eta_seconds(),
-            thread_count=DownloadService.MAX_WORKERS,
+            thread_count=result.active_threads or None,
             processed=self._completed,
         )
         self._add_log_row(result)
