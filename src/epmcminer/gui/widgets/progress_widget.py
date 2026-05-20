@@ -40,17 +40,9 @@ _ETA_SUB_STYLE = "color: #8a8a8d; font-size: 13px;"
 _DOT_BRIGHT = "background-color: #ff7a3d; border-radius: 3px;"
 _DOT_DIM = "background-color: rgba(255, 122, 61, 46); border-radius: 3px;"
 
-# Thread dot styles: static decreasing opacity (0.85, 0.67, 0.49, 0.31 × 255).
-_THREAD_DOT_STYLES = [
-    "background-color: rgba(255, 122, 61, 217); border-radius: 3px;",
-    "background-color: rgba(255, 122, 61, 171); border-radius: 3px;",
-    "background-color: rgba(255, 122, 61, 125); border-radius: 3px;",
-    "background-color: rgba(255, 122, 61, 79);  border-radius: 3px;",
-]
-
 _DOT_SIZE = 6
 _LOADING_DOT_COUNT = 3
-_MAX_THREAD_DOTS = len(_THREAD_DOT_STYLES)
+_MAX_THREAD_DOTS = 4
 _ANIM_INTERVAL_MS = 500
 
 
@@ -75,7 +67,7 @@ class ProgressWidget(QWidget):
         self._build_ui()
         self._anim_timer = QTimer(self)
         self._anim_timer.setInterval(_ANIM_INTERVAL_MS)
-        self._anim_timer.timeout.connect(self._tick_loading_dots)
+        self._anim_timer.timeout.connect(self._tick_dots)
         self.reset()
 
     # ------------------------------------------------------------------
@@ -118,7 +110,8 @@ class ProgressWidget(QWidget):
             thread_count: Number of active download threads, or ``None``
                 to hide the thread dot indicators.
         """
-        self._anim_timer.stop()
+        if not self._anim_timer.isActive():
+            self._anim_timer.start()
         self._bar.setRange(0, max(total, 1))
         self._bar.setValue(current)
         self._bar.setVisible(True)
@@ -249,10 +242,10 @@ class ProgressWidget(QWidget):
         dot_layout.setSpacing(5)
 
         dots: list[QFrame] = []
-        for style in _THREAD_DOT_STYLES:
+        for _ in range(_MAX_THREAD_DOTS):
             dot = QFrame()
             dot.setFixedSize(_DOT_SIZE, _DOT_SIZE)
-            dot.setStyleSheet(style)
+            dot.setStyleSheet(_DOT_DIM)
             dot_layout.addWidget(dot)
             dots.append(dot)
 
@@ -300,6 +293,8 @@ class ProgressWidget(QWidget):
         if thread_count is None:
             self._thread_row.setVisible(False)
             return
+        if not self._thread_row.isVisible():
+            self._dot_phase = 0
         self._thread_row.setVisible(True)
         n = min(thread_count, _MAX_THREAD_DOTS)
         for i, dot in enumerate(self._thread_dots):
@@ -308,9 +303,16 @@ class ProgressWidget(QWidget):
             "1 thread running" if thread_count == 1 else f"{thread_count} threads running"
         )
 
-    def _tick_loading_dots(self) -> None:
-        self._dot_phase = (self._dot_phase + 1) % _LOADING_DOT_COUNT
-        self._update_loading_dots()
+    def _tick_dots(self) -> None:
+        if self._loading_row.isVisible():
+            self._dot_phase = (self._dot_phase + 1) % _LOADING_DOT_COUNT
+            self._update_loading_dots()
+        else:
+            visible = [d for d in self._thread_dots if d.isVisible()]
+            if visible:
+                self._dot_phase = (self._dot_phase + 1) % len(visible)
+                for i, dot in enumerate(visible):
+                    dot.setStyleSheet(_DOT_BRIGHT if i == self._dot_phase else _DOT_DIM)
 
     def _update_loading_dots(self) -> None:
         for i, dot in enumerate(self._loading_dot_frames):
