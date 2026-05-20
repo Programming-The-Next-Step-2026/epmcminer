@@ -243,10 +243,10 @@ class TestScreenPreviewResultsState:
         assert w._stat_total_value.text() == "1,247"
 
     def test_on_result_stat_pdf_available(self, qapp: QApplication) -> None:
-        """Stat tile shows estimated_downloadable."""
+        """Stat tile shows PDF availability as percentage of previewed papers."""
         w = ScreenPreview(_make_service())
-        w._on_result(_make_result(pdf_count=892))
-        assert w._stat_pdf_value.text() == "892"
+        w._on_result(_make_result(n_papers=5, pdf_count=4))
+        assert w._stat_pdf_value.text() == "~80%"
 
     def test_on_result_stat_previewing(self, qapp: QApplication) -> None:
         """Stat tile shows number of papers in the preview list."""

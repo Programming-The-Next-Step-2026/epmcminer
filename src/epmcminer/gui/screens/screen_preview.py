@@ -348,7 +348,7 @@ class ScreenPreview(QWidget):
             "Total results", "matching your query"
         )
         tile_pdf, self._stat_pdf_value = self._make_stat_tile(
-            "PDF available", "open-access full text"
+            "PDF available", "of previewed results"
         )
         tile_prev, self._stat_previewing_value = self._make_stat_tile(
             "Previewing", "top results shown below"
@@ -558,9 +558,11 @@ class ScreenPreview(QWidget):
 
     def _on_result(self, result: SearchResult) -> None:
         """Handle a successful preview result from the worker."""
+        n_previewed = len(result.papers)
+        pdf_pct = round(100 * result.estimated_downloadable / n_previewed) if n_previewed else 0
         self._stat_total_value.setText(f"{result.total_found:,}")
-        self._stat_pdf_value.setText(f"{result.estimated_downloadable:,}")
-        self._stat_previewing_value.setText(str(len(result.papers)))
+        self._stat_pdf_value.setText(f"~{pdf_pct}%")
+        self._stat_previewing_value.setText(str(n_previewed))
         self._populate_paper_list(result.papers)
         self._progress.setVisible(False)
         self._error_widget.setVisible(False)
