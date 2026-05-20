@@ -99,16 +99,19 @@ class ProgressWidget(QWidget):
         total: int,
         eta_seconds: int | None = None,
         thread_count: int | None = None,
+        processed: int | None = None,
     ) -> None:
         """Show a determinate progress bar with download statistics.
 
         Args:
             current: Number of papers successfully downloaded so far.
-            total: Total number of papers requested.
+            total: Total number of papers requested (used for percentage).
             eta_seconds: Estimated seconds remaining, or ``None`` to hide
                 the ETA display.
             thread_count: Number of active download threads, or ``None``
                 to hide the thread dot indicators.
+            processed: Total papers processed (attempted) so far, or
+                ``None`` to omit the processed count from the label.
         """
         if not self._anim_timer.isActive():
             self._anim_timer.start()
@@ -118,7 +121,12 @@ class ProgressWidget(QWidget):
 
         pct = round(100 * current / total) if total > 0 else 0
         self._pct_label.setText(f"{pct}%")
-        self._count_label.setText(f"{current} downloaded out of {total} processed papers")
+        if processed is not None:
+            self._count_label.setText(
+                f"downloaded {current} out of {total}  –  processed {processed} results"
+            )
+        else:
+            self._count_label.setText(f"downloaded {current} out of {total}")
 
         self._update_eta(eta_seconds)
         self._update_thread_dots(thread_count)

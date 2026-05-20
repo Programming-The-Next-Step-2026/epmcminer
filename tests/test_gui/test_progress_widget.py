@@ -142,11 +142,17 @@ class TestProgressWidgetProgressState:
         w.set_progress(23, 50)
         assert w._pct_label.text() == "46%"
 
-    def test_set_progress_count_label(self, qapp: QApplication) -> None:
-        """Count label shows 'X downloaded out of Y processed papers'."""
+    def test_set_progress_count_label_without_processed(self, qapp: QApplication) -> None:
+        """Count label shows 'downloaded X out of Y' when processed is not given."""
         w = ProgressWidget()
         w.set_progress(23, 50)
-        assert w._count_label.text() == "23 downloaded out of 50 processed papers"
+        assert w._count_label.text() == "downloaded 23 out of 50"
+
+    def test_set_progress_count_label_with_processed(self, qapp: QApplication) -> None:
+        """Count label includes processed count when the processed argument is provided."""
+        w = ProgressWidget()
+        w.set_progress(23, 50, processed=30)
+        assert w._count_label.text() == "downloaded 23 out of 50  –  processed 30 results"
 
     def test_set_progress_percentage_zero(self, qapp: QApplication) -> None:
         """Percentage is 0% when current is 0."""
@@ -166,7 +172,7 @@ class TestProgressWidgetProgressState:
         w.set_progress(10, 50)
         w.set_progress(30, 50)
         assert w._pct_label.text() == "60%"
-        assert w._count_label.text() == "30 downloaded out of 50 processed papers"
+        assert w._count_label.text() == "downloaded 30 out of 50"
 
 
 # ---------------------------------------------------------------------------

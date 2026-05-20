@@ -391,9 +391,10 @@ class ScreenDownload(QWidget):
         self._completed += 1
         self._progress.set_progress(
             self._downloaded_count(),
-            self._completed,
+            self._total,
             eta_seconds=self._eta_seconds(),
             thread_count=DownloadService.MAX_WORKERS,
+            processed=self._completed,
         )
         self._add_log_row(result)
 
@@ -401,7 +402,7 @@ class ScreenDownload(QWidget):
         """Handle completion of the full download run."""
         self._cancel_btn.setEnabled(False)
         downloaded = sum(1 for r in results if r.status == DownloadResult.STATUS_DOWNLOADED)
-        self._progress.set_progress(downloaded, max(self._completed, 1))
+        self._progress.set_progress(downloaded, max(self._total, 1), processed=self._completed)
         if self._params is not None:
             try:
                 self._report_service.save_csv(
