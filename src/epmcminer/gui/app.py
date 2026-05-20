@@ -1,5 +1,8 @@
 """Main application window managing screen navigation and the step indicator."""
 
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as _pkg_version
+
 from PyQt6.QtCore import QPoint, Qt
 from PyQt6.QtGui import QMouseEvent
 from PyQt6.QtWidgets import (
@@ -21,7 +24,12 @@ from epmcminer.gui.screens.screen_summary import ScreenSummary
 from epmcminer.services import create_application_services
 from epmcminer.services.models import SearchParams
 
-APP_TITLE = "epmcminer"
+try:
+    APP_VERSION = _pkg_version("epmcminer")
+except PackageNotFoundError:
+    APP_VERSION = "dev"
+
+APP_TITLE = f"epmcminer v{APP_VERSION}"
 MINIMUM_WIDTH = 820
 MINIMUM_HEIGHT = 600
 DEFAULT_WIDTH = 960
@@ -32,9 +40,9 @@ DEFAULT_HEIGHT = 700
 _STEP_LABELS = ["Search", "Preview", "Download", "Summary"]
 _STEP_COUNT = len(_STEP_LABELS)
 _STEP_FONT_SIZE = 11
-_STEP_TOP_MARGIN = 10  # vertical padding above circles inside each step widget
+_STEP_TOP_MARGIN = 20  # vertical padding above circles inside each step widget
 
-_TITLE_BAR_HEIGHT = 64
+_TITLE_BAR_HEIGHT = 74
 _CIRCLE_SIZE = 26
 _CIRCLE_RADIUS = _CIRCLE_SIZE // 2
 _LINE_HEIGHT = 2
@@ -84,12 +92,18 @@ class _TitleBar(QWidget):
         layout.addStretch(1)
         layout.addLayout(self._make_steps())
         layout.addStretch(1)
-        # Mirror the traffic-lights section width on the right to keep steps centred
-        layout.addSpacing(
-            _TRAFFIC_LIGHTS_LEFT_MARGIN * 2
-            + _TRAFFIC_LIGHT_SIZE * 3
-            + _TRAFFIC_LIGHT_SPACING * 2
+        layout.addLayout(self._make_app_title())
+
+    def _make_app_title(self) -> QHBoxLayout:
+        lay = QHBoxLayout()
+        lay.setContentsMargins(0, 0, _TRAFFIC_LIGHTS_LEFT_MARGIN, 0)
+        lay.setSpacing(0)
+        lbl = QLabel(f"epmcminer  v{APP_VERSION}")
+        lbl.setStyleSheet(
+            f"color: {theme.ACCENT}; font-size: 12px; background-color: transparent;"
         )
+        lay.addWidget(lbl)
+        return lay
 
     def _make_traffic_lights(self) -> QHBoxLayout:
         btn_layout = QHBoxLayout()
