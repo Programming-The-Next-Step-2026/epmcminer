@@ -82,6 +82,17 @@ python -m epmcminer
 epmcminer
 ```
 
+### Tutorial notebook
+
+A step-by-step walkthrough of all four screens — with a worked example and sample output — is available as an interactive Jupyter notebook:
+
+```bash
+pip install jupyter
+jupyter lab docs/vignette.ipynb
+```
+
+The notebook also renders statically on GitHub (including the Mermaid flowchart) if you'd rather read it without launching Jupyter.
+
 <!-- TOC --><a name="python-api"></a>
 ## Python API
 
