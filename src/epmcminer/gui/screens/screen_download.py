@@ -389,12 +389,14 @@ class ScreenDownload(QWidget):
         """Handle one completed download attempt from the worker."""
         self._results.append(result)
         self._completed += 1
+        cancelling = self._worker is not None and self._worker.cancel_event.is_set()
         self._progress.set_progress(
             self._downloaded_count(),
             self._total,
             eta_seconds=self._eta_seconds(),
             thread_count=result.active_threads or None,
             processed=self._completed,
+            cancelling=cancelling,
         )
         self._add_log_row(result)
 

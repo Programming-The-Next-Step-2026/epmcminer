@@ -287,6 +287,28 @@ class TestDownload:
         assert mock_client.search.call_count == 1
         assert len(results) == 1
 
+    def test_cancel_mid_batch_does_not_raise(
+        self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
+    ) -> None:
+        """Cancelling mid-batch does not raise CancelledError or trigger an error callback."""
+        cancel_event = threading.Event()
+        papers = [make_raw_paper(pdf_url=None) for _ in range(10)]
+        mock_client.search.return_value = make_search_response(papers, next_cursor="c2")
+
+        callback_results: list = []
+
+        def callback(r: object) -> None:
+            callback_results.append(r)
+            cancel_event.set()
+
+        results = service.download(
+            make_params(tmp_path, count=10),
+            progress_callback=callback,
+            cancel_event=cancel_event,
+        )
+
+        assert isinstance(results, list)
+
     def test_download_stops_when_count_reached(
         self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
     ) -> None:

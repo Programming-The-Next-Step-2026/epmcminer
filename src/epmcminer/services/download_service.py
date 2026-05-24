@@ -104,7 +104,9 @@ class DownloadService:
                 break
 
             if page_size == DOWNLOAD_PAGE_SIZE:
-                page_results = self._download_page(raw_results, pdfs_dir, progress_callback)
+                page_results = self._download_page(
+                    raw_results, pdfs_dir, progress_callback, cancel_event
+                )
                 for result in page_results:
                     all_results.append(result)
                     if result.status == DownloadResult.STATUS_DOWNLOADED:
@@ -128,14 +130,20 @@ class DownloadService:
         raw_results: list[dict],
         pdfs_dir: Path,
         progress_callback: Callable[[DownloadResult], None],
+        cancel_event: threading.Event,
     ) -> list[DownloadResult]:
         """Download papers from one API page in parallel, calling progress_callback
         immediately as each individual download completes.
+
+        Respects cancel_event: tasks that have not yet started HTTP work are
+        short-circuited immediately; in-flight requests complete naturally.
 
         Args:
             raw_results: List of raw result dicts from the API.
             pdfs_dir: Directory where PDFs are saved.
             progress_callback: Called once per completed download.
+            cancel_event: When set, queued tasks are skipped and no new
+                HTTP requests are started.
 
         Returns:
             A list of DownloadResult objects in completion order.
@@ -146,6 +154,24 @@ class DownloadService:
 
         def run_one(raw: dict) -> DownloadResult:
             nonlocal active
+            if cancel_event.is_set():
+                pmid = raw.get("pmid") or raw.get("id", "")
+                paper = Paper(
+                    pmid=pmid,
+                    doi=raw.get("doi", ""),
+                    title=raw.get("title", ""),
+                    authors=raw.get("authorString", ""),
+                    journal=raw.get("journalTitle", ""),
+                    year=raw.get("pubYear", ""),
+                    abstract=raw.get("abstractText", ""),
+                    pdf_url=None,
+                )
+                return DownloadResult(
+                    paper=paper,
+                    status=DownloadResult.STATUS_SKIPPED,
+                    reason="Cancelled",
+                    file_path=None,
+                )
             with lock:
                 active += 1
             result = self._download_one(raw, pdfs_dir)

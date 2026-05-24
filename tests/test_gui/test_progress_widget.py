@@ -267,6 +267,18 @@ class TestProgressWidgetThreadDots:
         w.set_progress(20, 50, thread_count=None)
         assert w._thread_row.isHidden()
 
+    def test_thread_label_cancelling_singular(self, qapp: QApplication) -> None:
+        """cancelling=True with thread_count=1 shows 'cancelling, waiting for 1 thread'."""
+        w = ProgressWidget()
+        w.set_progress(10, 50, thread_count=1, cancelling=True)
+        assert w._thread_label.text() == "cancelling, waiting for 1 thread"
+
+    def test_thread_label_cancelling_plural(self, qapp: QApplication) -> None:
+        """cancelling=True with thread_count>1 shows 'cancelling, waiting for N threads'."""
+        w = ProgressWidget()
+        w.set_progress(10, 50, thread_count=3, cancelling=True)
+        assert w._thread_label.text() == "cancelling, waiting for 3 threads"
+
 
 # ---------------------------------------------------------------------------
 # TestProgressWidgetReset

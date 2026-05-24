@@ -101,6 +101,7 @@ class ProgressWidget(QWidget):
         eta_seconds: int | None = None,
         thread_count: int | None = None,
         processed: int | None = None,
+        cancelling: bool = False,
     ) -> None:
         """Show a determinate progress bar with download statistics.
 
@@ -113,6 +114,9 @@ class ProgressWidget(QWidget):
                 to hide the thread dot indicators.
             processed: Total papers processed (attempted) so far, or
                 ``None`` to omit the processed count from the label.
+            cancelling: When ``True``, the thread label reads
+                "cancelling, waiting for N thread(s)" instead of
+                "N thread(s) running".
         """
         if not self._anim_timer.isActive():
             self._anim_timer.start()
@@ -130,7 +134,7 @@ class ProgressWidget(QWidget):
             self._count_label.setText(f"downloaded {current} out of {total}")
 
         self._update_eta(eta_seconds)
-        self._update_thread_dots(thread_count)
+        self._update_thread_dots(thread_count, cancelling)
 
         self._loading_row.setVisible(False)
         self._stats_row.setVisible(True)
@@ -298,16 +302,20 @@ class ProgressWidget(QWidget):
         else:
             self._eta_value.setText(f"~{eta_seconds}s")
 
-    def _update_thread_dots(self, thread_count: int | None) -> None:
+    def _update_thread_dots(self, thread_count: int | None, cancelling: bool = False) -> None:
         if thread_count is None:
             self._thread_row.setVisible(False)
             return
         if not self._thread_row.isVisible():
             self._dot_phase = 0
         self._thread_row.setVisible(True)
-        self._thread_label.setText(
-            "1 thread running" if thread_count == 1 else f"{thread_count} threads running"
-        )
+        if cancelling:
+            noun = "thread" if thread_count == 1 else "threads"
+            self._thread_label.setText(f"cancelling, waiting for {thread_count} {noun}")
+        else:
+            self._thread_label.setText(
+                "1 thread running" if thread_count == 1 else f"{thread_count} threads running"
+            )
 
     def _tick_dots(self) -> None:
         if self._loading_row.isVisible():
