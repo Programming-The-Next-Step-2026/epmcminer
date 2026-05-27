@@ -124,6 +124,76 @@ class TestScreenSearchValidation:
         w._query_edit.setText("   ")
         assert not w._continue_btn.isEnabled()
 
+    def test_continue_button_disabled_when_no_license(self, qapp: QApplication) -> None:
+        """Button is disabled when all licenses are removed."""
+        w = ScreenSearch()
+        w._query_edit.setText("depression")
+        w._license.set_tags([])
+        assert not w._continue_btn.isEnabled()
+
+    def test_continue_button_enabled_after_license_restored(self, qapp: QApplication) -> None:
+        """Button re-enables when a license is added back."""
+        w = ScreenSearch()
+        w._query_edit.setText("depression")
+        w._license.set_tags([])
+        w._license.add_tag("CC-BY")
+        assert w._continue_btn.isEnabled()
+
+    def test_query_max_length_is_500(self, qapp: QApplication) -> None:
+        """Query input enforces a maximum length of 500 characters."""
+        w = ScreenSearch()
+        assert w._query_edit.maxLength() == 500
+
+    def test_date_from_minimum_is_1900(self, qapp: QApplication) -> None:
+        """Date From minimum is 1 January 1900."""
+        w = ScreenSearch()
+        assert w._date_from.minimumDate() == QDate(1900, 1, 1)
+
+
+# ---------------------------------------------------------------------------
+# TestScreenSearchHintLabel
+# ---------------------------------------------------------------------------
+
+
+class TestScreenSearchHintLabel:
+    """Tests for the action-bar hint label driven by _validate."""
+
+    def test_hint_label_hidden_when_all_valid(self, qapp: QApplication) -> None:
+        """Hint label is hidden when query and all tag fields are populated."""
+        w = ScreenSearch()
+        w._query_edit.setText("depression")
+        assert not w._hint_lbl.isVisible()
+
+    def test_hint_label_visible_when_query_empty(self, qapp: QApplication) -> None:
+        """Hint label is not explicitly hidden on initial load (query is empty)."""
+        w = ScreenSearch()
+        assert not w._hint_lbl.isHidden()
+
+    def test_hint_label_contains_keyword_when_query_missing(self, qapp: QApplication) -> None:
+        """Hint text mentions 'keyword' when the query field is empty."""
+        w = ScreenSearch()
+        assert "keyword" in w._hint_lbl.text().lower()
+
+    def test_hint_label_contains_license_when_only_license_missing(
+        self, qapp: QApplication
+    ) -> None:
+        """Hint text mentions 'license' when only the license field is empty."""
+        w = ScreenSearch()
+        w._query_edit.setText("depression")
+        w._license.set_tags([])
+        assert "license" in w._hint_lbl.text().lower()
+
+    def test_hint_label_mentions_all_missing_fields(self, qapp: QApplication) -> None:
+        """Hint text covers all three missing fields simultaneously."""
+        w = ScreenSearch()
+        # query empty, pub types cleared, license cleared
+        w._pub_types.set_tags([])
+        w._license.set_tags([])
+        text = w._hint_lbl.text().lower()
+        assert "keyword" in text
+        assert "publication" in text
+        assert "license" in text
+
 
 # ---------------------------------------------------------------------------
 # TestScreenSearchGetParams

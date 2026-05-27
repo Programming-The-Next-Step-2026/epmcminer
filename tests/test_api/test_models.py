@@ -140,6 +140,25 @@ class TestSearchParams:
         )
         assert isinstance(params.output_folder, Path)
 
+    def test_output_folder_defaults_to_none(self) -> None:
+        """output_folder defaults to None when not provided."""
+        params = SearchParams(
+            query="test",
+            date_from="2020-01-01",
+            date_to="2024-12-31",
+            count=1,
+        )
+        assert params.output_folder is None
+
+    def test_output_folder_none_does_not_raise(self) -> None:
+        """Constructing SearchParams without output_folder does not raise."""
+        SearchParams(
+            query="test",
+            date_from="2020-01-01",
+            date_to="2024-12-31",
+            count=1,
+        )  # must not raise
+
 
 # ---------------------------------------------------------------------------
 # Paper

@@ -4,7 +4,6 @@ import pytest
 
 from epmcminer.utils.orcid_utils import normalise_orcid, validate_orcid_format
 
-
 # ---------------------------------------------------------------------------
 # TestValidateOrcidFormat
 # ---------------------------------------------------------------------------

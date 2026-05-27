@@ -232,6 +232,7 @@ class ScreenSearch(QWidget):
         """Wire validation signals after all widgets are constructed."""
         self._query_edit.textChanged.connect(self._validate)
         self._pub_types.tags_changed.connect(self._validate)
+        self._license.tags_changed.connect(self._validate)
 
     def _make_query_card(self) -> QWidget:
         card, layout = make_card()
@@ -241,6 +242,7 @@ class ScreenSearch(QWidget):
         self._query_edit.setStyle(theme.get_fusion_style())
         self._query_edit.setStyleSheet(_QUERY_INPUT_STYLE)
         self._query_edit.setPlaceholderText("e.g. depression AND therapy")
+        self._query_edit.setMaxLength(500)
         layout.addWidget(self._query_edit)
 
         hint = QLabel("Defaults to AND if no operator specified")
@@ -305,7 +307,7 @@ class ScreenSearch(QWidget):
 
         self._date_from = DatePicker()
         self._date_from.setDate(five_years_ago)
-        self._date_from.setMinimumDate(QDate(2000, 1, 1))
+        self._date_from.setMinimumDate(QDate(1900, 1, 1))
         self._date_from.setMaximumDate(today)
         self._date_from.dateChanged.connect(self._on_date_from_changed)
         date_layout.addWidget(self._date_from)
@@ -357,20 +359,22 @@ class ScreenSearch(QWidget):
     # ------------------------------------------------------------------
 
     def _validate(self) -> None:
-        """Enable the continue button when query is non-empty and pub types selected."""
+        """Enable the continue button when all required fields are satisfied."""
         has_query = bool(self._query_edit.text().strip())
         has_pub_types = bool(self._pub_types.get_tags())
-        ok = has_query and has_pub_types
+        has_license = bool(self._license.get_tags())
+        ok = has_query and has_pub_types and has_license
         self._continue_btn.setEnabled(ok)
 
         if not ok:
-            if not has_query and not has_pub_types:
-                msg = "Enter a keyword and select at least one publication type to continue"
-            elif not has_query:
-                msg = "Enter a search keyword to continue"
-            else:
-                msg = "Select at least one publication type to continue"
-            self._hint_lbl.setText(msg)
+            parts: list[str] = []
+            if not has_query:
+                parts.append("Enter a search keyword")
+            if not has_pub_types:
+                parts.append("Select a publication type")
+            if not has_license:
+                parts.append("Select a license")
+            self._hint_lbl.setText("  ·  ".join(parts))
             self._hint_lbl.setVisible(True)
         else:
             self._hint_lbl.setVisible(False)

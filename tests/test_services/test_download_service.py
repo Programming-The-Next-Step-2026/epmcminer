@@ -582,3 +582,23 @@ class TestDownload:
         )
 
         mock_search_service.build_query.assert_called_once_with(params)
+
+    def test_download_raises_when_output_folder_is_none(
+        self,
+        service: DownloadService,
+        tmp_path: Path,
+    ) -> None:
+        """download() raises ValueError when params.output_folder is None."""
+        params = SearchParams(
+            query="test",
+            date_from="2020-01-01",
+            date_to="2024-12-31",
+            count=1,
+            output_folder=None,
+        )
+        with pytest.raises(ValueError, match="output_folder"):
+            service.download(
+                params,
+                progress_callback=lambda r: None,
+                cancel_event=threading.Event(),
+            )

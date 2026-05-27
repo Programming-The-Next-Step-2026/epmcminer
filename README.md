@@ -208,7 +208,7 @@ TODO: update with actual screenshots from the app once the UI is implemented and
 <!-- TOC --><a name="f1-keyword-search-input"></a>
 ### F1: Keyword search input
 
-Users can enter a search query using free text. If no boolean operators are specified, AND logic is assumed between words. Users can explicitly use AND or OR operators (case-insensitive) to control query logic.
+Users can enter a search query using free text. If no boolean operators are specified, AND logic is assumed between words. Users can explicitly use AND or OR operators (case-insensitive) to control query logic. The query field accepts up to 500 characters.
 
 ---
 
@@ -218,7 +218,7 @@ Users can enter a search query using free text. If no boolean operators are spec
 The following filters are available on the search screen.
 
 **Date range**
-Two date pickers for start and end date. Default: start = 5 years ago, end = today. The end date is capped at today.
+Two date pickers for start and end date. Default: start = 5 years ago, end = today. The start date can be set as far back as 1 January 1900. The end date is capped at today.
 
 **Publication type**
 A tag-style input field pre-loaded with the following default types: Review, Meta analysis, Clinical trial, Systematic review, Comparative study, Observational study, Randomized controlled trial, Twin study, Validation study, Case reports, Dataset, Corrected and republished article, Clinical study, Evaluation study, Multicenter study, Observational study (veterinary), Randomized controlled trial (veterinary), Books. The user can remove any tag or add new ones from a dropdown of all types available in the Europe PMC API. At least one type must be selected.
@@ -234,7 +234,7 @@ Each ORCID is validated in two steps as soon as it is added:
 1. **Format check** (synchronous) — verifies the four-group pattern and the ISO 7064 MOD 11-2 checksum digit. Invalid ORCIDs are shown as a red pill immediately.
 2. **Registry check** (asynchronous) — queries the ORCID public API (`pub.orcid.org`) to confirm the identifier exists. While the check is in flight the pill is shown in grey ("pending"). On success it turns orange; on failure it turns red. If the network is unreachable the pill stays grey so the user can still proceed (fail-open).
 
-Tags in any state (valid, pending, or invalid) are included in the search query — the validation is informational and does not block submission.
+Red pills (invalid format or not found in the registry) are **excluded** from the search query. Pending (grey) ORCIDs — where the registry was unreachable — are still included so the user can proceed without network access. The validation is informational and does not block submission.
 
 **Full-text availability**
 Not a user-facing filter — hardcoded requirement that all results must have a freely available full text (`HAS_FT:Y OR HAS_FREE_FULLTEXT:Y`). This is communicated to the user via a lock icon in the action bar.
@@ -251,8 +251,10 @@ When the user clicks "Continue to preview", a progress animation is displayed wh
 - A list of the first 10 results showing: title, authors, journal, year, DOI
 - A sort order selector (see F4) in the preview list header
 - A "Back" button to return to Screen 1 and adjust filters
-- Download settings (count and output folder) below the preview list
-- A "Start download" button, disabled until both count and output folder are filled in
+- Download settings (number of papers and output folder) below the preview list
+- A "Start download" button, disabled until the count is ≥ 1, an output folder is set, and the folder is writable
+
+When either button ("Continue to preview" or "Start download") is disabled, an inline hint in the action bar explains which field still needs attention.
 
 ---
 
@@ -273,9 +275,9 @@ A sort order selector is shown in the results preview header on Screen 2. Option
 
 These settings are configured on Screen 2 (the preview screen) after the user has seen what results are available.
 
-**Count**: an integer input specifying the number of successfully downloaded papers desired. The tool keeps retrieving results until count papers are downloaded or the API returns no more results.
+**Number of papers**: an integer input specifying the number of successfully downloaded papers desired. The tool keeps retrieving results until that many papers are downloaded or the API returns no more results. Skipped papers do not count toward this total.
 
-**Output folder**: the user selects a local folder via a folder picker dialog.
+**Output folder**: the user selects a local folder via a folder picker dialog. The folder must be writable; if a non-writable directory is selected the "Start download" button remains disabled and a hint explains the reason.
 
 ---
 

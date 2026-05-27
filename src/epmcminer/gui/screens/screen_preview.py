@@ -1,6 +1,7 @@
 """Screen 2 — results preview and download settings."""
 
 import dataclasses
+import os
 from pathlib import Path
 
 from PyQt6.QtCore import QPoint, Qt, QThread, pyqtSignal
@@ -208,6 +209,8 @@ class ScreenPreview(QWidget):
         self._params: SearchParams | None = None
         self._worker: PreviewWorker | None = None
         self._sort_index: int = 0
+        # True while the selected output folder is writable (or no folder is set yet).
+        self._folder_writable: bool = True
         self.setStyleSheet(f"background-color: {theme.APP_BG};")
         self._build_ui()
         self._connect_signals()
@@ -466,7 +469,7 @@ class ScreenPreview(QWidget):
         count_layout = QVBoxLayout(count_col)
         count_layout.setContentsMargins(0, 0, 0, 0)
         count_layout.setSpacing(8)
-        count_lbl = QLabel("Count")
+        count_lbl = QLabel("Number of papers")
         count_lbl.setStyleSheet(f"color: {theme.TEXT_BODY}; font-size: 14px; font-weight: 500;")
         count_layout.addWidget(count_lbl)
         self._count_spin = QSpinBox()
@@ -560,20 +563,21 @@ class ScreenPreview(QWidget):
     # ------------------------------------------------------------------
 
     def _validate(self) -> None:
-        """Enable Start download when count >= 1 and folder is non-empty."""
+        """Enable Start download when count >= 1, folder is set, and folder is writable."""
         has_count = self._count_spin.value() >= 1
         has_folder = bool(self._folder_edit.text().strip())
-        ok = has_count and has_folder
+        ok = has_count and has_folder and self._folder_writable
         self._start_btn.setEnabled(ok)
 
         if not ok:
-            if not has_count and not has_folder:
-                msg = "Set a download count and select an output folder to start"
-            elif not has_folder:
-                msg = "Select an output folder to start"
-            else:
-                msg = "Set a download count of at least 1 to start"
-            self._hint_lbl.setText(msg)
+            parts: list[str] = []
+            if not has_folder:
+                parts.append("Select an output folder")
+            elif not self._folder_writable:
+                parts.append("Selected folder is not writable")
+            if not has_count:
+                parts.append("Set a download count")
+            self._hint_lbl.setText("  ·  ".join(parts))
             self._hint_lbl.setVisible(True)
         else:
             self._hint_lbl.setVisible(False)
@@ -631,8 +635,14 @@ class ScreenPreview(QWidget):
         self.download_requested.emit(params)
 
     def _browse_folder(self) -> None:
+        """Open a folder picker dialog and update the output folder field.
+
+        Also checks whether the selected folder is writable, storing the result
+        in :attr:`_folder_writable` so :meth:`_validate` can gate the button.
+        """
         folder = QFileDialog.getExistingDirectory(self, "Select output folder")
         if folder:
+            self._folder_writable = os.access(folder, os.W_OK)
             self._folder_edit.setText(folder)
 
     def _populate_paper_list(self, papers: list[Paper]) -> None:

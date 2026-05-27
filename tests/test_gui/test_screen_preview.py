@@ -362,6 +362,63 @@ class TestScreenPreviewValidation:
         w = ScreenPreview(_make_service())
         assert w._count_spin.value() == 50
 
+    def test_start_disabled_when_folder_not_writable(self, qapp: QApplication) -> None:
+        """Button is disabled when a folder is selected but is not writable."""
+        w = ScreenPreview(_make_service())
+        w._count_spin.setValue(10)
+        # Simulate non-writable folder by setting internal flag directly
+        w._folder_edit.setText("/tmp/papers")
+        w._folder_writable = False
+        w._validate()
+        assert not w._start_btn.isEnabled()
+
+    def test_start_enabled_when_folder_writable(self, qapp: QApplication) -> None:
+        """Button is enabled when folder is set and writable."""
+        w = ScreenPreview(_make_service())
+        w._count_spin.setValue(10)
+        w._folder_edit.setText("/tmp/papers")
+        w._folder_writable = True
+        w._validate()
+        assert w._start_btn.isEnabled()
+
+    def test_browse_folder_sets_not_writable_on_unwritable_path(
+        self, qapp: QApplication
+    ) -> None:
+        """Selecting a non-writable folder via Browse sets _folder_writable to False."""
+
+        w = ScreenPreview(_make_service())
+        with (
+            patch(
+                "epmcminer.gui.screens.screen_preview.QFileDialog.getExistingDirectory",
+                return_value="/unwritable/path",
+            ),
+            patch("os.access", return_value=False),
+        ):
+            w._browse_folder()
+        assert w._folder_writable is False
+
+    def test_browse_folder_sets_writable_on_writable_path(self, qapp: QApplication) -> None:
+        """Selecting a writable folder via Browse sets _folder_writable to True."""
+        w = ScreenPreview(_make_service())
+        with (
+            patch(
+                "epmcminer.gui.screens.screen_preview.QFileDialog.getExistingDirectory",
+                return_value="/tmp/papers",
+            ),
+            patch("os.access", return_value=True),
+        ):
+            w._browse_folder()
+        assert w._folder_writable is True
+
+    def test_count_label_text(self, qapp: QApplication) -> None:
+        """The count field label reads 'Number of papers'."""
+        from PyQt6.QtWidgets import QLabel
+
+        w = ScreenPreview(_make_service())
+        labels = w.findChildren(QLabel)
+        texts = [lbl.text() for lbl in labels]
+        assert any("number of papers" in t.lower() for t in texts)
+
 
 # ---------------------------------------------------------------------------
 # TestScreenPreviewSignals

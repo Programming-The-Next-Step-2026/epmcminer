@@ -21,6 +21,8 @@ class SearchParams:
             ``"citations"``.
         count: Number of papers to successfully download. Must be greater than 0.
         output_folder: Local filesystem path to the folder where downloads are saved.
+            Must be set before calling :meth:`DownloadService.download`; may be
+            ``None`` when the params are only used for a search preview.
 
     Raises:
         ValueError: If ``count`` is not greater than 0.
@@ -34,7 +36,7 @@ class SearchParams:
     author_orcids: list[str] = field(default_factory=list)
     sort_order: Literal["relevance", "date", "citations"] = "relevance"
     count: int = 10
-    output_folder: Path = field(default_factory=Path)
+    output_folder: Path | None = None
 
     def __post_init__(self) -> None:
         """Validate field values after initialisation.

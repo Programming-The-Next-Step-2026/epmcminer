@@ -71,9 +71,15 @@ class DownloadService:
             A list of DownloadResult objects, one per paper processed.
 
         Raises:
+            ValueError: If ``params.output_folder`` is ``None``.
             APIError: If the Europe PMC search API returns a non-200 response.
             ConnectionError: If an HTTP request cannot be completed.
         """
+        if params.output_folder is None:
+            raise ValueError(
+                "SearchParams.output_folder must be set before calling download()."
+            )
+
         setup_logger(params.output_folder)
 
         pdfs_dir = params.output_folder / "pdfs"
