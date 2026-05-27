@@ -90,6 +90,10 @@ SCROLLBAR_STYLE = f"""
     }}
 """
 
+# Minimum height for vertically-expanding list sections (results, log, skipped papers).
+# All three expandable sections share this value so the UI feels consistent.
+EXPANDABLE_MIN_HEIGHT: int = 200
+
 _fusion_style: QStyle | None = None
 
 

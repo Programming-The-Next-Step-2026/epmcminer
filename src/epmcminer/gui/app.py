@@ -32,8 +32,8 @@ except PackageNotFoundError:
 APP_TITLE = f"epmcminer v{APP_VERSION}"
 MINIMUM_WIDTH = 820
 MINIMUM_HEIGHT = 600
-DEFAULT_WIDTH = 960
-DEFAULT_HEIGHT = 700
+DEFAULT_WIDTH = 1000
+DEFAULT_HEIGHT = 900
 
 
 # Step indicator geometry

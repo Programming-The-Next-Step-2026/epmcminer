@@ -152,9 +152,9 @@ class TestScreenPreviewDefaults:
         assert hasattr(ScreenPreview, "download_requested")
 
     def test_progress_hidden_initially(self, qapp: QApplication) -> None:
-        """Progress widget is hidden before load() is called."""
+        """Loading wrapper is hidden before load() is called."""
         w = ScreenPreview(_make_service())
-        assert w._progress.isHidden()
+        assert w._loading_card.isHidden()
 
     def test_error_widget_hidden_initially(self, qapp: QApplication) -> None:
         """Error widget is hidden before load() is called."""
@@ -224,10 +224,10 @@ class TestScreenPreviewResultsState:
         assert not w._content.isHidden()
 
     def test_on_result_hides_progress(self, qapp: QApplication) -> None:
-        """_on_result() hides the progress widget."""
+        """_on_result() hides the loading wrapper."""
         w = ScreenPreview(_make_service())
         w._on_result(_make_result())
-        assert w._progress.isHidden()
+        assert w._loading_card.isHidden()
 
     def test_on_result_hides_error_widget(self, qapp: QApplication) -> None:
         """_on_result() hides the error widget."""
@@ -298,10 +298,10 @@ class TestScreenPreviewErrorState:
         assert not w._error_widget.isHidden()
 
     def test_on_error_hides_progress(self, qapp: QApplication) -> None:
-        """_on_error() hides the progress widget."""
+        """_on_error() hides the loading wrapper."""
         w = ScreenPreview(_make_service())
         w._on_error("API unavailable")
-        assert w._progress.isHidden()
+        assert w._loading_card.isHidden()
 
     def test_on_error_hides_content(self, qapp: QApplication) -> None:
         """_on_error() hides the content area."""

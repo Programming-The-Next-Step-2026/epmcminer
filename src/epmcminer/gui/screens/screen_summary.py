@@ -4,20 +4,22 @@ from collections.abc import Callable
 from pathlib import Path
 
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6.QtGui import QResizeEvent
 from PyQt6.QtWidgets import (
     QFileDialog,
     QFrame,
     QHBoxLayout,
     QLabel,
-    QMessageBox,
     QPushButton,
     QScrollArea,
+    QSizePolicy,
     QVBoxLayout,
     QWidget,
 )
 
 import epmcminer.gui.theme as theme
 from epmcminer.gui.widgets.card import make_card, make_section_label
+from epmcminer.gui.widgets.toast import Toast
 from epmcminer.services.models import DownloadResult, SearchParams
 from epmcminer.services.report_service import ReportService
 from epmcminer.utils.logger import get_logger
@@ -31,7 +33,7 @@ _DANGER = "#f87171"
 _DANGER_BG = "#3a1a1a"
 _DIVIDER = theme.BORDER_FAINT
 
-_SKIPPED_LIST_HEIGHT = 220
+_SKIPPED_LIST_MIN_HEIGHT = theme.EXPANDABLE_MIN_HEIGHT
 _DOT_SIZE = 26
 _DOT_RADIUS = _DOT_SIZE // 2
 # License strings up to this many characters are placed inline on row 1;
@@ -181,6 +183,12 @@ class ScreenSummary(QWidget):
     # UI construction
     # ------------------------------------------------------------------
 
+    def resizeEvent(self, event: QResizeEvent) -> None:
+        """Reposition the toast whenever the screen is resized."""
+        super().resizeEvent(event)
+        if not self._toast.isHidden():
+            self._toast._reposition()
+
     def _build_ui(self) -> None:
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
@@ -201,13 +209,15 @@ class ScreenSummary(QWidget):
         layout.addLayout(self._make_stat_row())
         layout.addWidget(self._make_params_card())
         self._skipped_card = self._make_skipped_card()
-        layout.addWidget(self._skipped_card)
+        self._skipped_card.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        layout.addWidget(self._skipped_card, 1)
         self._skipped_card.setVisible(False)
-        layout.addStretch()
 
         scroll.setWidget(content_widget)
         root.addWidget(scroll)
         root.addWidget(self._make_action_bar())
+
+        self._toast = Toast(self)
 
     def _make_stat_card(
         self,
@@ -272,7 +282,8 @@ class ScreenSummary(QWidget):
 
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        scroll.setFixedHeight(_SKIPPED_LIST_HEIGHT)
+        scroll.setMinimumHeight(_SKIPPED_LIST_MIN_HEIGHT)
+        scroll.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         scroll.setStyleSheet(
             f"QScrollArea {{ background-color: {theme.CARD_BG}; border: none; }}"
             f"QScrollArea > QWidget > QWidget {{ background-color: {theme.CARD_BG}; }}"
@@ -526,7 +537,7 @@ class ScreenSummary(QWidget):
         if self._params is None:
             return
         path, _ = QFileDialog.getSaveFileName(
-            self, "Export Excel", "", "Excel Files (*.xlsx)"
+            self, "Export Excel", "results.xlsx", "Excel Files (*.xlsx)"
         )
         if not path:
             return
@@ -542,7 +553,7 @@ class ScreenSummary(QWidget):
         if self._params is None:
             return
         path, _ = QFileDialog.getSaveFileName(
-            self, "Export PDF", "", "PDF Files (*.pdf)"
+            self, "Export PDF", "results.pdf", "PDF Files (*.pdf)"
         )
         if not path:
             return
@@ -566,10 +577,10 @@ class ScreenSummary(QWidget):
         self._worker.start()
 
     def _on_export_done(self, path: str) -> None:
-        """Show a success dialog after a successful export."""
-        QMessageBox.information(self, "Export complete", f"Saved to:\n{path}")
+        """Show a success toast after a successful export."""
+        self._toast.show_message(f"Saved to {path}", success=True)
 
     def _on_export_error(self, message: str) -> None:
-        """Log and show a warning dialog when an export fails."""
+        """Log the error and show a failure toast."""
         _logger.error("Export failed: %s", message)
-        QMessageBox.warning(self, "Export failed", message)
+        self._toast.show_message(f"Export failed: {message}", success=False)

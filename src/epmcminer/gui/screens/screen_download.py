@@ -4,13 +4,14 @@ import threading
 import time
 
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6.QtGui import QResizeEvent
 from PyQt6.QtWidgets import (
     QFrame,
     QHBoxLayout,
     QLabel,
-    QMessageBox,
     QPushButton,
     QScrollArea,
+    QSizePolicy,
     QVBoxLayout,
     QWidget,
 )
@@ -18,6 +19,7 @@ from PyQt6.QtWidgets import (
 import epmcminer.gui.theme as theme
 from epmcminer.gui.widgets.card import make_card, make_section_label
 from epmcminer.gui.widgets.progress_widget import ProgressWidget
+from epmcminer.gui.widgets.toast import Toast
 from epmcminer.services.download_service import DownloadService
 from epmcminer.services.models import DownloadResult, SearchParams
 from epmcminer.services.report_service import ReportService
@@ -35,7 +37,7 @@ _DANGER = "#f87171"
 _SKIPPED_BG = "rgba(255, 122, 61, 20)"
 _DIVIDER = theme.BORDER_FAINT
 
-_LOG_HEIGHT = 520
+_LOG_MIN_HEIGHT = theme.EXPANDABLE_MIN_HEIGHT
 _DOT_SIZE = 26
 _DOT_RADIUS = _DOT_SIZE // 2
 _BYTES_PER_MB = 1_000_000
@@ -182,6 +184,12 @@ class ScreenDownload(QWidget):
         self._worker.error_occurred.connect(self._on_error)
         self._worker.start()
 
+    def resizeEvent(self, event: QResizeEvent) -> None:
+        """Reposition the toast whenever the screen is resized."""
+        super().resizeEvent(event)
+        if not self._toast.isHidden():
+            self._toast._reposition()
+
     # ------------------------------------------------------------------
     # UI construction
     # ------------------------------------------------------------------
@@ -204,12 +212,15 @@ class ScreenDownload(QWidget):
         layout.setSpacing(18)
 
         layout.addWidget(self._make_progress_card())
-        layout.addWidget(self._make_log_card())
-        layout.addStretch()
+        log_card = self._make_log_card()
+        log_card.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        layout.addWidget(log_card, 1)
 
         scroll.setWidget(content_widget)
         root.addWidget(scroll)
         root.addWidget(self._make_action_bar())
+
+        self._toast = Toast(self)
 
     def _make_progress_card(self) -> QWidget:
         card, layout = make_card(padding=26)
@@ -224,7 +235,8 @@ class ScreenDownload(QWidget):
 
         self._log_scroll = QScrollArea()
         self._log_scroll.setWidgetResizable(True)
-        self._log_scroll.setFixedHeight(_LOG_HEIGHT)
+        self._log_scroll.setMinimumHeight(_LOG_MIN_HEIGHT)
+        self._log_scroll.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self._log_scroll.setStyleSheet(
             f"QScrollArea {{ background-color: {theme.CARD_BG}; border: none; }}"
             f"QScrollArea > QWidget > QWidget {{ background-color: {theme.CARD_BG}; }}"
@@ -418,7 +430,7 @@ class ScreenDownload(QWidget):
         """Handle an unrecoverable error from the worker."""
         _logger.error("Download worker error: %s", message)
         self._cancel_btn.setEnabled(False)
-        QMessageBox.critical(self, "Download error", message)
+        self._toast.show_message(f"Download error: {message}", success=False)
 
     def _on_cancel(self) -> None:
         """Request cancellation and disable the cancel button."""

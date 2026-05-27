@@ -33,7 +33,7 @@ _SORT_LABELS: dict[str, str] = {"relevance": "Relevance", "date": "Date", "citat
 _DEFAULT_COUNT = 50
 _COUNT_MIN = 1
 _COUNT_MAX = 10_000
-_PAPER_LIST_HEIGHT = 380
+_PAPER_LIST_MIN_HEIGHT = theme.EXPANDABLE_MIN_HEIGHT
 _DIVIDER = theme.BORDER_FAINT
 
 _ACTION_BTN_STYLE = f"""
@@ -268,23 +268,35 @@ class ScreenPreview(QWidget):
         layout.setContentsMargins(22, 22, 22, 22)
         layout.setSpacing(18)
 
+        # Loading card — identical structure to the progress card on Screen 3.
+        # Fixed vertical size policy keeps the card at its natural height; the
+        # remaining space stays blank below it rather than stretching the card.
         self._progress = ProgressWidget()
-        self._progress.setVisible(False)
-        layout.addWidget(self._progress)
+        self._loading_card = self._make_loading_card()
+        self._loading_card.setVisible(False)
+        self._loading_card.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        layout.addWidget(self._loading_card)
 
         self._error_widget = self._make_error_widget()
         self._error_widget.setVisible(False)
-        layout.addWidget(self._error_widget)
+        self._error_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        layout.addWidget(self._error_widget, 1)
 
         self._content = self._make_content()
         self._content.setVisible(False)
-        layout.addWidget(self._content)
-
-        layout.addStretch()
+        self._content.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        layout.addWidget(self._content, 1)
 
         scroll.setWidget(content_widget)
         root.addWidget(scroll)
         root.addWidget(self._make_action_bar())
+
+    def _make_loading_card(self) -> QWidget:
+        """Build the search-progress card, mirroring the download screen's progress card."""
+        card, layout = make_card(padding=26)
+        layout.addWidget(make_section_label("Search progress"))
+        layout.addWidget(self._progress)
+        return card
 
     def _make_error_widget(self) -> QWidget:
         widget = QWidget()
@@ -317,8 +329,10 @@ class ScreenPreview(QWidget):
         layout.setSpacing(18)
 
         layout.addWidget(self._make_stat_row())
-        layout.addWidget(self._make_results_card())
         layout.addWidget(self._make_download_settings_card())
+        results_card = self._make_results_card()
+        results_card.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        layout.addWidget(results_card, 1)
 
         return widget
 
@@ -403,7 +417,8 @@ class ScreenPreview(QWidget):
 
         paper_scroll = QScrollArea()
         paper_scroll.setWidgetResizable(True)
-        paper_scroll.setFixedHeight(_PAPER_LIST_HEIGHT)
+        paper_scroll.setMinimumHeight(_PAPER_LIST_MIN_HEIGHT)
+        paper_scroll.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         paper_scroll.setStyleSheet(
             f"QScrollArea {{ background-color: {theme.CARD_BG}; border: none; }}"
             f"QScrollArea > QWidget > QWidget {{ background-color: {theme.CARD_BG}; }}"
@@ -554,7 +569,7 @@ class ScreenPreview(QWidget):
 
     def _show_loading(self) -> None:
         self._progress.set_loading("Searching…")
-        self._progress.setVisible(True)
+        self._loading_card.setVisible(True)
         self._error_widget.setVisible(False)
         self._content.setVisible(False)
 
@@ -590,7 +605,7 @@ class ScreenPreview(QWidget):
         self._stat_pdf_value.setText(f"~{pdf_pct}%")
         self._stat_previewing_value.setText(str(n_previewed))
         self._populate_paper_list(result.papers)
-        self._progress.setVisible(False)
+        self._loading_card.setVisible(False)
         self._error_widget.setVisible(False)
         self._content.setVisible(True)
         self.result_loaded.emit(result.total_found)
@@ -598,7 +613,7 @@ class ScreenPreview(QWidget):
     def _on_error(self, message: str) -> None:
         """Handle an error emitted by the worker."""
         self._error_label.setText(message)
-        self._progress.setVisible(False)
+        self._loading_card.setVisible(False)
         self._content.setVisible(False)
         self._error_widget.setVisible(True)
 
