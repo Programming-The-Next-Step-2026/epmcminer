@@ -109,7 +109,8 @@ epmcminer can be used as a library without launching the GUI. All public classes
 | `SearchService` | Searches Europe PMC and returns `SearchResult` |
 | `DownloadService` | Downloads PDFs in parallel and returns `list[DownloadResult]` |
 | `ReportService` | Saves `report.csv`, Excel, or PDF exports from results |
-| `create_application_services` | Factory that wires up all three services in one call |
+| `OrcidValidationService` | Validates ORCID format (checksum) and registry existence |
+| `create_application_services` | Factory that wires up all four services in one call |
 
 ### Example: search and preview results
 
@@ -118,7 +119,7 @@ import threading
 from pathlib import Path
 import epmcminer
 
-search, download, report = epmcminer.create_application_services()
+search, download, report, orcid = epmcminer.create_application_services()
 
 params = epmcminer.SearchParams(
     query="depression AND therapy",
@@ -226,7 +227,14 @@ A tag-style input field pre-loaded with the following default types: Review, Met
 A tag-style input field. Default: CC-BY. Options match those available on the Europe PMC website. At least one license must be selected.
 
 **Author (ORCID)**
-A tag-style input field. The user can add one or more ORCID identifiers. Multiple ORCIDs use OR logic. The field can be left empty to search across all authors.
+A tag-style input field. The user can add one or more ORCID identifiers (bare format `0000-0000-0000-0000` or with the `https://orcid.org/` prefix — the prefix is stripped automatically). Multiple ORCIDs use OR logic. The field can be left empty to search across all authors.
+
+Each ORCID is validated in two steps as soon as it is added:
+
+1. **Format check** (synchronous) — verifies the four-group pattern and the ISO 7064 MOD 11-2 checksum digit. Invalid ORCIDs are shown as a red pill immediately.
+2. **Registry check** (asynchronous) — queries the ORCID public API (`pub.orcid.org`) to confirm the identifier exists. While the check is in flight the pill is shown in grey ("pending"). On success it turns orange; on failure it turns red. If the network is unreachable the pill stays grey so the user can still proceed (fail-open).
+
+Tags in any state (valid, pending, or invalid) are included in the search query — the validation is informational and does not block submission.
 
 **Full-text availability**
 Not a user-facing filter — hardcoded requirement that all results must have a freely available full text (`HAS_FT:Y OR HAS_FREE_FULLTEXT:Y`). This is communicated to the user via a lock icon in the action bar.

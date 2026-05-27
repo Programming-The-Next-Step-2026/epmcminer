@@ -268,10 +268,12 @@ class MainWindow(QMainWindow):
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.Window)
 
         # Services — created once and injected; never re-created on navigation
-        search_service, download_service, report_service = create_application_services()
+        search_service, download_service, report_service, orcid_service = (
+            create_application_services()
+        )
 
         # Screens
-        self._screen_search = ScreenSearch()
+        self._screen_search = ScreenSearch(orcid_service=orcid_service)
         self._screen_preview = ScreenPreview(search_service)
         self._screen_download = ScreenDownload(download_service, report_service)
         self._screen_summary = ScreenSummary(report_service)

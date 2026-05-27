@@ -38,7 +38,7 @@ Issues identified during code review that were **not** fixed in-branch, with con
 
 ## Medium — Double free-text filter in search queries
 
-**Files:** `src/epmcminer/services/search_service.py:93`, `src/epmcminer/api/client.py:81`
+**Files:** `src/epmcminer/services/search_service.py`, `src/epmcminer/api/client.py`
 
 **Detail:** `FREE_FULL_TEXT_FILTER` is appended by both `SearchService.build_query()` and `EuropePMCClient.search()`. The final API query contains the clause twice: `(...AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)) AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)`. This doesn't break search results but wastes URL space and is confusing. To fix: decide which layer owns this rule (recommend removing it from `build_query()` since the client already handles it) and update `test_free_full_text_filter_always_present` accordingly.
 
@@ -73,6 +73,14 @@ Issues identified during code review that were **not** fixed in-branch, with con
 **Files:** `src/epmcminer/gui/screens/screen_download.py:406`
 
 **Detail:** `_on_finished()` wraps `report_service.save_csv()` in a bare `except Exception` that only logs the error; no dialog is shown to the user. If saving the CSV fails (e.g. permissions issue, full disk), the user sees nothing and loses their report silently. Fix: display a `QMessageBox.warning()` inside the except block so the user is informed and can retry or choose a different output location.
+
+---
+
+## Low — OrcidValidationService: surface network errors in the UI
+
+**Files:** `src/epmcminer/gui/screens/screen_search.py` — `_on_orcid_network_error`
+
+**Detail:** When the ORCID registry check fails with a `ConnectionError`, the pill stays grey ("pending") forever — there is no tooltip, banner, or status label telling the user why. The fail-open behaviour is intentional and correct, but it is silent. Fix: add a subtle tooltip on the pending pill (e.g. "Could not verify — no network connection") or emit a one-line status message below the ORCID input so the user understands the grey state.
 
 ---
 

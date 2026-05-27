@@ -33,6 +33,42 @@ _PILL_STYLE = """
     }
 """
 
+_PILL_PENDING_STYLE = """
+    QPushButton {
+        background-color: #28282c;
+        color: #8a8a90;
+        border: 1px solid #3c3c42;
+        border-radius: 14px;
+        padding: 6px 12px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    QPushButton:hover {
+        background-color: #303036;
+    }
+"""
+
+_PILL_INVALID_STYLE = """
+    QPushButton {
+        background-color: #2e1a1a;
+        color: #f87171;
+        border: 1px solid #5a2424;
+        border-radius: 14px;
+        padding: 6px 12px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    QPushButton:hover {
+        background-color: #3a2020;
+    }
+"""
+
+_PILL_STYLES: dict[str, str] = {
+    "valid": _PILL_STYLE,
+    "pending": _PILL_PENDING_STYLE,
+    "invalid": _PILL_INVALID_STYLE,
+}
+
 _ADD_BUTTON_STYLE = """
     QPushButton {
         background-color: #1c1c1f;
@@ -172,15 +208,34 @@ class _FlowLayout(QLayout):
 
 
 class _TagPill(QPushButton):
-    """A removable pill button representing a single tag."""
+    """A removable pill button representing a single tag.
+
+    The visual appearance is controlled by the ``status`` argument:
+
+    * ``"valid"``   — default orange accent style
+    * ``"pending"`` — muted grey; existence check is in flight
+    * ``"invalid"`` — red; bad format or ORCID not found in registry
+    """
 
     removed = pyqtSignal(str)
 
-    def __init__(self, tag: str, parent: QWidget | None = None) -> None:
+    def __init__(
+        self,
+        tag: str,
+        status: str = "valid",
+        parent: QWidget | None = None,
+    ) -> None:
+        """Initialise the pill button.
+
+        Args:
+            tag: The tag string displayed on the pill.
+            status: Visual state — ``"valid"``, ``"pending"``, or ``"invalid"``.
+            parent: Optional parent widget.
+        """
         super().__init__(f"{tag}  ×", parent)
         self._tag = tag
         self.setStyle(theme.get_fusion_style())
-        self.setStyleSheet(_PILL_STYLE)
+        self.setStyleSheet(_PILL_STYLES.get(status, _PILL_STYLE))
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.clicked.connect(lambda: self.removed.emit(self._tag))
@@ -383,6 +438,7 @@ class TagInput(QWidget):
         """
         super().__init__(parent)
         self._tags: list[str] = []
+        self._tag_statuses: dict[str, str] = {}
         self._available_options = available_options or []
         self._add_label = add_label
         self._build_ui()
@@ -402,6 +458,9 @@ class TagInput(QWidget):
     def add_tag(self, tag: str) -> None:
         """Add a tag if non-blank and not already present.
 
+        The tag is given a default status of ``"valid"``; call
+        :meth:`set_tag_status` afterwards to change it.
+
         Args:
             tag: The tag string to add.
         """
@@ -409,6 +468,7 @@ class TagInput(QWidget):
         if not cleaned or cleaned in self._tags:
             return
         self._tags.append(cleaned)
+        self._tag_statuses.setdefault(cleaned, "valid")
         self._rebuild_pills()
         self._slot.set_excluded(self._tags)
         self.tags_changed.emit(list(self._tags))
@@ -422,12 +482,16 @@ class TagInput(QWidget):
         if tag not in self._tags:
             return
         self._tags.remove(tag)
+        self._tag_statuses.pop(tag, None)
         self._rebuild_pills()
         self._slot.set_excluded(self._tags)
         self.tags_changed.emit(list(self._tags))
 
     def set_tags(self, tags: list[str]) -> None:
         """Replace the tag list. Filters blanks, deduplicates, emits once.
+
+        Existing statuses are preserved for tags that appear in both the old
+        and new lists. New tags start with status ``"valid"``.
 
         Args:
             tags: The new list of tag strings.
@@ -438,9 +502,25 @@ class TagInput(QWidget):
             if cleaned and cleaned not in seen:
                 seen.append(cleaned)
         self._tags = seen
+        # Remove statuses for tags no longer present; keep existing ones.
+        self._tag_statuses = {t: self._tag_statuses.get(t, "valid") for t in self._tags}
         self._rebuild_pills()
         self._slot.set_excluded(self._tags)
         self.tags_changed.emit(list(self._tags))
+
+    def set_tag_status(self, tag: str, status: str) -> None:
+        """Update the visual status of an existing tag pill.
+
+        If ``tag`` is not currently in the tag list this is a no-op.
+
+        Args:
+            tag: The tag string to update.
+            status: One of ``"valid"``, ``"pending"``, or ``"invalid"``.
+        """
+        if tag not in self._tags:
+            return
+        self._tag_statuses[tag] = status
+        self._rebuild_pills()
 
     # ------------------------------------------------------------------
     # Internal UI
@@ -455,15 +535,18 @@ class TagInput(QWidget):
         self._flow.addWidget(self._slot)
 
     def _rebuild_pills(self) -> None:
-        # Remove all items except _slot; detach pill widgets immediately.
+        # Remove all items except _slot; hide before deparenting so that Qt
+        # does not promote visible widgets to top-level windows.
         while self._flow.count() > 0:
             item = self._flow.takeAt(0)
             widget = item.widget() if item else None
             if widget and widget is not self._slot:
+                widget.hide()
                 widget.setParent(None)
         # Re-add pills in order, then the input slot.
         for tag in self._tags:
-            pill = _TagPill(tag)
+            status = self._tag_statuses.get(tag, "valid")
+            pill = _TagPill(tag, status=status)
             pill.removed.connect(self.remove_tag)
             self._flow.addWidget(pill)
         self._flow.addWidget(self._slot)

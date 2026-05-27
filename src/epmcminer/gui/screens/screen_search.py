@@ -1,6 +1,8 @@
 """Screen 1 — search query and filter inputs."""
 
-from PyQt6.QtCore import QDate, Qt, pyqtSignal
+from __future__ import annotations
+
+from PyQt6.QtCore import QDate, Qt, QThread, pyqtSignal
 from PyQt6.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -16,6 +18,7 @@ from epmcminer.gui.widgets.card import make_card, make_section_label
 from epmcminer.gui.widgets.date_picker import DatePicker
 from epmcminer.gui.widgets.tag_input import TagInput
 from epmcminer.services.models import SearchParams
+from epmcminer.services.orcid_validation_service import OrcidValidationService
 
 DEFAULT_PUBLICATION_TYPES: list[str] = [
     "Review",
@@ -82,6 +85,58 @@ _CONTINUE_BTN_STYLE = f"""
 _HINT_STYLE = f"color: {theme.TEXT_MUTED}; font-size: 13px;"
 
 
+# ---------------------------------------------------------------------------
+# Background worker
+# ---------------------------------------------------------------------------
+
+
+class OrcidExistenceWorker(QThread):
+    """QThread worker that checks whether an ORCID exists in the public registry.
+
+    Emits :attr:`validation_done` on success/failure, or :attr:`network_error`
+    when a network-level failure prevents the request from completing. The
+    latter leaves the pill in ``"pending"`` state — non-blocking fail-open
+    behaviour so the user can still submit the form.
+
+    Signals:
+        validation_done: Emitted with ``(orcid, exists)`` on HTTP response.
+        network_error: Emitted with ``orcid`` on :class:`ConnectionError`.
+    """
+
+    validation_done = pyqtSignal(str, bool)
+    network_error = pyqtSignal(str)
+
+    def __init__(
+        self,
+        orcid: str,
+        service: OrcidValidationService,
+        parent: QWidget | None = None,
+    ) -> None:
+        """Initialise the worker.
+
+        Args:
+            orcid: The bare ORCID identifier to look up.
+            service: The validation service used to perform the HTTP check.
+            parent: Optional parent for ownership / lifetime management.
+        """
+        super().__init__(parent)
+        self._orcid = orcid
+        self._service = service
+
+    def run(self) -> None:
+        """Perform the existence check and emit the result signal."""
+        try:
+            exists = self._service.check_exists(self._orcid)
+            self.validation_done.emit(self._orcid, exists)
+        except ConnectionError:
+            self.network_error.emit(self._orcid)
+
+
+# ---------------------------------------------------------------------------
+# Screen
+# ---------------------------------------------------------------------------
+
+
 class ScreenSearch(QWidget):
     """Wizard screen for composing a Europe PMC search query.
 
@@ -98,13 +153,26 @@ class ScreenSearch(QWidget):
 
     search_requested = pyqtSignal(SearchParams)
 
-    def __init__(self, parent: QWidget | None = None) -> None:
+    def __init__(
+        self,
+        orcid_service: OrcidValidationService | None = None,
+        parent: QWidget | None = None,
+    ) -> None:
         """Initialise the search screen.
 
         Args:
+            orcid_service: Optional service used to validate ORCID identifiers.
+                When ``None``, ORCIDs are accepted without validation (useful
+                in tests that do not need the validation feature).
             parent: Optional parent widget.
         """
         super().__init__(parent)
+        self._orcid_service = orcid_service
+        # Track which ORCID tags have already been processed so the handler is
+        # idempotent — we only launch a new worker for newly added tags.
+        self._validated_orcids: set[str] = set()
+        # Keep worker references alive until Qt delivers the signals.
+        self._workers: list[OrcidExistenceWorker] = []
         self.setStyleSheet(f"background-color: {theme.APP_BG};")
         self._build_ui()
         self._connect_signals()
@@ -185,9 +253,10 @@ class ScreenSearch(QWidget):
         layout.addWidget(make_section_label("Author ORCIDs"))
 
         self._orcids = TagInput(add_label="+ Add ORCID")
+        self._orcids.tags_changed.connect(self._on_orcid_tags_changed)
         layout.addWidget(self._orcids)
 
-        hint = QLabel("Multiple ORCIDs use OR logic — leave empty to search all authors")
+        hint = QLabel("Format: 0000-0000-0000-0000 · Multiple ORCIDs use OR logic")
         hint.setStyleSheet(_HINT_STYLE)
         layout.addWidget(hint)
         return card
@@ -298,3 +367,79 @@ class ScreenSearch(QWidget):
 
     def _on_continue(self) -> None:
         self.search_requested.emit(self.get_params())
+
+    def _on_orcid_tags_changed(self, tags: list[str]) -> None:
+        """Handle additions and removals on the ORCID tag input.
+
+        For each newly added tag:
+
+        1. Normalise it — if the user pasted a URL-prefixed form, replace the
+           tag in the widget with its bare form and return (the signal will
+           re-fire with the normalised value).
+        2. Run a format check synchronously. Invalid format → mark red.
+        3. If format is valid, mark pending and launch an
+           :class:`OrcidExistenceWorker` for the async registry check.
+
+        When the service is ``None`` (tests / no-service mode) tags are
+        accepted as-is without any validation styling.
+        """
+        if self._orcid_service is None:
+            return
+
+        current_set = set(tags)
+
+        # Clean up stale state for removed tags.
+        removed = self._validated_orcids - current_set
+        self._validated_orcids -= removed
+
+        for tag in tags:
+            if tag in self._validated_orcids:
+                continue  # already processed
+
+            # Step 1: normalise URL-prefixed ORCIDs.
+            normalised = self._orcid_service.normalise(tag)
+            if normalised != tag:
+                # Replace the raw tag with the bare form. The subsequent
+                # tags_changed signal will re-enter this handler with the
+                # normalised value, so we return early.
+                self._validated_orcids.add(tag)  # prevent infinite loop
+                self._orcids.remove_tag(tag)
+                self._orcids.add_tag(normalised)
+                return
+
+            # Step 2: format validation (synchronous, local).
+            self._validated_orcids.add(tag)
+            if not self._orcid_service.validate_format(tag):
+                self._orcids.set_tag_status(tag, "invalid")
+                continue
+
+            # Step 3: existence check (async, HTTP).
+            self._orcids.set_tag_status(tag, "pending")
+            worker = OrcidExistenceWorker(tag, self._orcid_service)
+            worker.validation_done.connect(self._on_orcid_existence_checked)
+            worker.network_error.connect(self._on_orcid_network_error)
+            self._workers.append(worker)
+            worker.start()
+
+    def _on_orcid_existence_checked(self, orcid: str, exists: bool) -> None:
+        """Update the pill status once the registry check completes.
+
+        Args:
+            orcid: The ORCID that was checked.
+            exists: ``True`` if the registry returned HTTP 200.
+        """
+        self._orcids.set_tag_status(orcid, "valid" if exists else "invalid")
+        # Discard completed workers to avoid unbounded growth.
+        self._workers = [w for w in self._workers if w.isRunning()]
+
+    def _on_orcid_network_error(self, orcid: str) -> None:
+        """Keep the pill in ``"pending"`` state when the network is unreachable.
+
+        This is a deliberate fail-open: the user can still submit the form
+        with a pending ORCID; the tag simply has not been confirmed.
+
+        Args:
+            orcid: The ORCID whose existence check failed due to a network error.
+        """
+        # Pill already shows "pending" — no style change needed. Just clean up.
+        self._workers = [w for w in self._workers if w.isRunning()]
