@@ -522,6 +522,20 @@ class TagInput(QWidget):
         self._tag_statuses[tag] = status
         self._rebuild_pills()
 
+    def get_tags_by_status(self, statuses: list[str]) -> list[str]:
+        """Return tags whose current status is one of the given values.
+
+        Useful for filtering out tags that have been marked ``"invalid"``
+        before passing them to a query builder.
+
+        Args:
+            statuses: Status strings to include, e.g. ``["valid", "pending"]``.
+
+        Returns:
+            Tags in insertion order whose status is in ``statuses``.
+        """
+        return [t for t in self._tags if self._tag_statuses.get(t, "valid") in statuses]
+
     # ------------------------------------------------------------------
     # Internal UI
     # ------------------------------------------------------------------

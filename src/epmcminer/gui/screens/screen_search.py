@@ -194,7 +194,7 @@ class ScreenSearch(QWidget):
             date_to=self._date_to.date().toString("yyyy-MM-dd"),
             publication_types=self._pub_types.get_tags(),
             licenses=self._license.get_tags(),
-            author_orcids=self._orcids.get_tags(),
+            author_orcids=self._orcids.get_tags_by_status(["valid", "pending"]),
         )
 
     # ------------------------------------------------------------------
@@ -339,6 +339,12 @@ class ScreenSearch(QWidget):
         bar_layout.addWidget(lock_lbl)
         bar_layout.addStretch()
 
+        self._hint_lbl = QLabel()
+        self._hint_lbl.setStyleSheet(_HINT_STYLE)
+        self._hint_lbl.setVisible(False)
+        bar_layout.addWidget(self._hint_lbl)
+        bar_layout.addSpacing(16)
+
         self._continue_btn = QPushButton("Continue to preview  →")
         self._continue_btn.setStyle(theme.get_fusion_style())
         self._continue_btn.setStyleSheet(_CONTINUE_BTN_STYLE)
@@ -352,8 +358,22 @@ class ScreenSearch(QWidget):
 
     def _validate(self) -> None:
         """Enable the continue button when query is non-empty and pub types selected."""
-        ok = bool(self._query_edit.text().strip()) and bool(self._pub_types.get_tags())
+        has_query = bool(self._query_edit.text().strip())
+        has_pub_types = bool(self._pub_types.get_tags())
+        ok = has_query and has_pub_types
         self._continue_btn.setEnabled(ok)
+
+        if not ok:
+            if not has_query and not has_pub_types:
+                msg = "Enter a keyword and select at least one publication type to continue"
+            elif not has_query:
+                msg = "Enter a search keyword to continue"
+            else:
+                msg = "Select at least one publication type to continue"
+            self._hint_lbl.setText(msg)
+            self._hint_lbl.setVisible(True)
+        else:
+            self._hint_lbl.setVisible(False)
 
     def _on_date_from_changed(self, new_from: QDate) -> None:
         """Enforce start ≤ end by updating the end date minimum and value."""

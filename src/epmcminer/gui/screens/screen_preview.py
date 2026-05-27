@@ -132,6 +132,8 @@ _BROWSE_BTN_STYLE = f"""
     }}
 """
 
+_HINT_STYLE = f"color: {theme.TEXT_MUTED}; font-size: 13px;"
+
 
 # ---------------------------------------------------------------------------
 # Worker
@@ -524,6 +526,12 @@ class ScreenPreview(QWidget):
 
         bar_layout.addStretch()
 
+        self._hint_lbl = QLabel()
+        self._hint_lbl.setStyleSheet(_HINT_STYLE)
+        self._hint_lbl.setVisible(False)
+        bar_layout.addWidget(self._hint_lbl)
+        bar_layout.addSpacing(16)
+
         self._start_btn = QPushButton("Start download  →")
         self._start_btn.setStyle(theme.get_fusion_style())
         self._start_btn.setStyleSheet(_ACTION_BTN_STYLE)
@@ -553,8 +561,22 @@ class ScreenPreview(QWidget):
 
     def _validate(self) -> None:
         """Enable Start download when count >= 1 and folder is non-empty."""
-        ok = self._count_spin.value() >= 1 and bool(self._folder_edit.text().strip())
+        has_count = self._count_spin.value() >= 1
+        has_folder = bool(self._folder_edit.text().strip())
+        ok = has_count and has_folder
         self._start_btn.setEnabled(ok)
+
+        if not ok:
+            if not has_count and not has_folder:
+                msg = "Set a download count and select an output folder to start"
+            elif not has_folder:
+                msg = "Select an output folder to start"
+            else:
+                msg = "Set a download count of at least 1 to start"
+            self._hint_lbl.setText(msg)
+            self._hint_lbl.setVisible(True)
+        else:
+            self._hint_lbl.setVisible(False)
 
     def _on_result(self, result: SearchResult) -> None:
         """Handle a successful preview result from the worker."""
