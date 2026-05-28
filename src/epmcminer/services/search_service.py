@@ -1,6 +1,7 @@
 """Search service — builds Europe PMC queries and maps results to data models."""
 
 import re
+from typing import Any
 
 from epmcminer.api.client import (
     PDF_DOCUMENT_STYLE,
@@ -49,7 +50,7 @@ def _pub_type_to_api(display_name: str) -> str:
     return _PUB_TYPE_API_EXCEPTIONS.get(display_name, display_name.lower())
 
 
-def pdf_url_from_raw(raw: dict) -> str | None:
+def pdf_url_from_raw(raw: dict[str, Any]) -> str | None:
     """Extract the PDF URL from a raw core search result.
 
     The core search response embeds fullTextUrlList directly, avoiding a
@@ -65,11 +66,11 @@ def pdf_url_from_raw(raw: dict) -> str | None:
     entries = raw.get("fullTextUrlList", {}).get("fullTextUrl", [])
     for entry in entries:
         if entry.get("documentStyle") == PDF_DOCUMENT_STYLE:
-            return entry["url"]
+            return str(entry["url"])
     return None
 
 
-def paper_from_raw(raw: dict) -> Paper:
+def paper_from_raw(raw: dict[str, Any]) -> Paper:
     """Build a Paper dataclass from a single raw Europe PMC result dict.
 
     Handles both MED (PubMed) records that carry a ``pmid`` field and

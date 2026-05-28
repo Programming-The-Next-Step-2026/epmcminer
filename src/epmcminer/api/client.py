@@ -2,6 +2,7 @@
 
 import threading
 import time
+from typing import Any, cast
 
 import requests
 
@@ -93,7 +94,7 @@ class EuropePMCClient:
         page_size: int,
         sort: str | None = None,
         cursor_mark: str = DEFAULT_CURSOR_MARK,
-    ) -> dict:
+    ) -> dict[str, Any]:
         """Query the Europe PMC search endpoint.
 
         Appends the free-full-text availability filter to every query so
@@ -126,7 +127,7 @@ class EuropePMCClient:
             'Cognitive behavioural therapy for depression: a meta-analysis'
         """
         full_query = f"({query}) AND ({FREE_FULL_TEXT_FILTER})"
-        params: dict = {
+        params: dict[str, Any] = {
             "query": full_query,
             "format": RESPONSE_FORMAT,
             "resultType": RESULT_TYPE,
@@ -154,7 +155,7 @@ class EuropePMCClient:
                     time.sleep(delay)
                 continue
             if response.status_code == 200:
-                return response.json()
+                return cast(dict[str, Any], response.json())
             if response.status_code == _HTTP_429_TOO_MANY_REQUESTS:
                 delay = _parse_retry_after(response) or (
                     _RETRY_BACKOFF_BASE * (2 ** attempt)
@@ -255,7 +256,7 @@ class EuropePMCClient:
                             f"Response from {url!r} is not a valid PDF "
                             f"(got {response.content[:16]!r})"
                         )
-                    return response.content
+                    return cast(bytes, response.content)
                 if response.status_code == _HTTP_429_TOO_MANY_REQUESTS:
                     # Rate-limited: honour the Retry-After hint; fall back to
                     # the same exponential schedule used for 5xx errors.

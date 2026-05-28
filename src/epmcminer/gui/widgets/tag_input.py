@@ -154,16 +154,17 @@ class _FlowLayout(QLayout):
         self._h_spacing = h_spacing
         self._v_spacing = v_spacing
 
-    def addItem(self, item) -> None:  # type: ignore[override]
-        self._items.append(item)
+    def addItem(self, item: QLayoutItem | None) -> None:
+        if item is not None:
+            self._items.append(item)
 
     def count(self) -> int:
         return len(self._items)
 
-    def itemAt(self, index: int):  # type: ignore[override]
+    def itemAt(self, index: int) -> QLayoutItem | None:
         return self._items[index] if 0 <= index < len(self._items) else None
 
-    def takeAt(self, index: int):  # type: ignore[override]
+    def takeAt(self, index: int) -> QLayoutItem | None:
         return self._items.pop(index) if 0 <= index < len(self._items) else None
 
     def hasHeightForWidth(self) -> bool:
@@ -359,7 +360,7 @@ class _InputSlot(QWidget):
         for option in self._available_options:
             if option not in self._excluded:
                 action = self._menu.addAction(option)
-                action.triggered.connect(
+                action.triggered.connect(  # type: ignore[union-attr]
                     lambda checked, o=option: self.tag_confirmed.emit(o)
                 )
 
@@ -397,15 +398,18 @@ class _InputSlot(QWidget):
 
     def _relayout(self) -> None:
         """Resize to new sizeHint and force parent flow layout to reposition."""
-        self.layout().invalidate()
-        self.layout().activate()
+        layout = self.layout()
+        if layout is not None:
+            layout.invalidate()
+            layout.activate()
         self.resize(self.sizeHint())
         self.updateGeometry()
         parent = self.parentWidget()
         if parent is not None:
-            if parent.layout() is not None:
-                parent.layout().invalidate()
-                parent.layout().activate()
+            parent_layout = parent.layout()
+            if parent_layout is not None:
+                parent_layout.invalidate()
+                parent_layout.activate()
             parent.updateGeometry()
 
 

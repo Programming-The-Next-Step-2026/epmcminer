@@ -4,6 +4,7 @@ import threading
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
+from typing import Any
 
 from epmcminer.api.client import (
     DEFAULT_CURSOR_MARK,
@@ -123,7 +124,7 @@ class DownloadService:
                 sort=sort,
                 cursor_mark=cursor_mark,
             )
-            raw_results: list[dict] = data.get("resultList", {}).get("result", [])
+            raw_results: list[dict[str, Any]] = data.get("resultList", {}).get("result", [])
             if not raw_results:
                 break
 
@@ -151,7 +152,7 @@ class DownloadService:
 
     def _download_page(
         self,
-        raw_results: list[dict],
+        raw_results: list[dict[str, Any]],
         pdfs_dir: Path,
         progress_callback: Callable[[DownloadResult], None],
         cancel_event: threading.Event,
@@ -176,7 +177,7 @@ class DownloadService:
         active = 0
         lock = threading.Lock()
 
-        def run_one(raw: dict) -> DownloadResult:
+        def run_one(raw: dict[str, Any]) -> DownloadResult:
             nonlocal active
             if cancel_event.is_set():
                 return DownloadResult(
@@ -203,7 +204,7 @@ class DownloadService:
 
     def _download_one(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         pdfs_dir: Path,
         cancel_event: threading.Event | None = None,
     ) -> DownloadResult:

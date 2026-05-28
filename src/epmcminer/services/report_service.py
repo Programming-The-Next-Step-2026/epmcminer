@@ -288,7 +288,7 @@ class ReportService:
         params: SearchParams,
         total_found: int,
         styles: dict[str, ParagraphStyle],
-    ) -> list[Any]:
+    ) -> list[Any]:  # reportlab flowables have no common base type
         """Assemble all flowable elements into the PDF story list.
 
         Args:
@@ -300,7 +300,7 @@ class ReportService:
         Returns:
             A list of reportlab flowable objects ready to pass to ``doc.build()``.
         """
-        story: list = []
+        story: list[Any] = []
         story.extend(self._pdf_header(styles))
         story.append(self._pdf_stat_row(results, total_found, styles))
         story.append(Spacer(1, 0.4 * cm))
@@ -315,7 +315,7 @@ class ReportService:
             story.extend(skipped_items)
         return story
 
-    def _pdf_header(self, styles: dict[str, ParagraphStyle]) -> list:
+    def _pdf_header(self, styles: dict[str, ParagraphStyle]) -> list[Any]:
         """Build the title and timestamp header flowables.
 
         Args:
@@ -391,7 +391,7 @@ class ReportService:
         self,
         params: SearchParams,
         styles: dict[str, ParagraphStyle],
-    ) -> list:
+    ) -> list[Any]:
         """Build the search parameters card flowables.
 
         Always includes Query, Sort, and Date. Conditionally appends License,
@@ -427,7 +427,7 @@ class ReportService:
         ]
 
         n = len(rows)
-        style_commands: list = [
+        style_commands: list[Any] = [
             ("BACKGROUND", (0, 0), (-1, -1), _PDF_CARD),
             ("TOPPADDING", (0, 0), (-1, -1), 8),
             ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
@@ -446,7 +446,7 @@ class ReportService:
         self,
         results: list[DownloadResult],
         styles: dict[str, ParagraphStyle],
-    ) -> list:
+    ) -> list[Any]:
         """Build the downloaded papers section flowables.
 
         Returns an empty list when no papers were downloaded successfully.
@@ -463,11 +463,11 @@ class ReportService:
         if not downloaded:
             return []
 
-        items: list = [Paragraph("Downloaded papers", styles["section"]), Spacer(1, 4)]
+        items: list[Any] = [Paragraph("Downloaded papers", styles["section"]), Spacer(1, 4)]
         for i, result in enumerate(downloaded):
             meta_parts = [result.paper.authors, result.paper.journal, result.paper.year]
             meta_str = " · ".join(p for p in meta_parts if p)
-            cell_content: list = [
+            cell_content: list[Any] = [
                 Paragraph(result.paper.title or "", styles["paper_title"]),
                 Spacer(1, 2),
                 Paragraph(meta_str or "—", styles["paper_meta"]),
@@ -495,7 +495,7 @@ class ReportService:
         self,
         results: list[DownloadResult],
         styles: dict[str, ParagraphStyle],
-    ) -> list:
+    ) -> list[Any]:
         """Build the skipped/failed papers section flowables.
 
         Returns an empty list when all papers were downloaded successfully.
@@ -512,11 +512,11 @@ class ReportService:
         if not not_downloaded:
             return []
 
-        items: list = [Paragraph("Skipped papers", styles["section"]), Spacer(1, 4)]
+        items: list[Any] = [Paragraph("Skipped papers", styles["section"]), Spacer(1, 4)]
         for i, result in enumerate(not_downloaded):
             meta_parts = [result.paper.authors, result.paper.journal, result.paper.year]
             meta_str = " · ".join(p for p in meta_parts if p)
-            cell_content: list = [
+            cell_content: list[Any] = [
                 Paragraph(result.paper.title or "", styles["paper_title"]),
                 Spacer(1, 2),
                 Paragraph(meta_str or "—", styles["paper_meta"]),

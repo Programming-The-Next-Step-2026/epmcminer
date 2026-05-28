@@ -57,4 +57,4 @@ class OrcidClient:
             )
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:
             raise ConnectionError(str(exc)) from exc
-        return response.status_code == 200
+        return bool(response.status_code == 200)

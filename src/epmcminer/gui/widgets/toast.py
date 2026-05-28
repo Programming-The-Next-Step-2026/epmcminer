@@ -177,7 +177,7 @@ class Toast(QWidget):
     # Internal helpers
     # ------------------------------------------------------------------
 
-    def paintEvent(self, event: QPaintEvent) -> None:
+    def paintEvent(self, event: QPaintEvent | None) -> None:
         """Paint the stylesheet background explicitly.
 
         ``QGraphicsOpacityEffect`` renders the widget to an offscreen buffer
@@ -190,7 +190,7 @@ class Toast(QWidget):
         opt = QStyleOption()
         opt.initFrom(self)
         painter = QPainter(self)
-        self.style().drawPrimitive(QStyle.PrimitiveElement.PE_Widget, opt, painter, self)
+        self.style().drawPrimitive(QStyle.PrimitiveElement.PE_Widget, opt, painter, self)  # type: ignore[union-attr]
 
     def _build_ui(self) -> None:
         layout = QHBoxLayout(self)

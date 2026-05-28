@@ -431,7 +431,7 @@ class ScreenPreview(QWidget):
         self._sort_menu.setStyleSheet(_SORT_MENU_STYLE)
         for key in _SORT_OPTIONS:
             action = self._sort_menu.addAction(_SORT_LABELS[key])
-            action.triggered.connect(lambda checked, k=key: self._on_sort_menu_selected(k))
+            action.triggered.connect(lambda checked, k=key: self._on_sort_menu_selected(k))  # type: ignore[union-attr]
 
         sort_layout.addWidget(self._sort_btn)
 
@@ -655,7 +655,7 @@ class ScreenPreview(QWidget):
         self._sort_btn.setText(_SORT_LABELS[sort_key] + "  ▾")
         if self._params is None:
             return
-        self._params = dataclasses.replace(self._params, sort_order=sort_key)
+        self._params = dataclasses.replace(self._params, sort_order=sort_key)  # type: ignore[arg-type]
         self.load(self._params)
 
     def _on_start_download(self) -> None:
@@ -667,7 +667,7 @@ class ScreenPreview(QWidget):
             self._params,
             count=self._count_spin.value(),
             output_folder=Path(self._folder_edit.text().strip()),
-            sort_order=sort_key,
+            sort_order=sort_key,  # type: ignore[arg-type]
         )
         self.download_requested.emit(params)
 
@@ -686,8 +686,8 @@ class ScreenPreview(QWidget):
         # Remove all items including the trailing stretch
         while self._paper_list_layout.count():
             item = self._paper_list_layout.takeAt(0)
-            if item.widget():
-                item.widget().deleteLater()
+            if item.widget():  # type: ignore[union-attr]
+                item.widget().deleteLater()  # type: ignore[union-attr]
         for paper in papers:
             self._paper_list_layout.addWidget(self._make_paper_row(paper))
         self._paper_list_layout.addStretch()

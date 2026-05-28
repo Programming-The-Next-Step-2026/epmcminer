@@ -181,7 +181,7 @@ class ScreenDownload(QWidget):
         self._worker.error_occurred.connect(self._on_error)
         self._worker.start()
 
-    def resizeEvent(self, event: QResizeEvent) -> None:
+    def resizeEvent(self, event: QResizeEvent | None) -> None:
         """Reposition the toast whenever the screen is resized."""
         super().resizeEvent(event)
         if self._toast is not None and not self._toast.isHidden():
@@ -238,8 +238,8 @@ class ScreenDownload(QWidget):
             f"QScrollArea {{ background-color: {theme.CARD_BG}; border: none; }}"
             f"QScrollArea > QWidget > QWidget {{ background-color: {theme.CARD_BG}; }}"
         )
-        self._log_scroll.verticalScrollBar().rangeChanged.connect(
-            lambda _, max_val: self._log_scroll.verticalScrollBar().setValue(max_val)
+        self._log_scroll.verticalScrollBar().rangeChanged.connect(  # type: ignore[union-attr]
+            lambda _, max_val: self._log_scroll.verticalScrollBar().setValue(max_val)  # type: ignore[union-attr]
         )
 
         log_container = QWidget()
@@ -370,8 +370,8 @@ class ScreenDownload(QWidget):
         """Remove all rows from the log layout and restore the trailing stretch."""
         while self._log_layout.count():
             item = self._log_layout.takeAt(0)
-            if item.widget():
-                item.widget().deleteLater()
+            if item.widget():  # type: ignore[union-attr]
+                item.widget().deleteLater()  # type: ignore[union-attr]
         self._log_layout.addStretch()
 
     def _add_log_row(self, result: DownloadResult) -> None:
@@ -424,7 +424,7 @@ class ScreenDownload(QWidget):
                 self._report_service.save_csv(results, self._params, output_folder)
             except Exception as exc:  # noqa: BLE001
                 _logger.exception("Failed to save report.csv: %s", exc)
-                self._toast.show_message("Could not save report.csv", success=False)
+                self._toast.show_message("Could not save report.csv", success=False)  # type: ignore[union-attr]
         self.download_complete.emit(results)
 
     def _on_error(self, message: str) -> None:
@@ -439,7 +439,7 @@ class ScreenDownload(QWidget):
         self._progress.set_progress(
             self._downloaded_count(), max(self._total, 1), processed=self._completed
         )
-        self._toast.show_message(f"Download error: {message}", success=False)
+        self._toast.show_message(f"Download error: {message}", success=False)  # type: ignore[union-attr]
 
     def _on_cancel(self) -> None:
         """Request cancellation and disable the cancel button."""

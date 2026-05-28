@@ -185,7 +185,7 @@ class ScreenSummary(QWidget):
     # UI construction
     # ------------------------------------------------------------------
 
-    def resizeEvent(self, event: QResizeEvent) -> None:
+    def resizeEvent(self, event: QResizeEvent | None) -> None:
         """Reposition the toast whenever the screen is resized."""
         super().resizeEvent(event)
         if self._toast is not None and not self._toast.isHidden():
@@ -422,8 +422,8 @@ class ScreenSummary(QWidget):
     def _populate_params(self, params: SearchParams) -> None:
         while self._param_pairs_layout.count():
             item = self._param_pairs_layout.takeAt(0)
-            if item.widget():
-                item.widget().deleteLater()
+            if item.widget():  # type: ignore[union-attr]
+                item.widget().deleteLater()  # type: ignore[union-attr]
 
         date_str = f"{params.date_from} → {params.date_to}"
 
@@ -464,8 +464,8 @@ class ScreenSummary(QWidget):
 
         while self._skipped_list_layout.count():
             item = self._skipped_list_layout.takeAt(0)
-            if item.widget():
-                item.widget().deleteLater()
+            if item.widget():  # type: ignore[union-attr]
+                item.widget().deleteLater()  # type: ignore[union-attr]
 
         for i, result in enumerate(not_downloaded):
             last = i == len(not_downloaded) - 1
@@ -584,9 +584,9 @@ class ScreenSummary(QWidget):
         Only the filename (not the full path) is shown so the toast fits
         without overflowing on long directory paths.
         """
-        self._toast.show_message(f"Saved to {Path(path).name}", success=True)
+        self._toast.show_message(f"Saved to {Path(path).name}", success=True)  # type: ignore[union-attr]
 
     def _on_export_error(self, message: str) -> None:
         """Log the error and show a failure toast."""
         _logger.error("Export failed: %s", message)
-        self._toast.show_message(f"Export failed: {message}", success=False)
+        self._toast.show_message(f"Export failed: {message}", success=False)  # type: ignore[union-attr]

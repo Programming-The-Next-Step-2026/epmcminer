@@ -168,7 +168,7 @@ class _CalendarPopup(QFrame):
         """
         return self._calendar
 
-    def resizeEvent(self, event: QResizeEvent) -> None:
+    def resizeEvent(self, event: QResizeEvent | None) -> None:
         """Clip the popup to its rounded-corner shape so no boxy corners bleed through."""
         super().resizeEvent(event)
         path = QPainterPath()

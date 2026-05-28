@@ -2309,4 +2309,573 @@ interactions:
     status:
       code: 200
       message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - JSESSIONID=F41DBEF735FBCB688E7451DC4423BA9F
+      User-Agent:
+      - python-requests/2.32.5
+    method: GET
+    uri: https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%28depression+AND+%28FIRST_PDATE%3A%5B2020-01-01+TO+2024-12-31%5D%29%29+AND+%28HAS_FT%3AY+OR+HAS_FREE_FULLTEXT%3AY%29&format=json&resultType=core&pageSize=10&cursorMark=%2A&sort=P_PDATE_D+desc
+  response:
+    body:
+      string: "{\"version\":\"6.9\",\"hitCount\":491620,\"nextCursorMark\":\"AoJwwN2ewJ4DKDUwNTk0NjE1\",\"nextPageUrl\":\"https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=(depression
+        AND (FIRST_PDATE:[2020-01-01 TO 2024-12-31])) AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)&cursorMark=AoJwwN2ewJ4DKDUwNTk0NjE1&resultType=core&pageSize=10&sort=P_PDATE_D
+        desc&format=json\",\"request\":{\"queryString\":\"(depression AND (FIRST_PDATE:[2020-01-01
+        TO 2024-12-31])) AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)\",\"resultType\":\"core\",\"cursorMark\":\"%2A\",\"pageSize\":10,\"sort\":\"P_PDATE_D
+        desc\",\"synonym\":false},\"resultList\":{\"result\":[{\"id\":\"39615013\",\"source\":\"MED\",\"pmid\":\"39615013\",\"pmcid\":\"PMC12295202\",\"fullTextIdList\":{\"fullTextId\":[\"PMC12295202\"]},\"doi\":\"10.1007/s11764-024-01715-y\",\"title\":\"Actigraphy-derived
+        multidimensional sleep health among breast cancer survivors and controls:
+        Pink SWAN.\",\"authorString\":\"Price SN, Crawford SL, Swanson LM, Hood MM,
+        Avis NE.\",\"authorList\":{\"author\":[{\"fullName\":\"Price SN\",\"firstName\":\"Sarah
+        N\",\"lastName\":\"Price\",\"initials\":\"SN\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-1622-1700\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Social Sciences and Health Policy, Wake Forest University School of Medicine,
+        525 Vine Street, Ste. 410, Winston-Salem, NC, 27101, USA. sarahpr@wakehealth.edu.\"}]}},{\"fullName\":\"Crawford
+        SL\",\"firstName\":\"Sybil L\",\"lastName\":\"Crawford\",\"initials\":\"SL\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Tan
+        Chingfen Graduate School of Nursing, UMass Chan Medical School, Worcester,
+        MA, USA.\"}]}},{\"fullName\":\"Swanson LM\",\"firstName\":\"Leslie M\",\"lastName\":\"Swanson\",\"initials\":\"LM\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-1720-1760\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Psychiatry, University of Michigan School of Medicine, Ann Arbor, MI, USA.\"}]}},{\"fullName\":\"Hood
+        MM\",\"firstName\":\"Michelle M\",\"lastName\":\"Hood\",\"initials\":\"MM\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-1049-8426\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Epidemiology, School of Public Health, University of Michigan, Ann Arbor,
+        MI, USA.\"}]}},{\"fullName\":\"Avis NE\",\"firstName\":\"Nancy E\",\"lastName\":\"Avis\",\"initials\":\"NE\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Social Sciences and Health Policy, Wake Forest University School of Medicine,
+        525 Vine Street, Ste. 410, Winston-Salem, NC, 27101, USA.\"}]}}]},\"authorIdList\":{\"authorId\":[{\"type\":\"ORCID\",\"value\":\"0000-0002-1049-8426\"},{\"type\":\"ORCID\",\"value\":\"0000-0002-1622-1700\"},{\"type\":\"ORCID\",\"value\":\"0000-0002-1720-1760\"}]},\"dataLinksTagsList\":{\"dataLinkstag\":[\"altmetrics\"]},\"journalInfo\":{\"issue\":\"3\",\"volume\":\"20\",\"journalIssueId\":4189280,\"dateOfPublication\":\"2026
+        Jun\",\"monthOfPublication\":6,\"yearOfPublication\":2026,\"printPublicationDate\":\"2026-06-01\",\"journal\":{\"title\":\"Journal
+        of cancer survivorship : research and practice\",\"medlineAbbreviation\":\"J
+        Cancer Surviv\",\"isoabbreviation\":\"J Cancer Surviv\",\"nlmid\":\"101307557\",\"issn\":\"1932-2259\",\"essn\":\"1932-2267\"}},\"pubYear\":\"2026\",\"pageInfo\":\"1131-1144\",\"abstractText\":\"<h4>Purpose</h4>To
+        compare breast cancer survivors (BCS) to women without breast cancer (controls)
+        on sleep health risk factors and actigraphy-derived dimensions of sleep (duration,
+        maintenance, timing, and regularity) and examine whether the effect of breast
+        cancer on sleep differs by time since diagnosis.<h4>Methods</h4>Analyses included
+        data from 68 BCS and 1042 controls who participated in actigraphy and Pink
+        SWAN sub-studies within the Study of Women's Health Across the Nation. BCS
+        and control characteristics were compared using chi-square, Fisher's exact,
+        and Wilcoxon rank sum tests. Sleep measures were regressed onto breast cancer
+        status using binomial logistic and linear regression. The interaction between
+        BCS status and years since diagnosis (<\u20095;\u2009\u2265\u20095) was tested
+        in these models before and after covariate adjustment.<h4>Results</h4>There
+        were no overall sleep differences between BCS and controls; both groups experienced
+        poor sleep health on average across multiple dimensions. Physical inactivity,
+        sleep apnea, and vasomotor and depressive symptoms were associated with worse
+        sleep in both groups. Total sleep time was lower among BCS than controls within
+        5\_years of diagnosis (6.13 vs. 6.57\_h; p\u2009=\u2009.03) but did not differ
+        at\u2009>\u20095\_years post-diagnosis (6.59 vs. 6.45\_h; p\u2009=\u2009.32).
+        BCS reported greater use of exogenous hormones (p\u2009<\u2009.0001) and were
+        twice as likely to have initiated anxiolytic use post-diagnosis (p\u2009=\u2009.03).<h4>Conclusions</h4>BCS
+        within 5\_years of diagnosis experienced shorter sleep duration than controls
+        but did not differ on other sleep parameters. Both groups experienced poor
+        sleep health.<h4>Implications for cancer survivors</h4>BCS and similarly-aged
+        women experience poor sleep health requiring assessment and treatment.\",\"affiliation\":\"Department
+        of Social Sciences and Health Policy, Wake Forest University School of Medicine,
+        525 Vine Street, Ste. 410, Winston-Salem, NC, 27101, USA. sarahpr@wakehealth.edu.\",\"publicationStatus\":\"ppublish\",\"language\":\"eng\",\"pubModel\":\"Print-Electronic\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"grantsList\":{\"grant\":[{\"grantId\":\"U01 AG012505\",\"agency\":\"NIA
+        NIH HHS\",\"acronym\":\"AG\",\"orderIn\":0},{\"grantId\":\"U01 AG012531\",\"agency\":\"NIA
+        NIH HHS\",\"acronym\":\"AG\",\"orderIn\":0},{\"grantId\":\"U01 AG012535\",\"agency\":\"NIA
+        NIH HHS\",\"acronym\":\"AG\",\"orderIn\":0},{\"grantId\":\"R01 CA199137\",\"agency\":\"NCI
+        NIH HHS\",\"acronym\":\"CA\",\"orderIn\":0},{\"grantId\":\"T32 CA122061\",\"agency\":\"NCI
+        NIH HHS\",\"acronym\":\"CA\",\"orderIn\":0},{\"grantId\":\"U01 AG012495\",\"agency\":\"NIA
+        NIH HHS\",\"acronym\":\"AG\",\"orderIn\":0},{\"grantId\":\"U01 AG012546\",\"agency\":\"NIA
+        NIH HHS\",\"acronym\":\"AG\",\"orderIn\":0},{\"grantId\":\"U01 AG012553\",\"agency\":\"NIA
+        NIH HHS\",\"acronym\":\"AG\",\"orderIn\":0},{\"grantId\":\"U01 AG012554\",\"agency\":\"NIA
+        NIH HHS\",\"acronym\":\"AG\",\"orderIn\":0},{\"grantId\":\"U19 AG063720\",\"agency\":\"NIA
+        NIH HHS\",\"acronym\":\"AG\",\"orderIn\":0},{\"grantId\":\"P50 CA244693\",\"agency\":\"NCI
+        NIH HHS\",\"acronym\":\"CA\",\"orderIn\":0},{\"grantId\":\"T32CA122061\",\"agency\":\"National
+        Cancer Institute, United States\",\"orderIn\":0},{\"grantId\":\"U01 AG012539\",\"agency\":\"NIA
+        NIH HHS\",\"acronym\":\"AG\",\"orderIn\":0},{\"grantId\":\"U01NR004061; U01AG012505,
+        U01AG012535, U01AG012531, U01AG012539, U01AG012546, U01AG012553, U01AG012554,
+        U01AG012495, and U19AG063720\",\"agency\":\"NIH HHS\",\"acronym\":\"NH\",\"orderIn\":0},{\"grantId\":\"U01
+        NR004061\",\"agency\":\"NINR NIH HHS\",\"acronym\":\"NR\",\"orderIn\":0}]},\"meshHeadingList\":{\"meshHeading\":[{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Humans\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Breast
+        Neoplasms\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"CO\",\"qualifierName\":\"complications\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"MO\",\"qualifierName\":\"mortality\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Sleep
+        Apnea Syndromes\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"EP\",\"qualifierName\":\"epidemiology\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"PP\",\"qualifierName\":\"physiopathology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Linear
+        Models\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Risk Factors\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Case-Control
+        Studies\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Depression\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"EP\",\"qualifierName\":\"epidemiology\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"PP\",\"qualifierName\":\"physiopathology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Sleep\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PH\",\"qualifierName\":\"physiology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Time
+        Factors\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Adult\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Middle
+        Aged\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Female\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Actigraphy\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"SN\",\"qualifierName\":\"statistics
+        & numerical data\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Sleep
+        Wake Disorders\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"DI\",\"qualifierName\":\"diagnosis\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"ET\",\"qualifierName\":\"etiology\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"EP\",\"qualifierName\":\"epidemiology\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"PP\",\"qualifierName\":\"physiopathology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Cancer
+        Survivors\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"SN\",\"qualifierName\":\"statistics
+        & numerical data\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Sedentary
+        Behavior\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Sleep Quality\"}]},\"keywordList\":{\"keyword\":[\"Sleep\",\"Breast
+        cancer\",\"Cancer Survivors\"]},\"subsetList\":{\"subset\":[{\"code\":\"IM\",\"name\":\"Index
+        Medicus\"}]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1007/s11764-024-01715-y\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC12295202\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC12295202?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":0,\"hasData\":\"N\",\"hasReferences\":\"Y\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"Y\",\"license\":\"cc
+        by\",\"hasEvaluations\":\"N\",\"authMan\":\"Y\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"Y\",\"manuscriptId\":\"NIHMS2091603\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2026-05-06\",\"dateOfCreation\":\"2024-11-30\",\"firstIndexDate\":\"2024-12-01\",\"fullTextReceivedDate\":\"2025-12-23\",\"dateOfRevision\":\"2026-05-08\",\"electronicPublicationDate\":\"2024-11-30\",\"firstPublicationDate\":\"2024-11-30\"},{\"id\":\"39589721\",\"source\":\"MED\",\"pmid\":\"39589721\",\"pmcid\":\"PMC12970109\",\"fullTextIdList\":{\"fullTextId\":[\"PMC12970109\"]},\"doi\":\"10.1007/s11764-024-01704-1\",\"title\":\"Nurse-delivered
+        brief behavioral treatment for insomnia in cancer survivors: a randomized
+        controlled trial.\",\"authorString\":\"Dickerson SS, Kwon M, Wilding GE, Zhu
+        J.\",\"authorList\":{\"author\":[{\"fullName\":\"Dickerson SS\",\"firstName\":\"Suzanne
+        S\",\"lastName\":\"Dickerson\",\"initials\":\"SS\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"University
+        at Buffalo School of Nursing, The State University of New York, 301E Wende
+        Hall, 3435 Main St, Buffalo, NY, 14214, USA. sdickers@buffalo.edu.\"}]}},{\"fullName\":\"Kwon
+        M\",\"firstName\":\"Misol\",\"lastName\":\"Kwon\",\"initials\":\"M\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-9608-2754\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"University
+        at Buffalo School of Nursing, The State University of New York, 301E Wende
+        Hall, 3435 Main St, Buffalo, NY, 14214, USA.\"},{\"affiliation\":\"Division
+        of Sleep Medicine, University of Pennsylvania Perelman School of Medicine,
+        Philadelphia, PA, USA.\"},{\"affiliation\":\"University of Pennsylvania School
+        of Nursing, Philadelphia, PA, USA.\"}]}},{\"fullName\":\"Wilding GE\",\"firstName\":\"Gregory
+        E\",\"lastName\":\"Wilding\",\"initials\":\"GE\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Biostatistics, University at Buffalo School of Public Health and Health
+        Professions, The State University of New York, Buffalo, NY, USA.\"}]}},{\"fullName\":\"Zhu
+        J\",\"firstName\":\"Jingtao\",\"lastName\":\"Zhu\",\"initials\":\"J\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Biostatistics, University at Buffalo School of Public Health and Health
+        Professions, The State University of New York, Buffalo, NY, USA.\"}]}}]},\"authorIdList\":{\"authorId\":[{\"type\":\"ORCID\",\"value\":\"0000-0002-9608-2754\"}]},\"dataLinksTagsList\":{\"dataLinkstag\":[\"altmetrics\",\"supporting_data\"]},\"journalInfo\":{\"issue\":\"3\",\"volume\":\"20\",\"journalIssueId\":4189280,\"dateOfPublication\":\"2026
+        Jun\",\"monthOfPublication\":6,\"yearOfPublication\":2026,\"printPublicationDate\":\"2026-06-01\",\"journal\":{\"title\":\"Journal
+        of cancer survivorship : research and practice\",\"medlineAbbreviation\":\"J
+        Cancer Surviv\",\"isoabbreviation\":\"J Cancer Surviv\",\"nlmid\":\"101307557\",\"issn\":\"1932-2259\",\"essn\":\"1932-2267\"}},\"pubYear\":\"2026\",\"pageInfo\":\"1010-1022\",\"abstractText\":\"<h4>Purpose</h4>To
+        determine the efficacy of nurse-delivered brief behavioral treatment for insomnia
+        (BBTI) compared to an attention control, in a heterogeneous sample of cancer
+        survivors to reduce insomnia symptom severity.<h4>Methods</h4>We recruited
+        132 participants from cancer care clinics, who had an Insomnia Severity Index
+        (ISI) score\u2009\u2265\u20098. Participants were randomized into two groups:
+        an experimental BBTI group and a healthy eating attention control group. Demographics
+        survey at baseline, and sleep-related questionnaires, self-reported sleep
+        diaries, and wrist-worn actigraphy at baseline, 1, 3, and 12\_months were
+        collected. Statistical analyses used analysis of covariance (ANCOVA) models
+        with two-sided 0.05 nominal significance level for treatment effect for primary
+        outcome of insomnia severity at 1\_month.<h4>Results</h4>Participants were
+        cancer survivors with a mean age of 63.7\_years, 55% female, 88.6% white,
+        with breast, prostate, colorectal, and lung cancer. Statistically significant
+        group differences were observed at all time points for ISI and sleep quality
+        (ISI effect sizes 0.56, 0.59, and 0.54 respectively). Additionally, at 1\_month,
+        those in insomnia remission (ISI\u2009\u2264\u20098) were higher for the BBTI
+        (55.1%) compared to the control group (43.3%). Secondary outcomes from sleep
+        diary measures (i.e., sleep efficiency, sleep onset latency, wake after sleep
+        onset) were significant at 1\_month.<h4>Conclusion</h4>The BBTI group was
+        significantly effective in reducing insomnia severity and improving sleep
+        quality over time compared to the control among cancer survivors.<h4>Clinical
+        trial registration</h4>Clinical trials identifier: http://ClinicalTrials.gov
+        , NCT03810365.<h4>Implications for cancer survivors</h4>Implementing BBTI
+        in survivorship settings can effectively address and manage insomnia symptoms,
+        thus bridging a crucial gap in care for cancer survivors.\",\"affiliation\":\"University
+        at Buffalo School of Nursing, The State University of New York, 301E Wende
+        Hall, 3435 Main St, Buffalo, NY, 14214, USA. sdickers@buffalo.edu.\",\"publicationStatus\":\"ppublish\",\"language\":\"eng\",\"pubModel\":\"Print-Electronic\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Randomized
+        Controlled Trial\",\"Journal Article\"]},\"grantsList\":{\"grant\":[{\"grantId\":\"R01
+        NR018215\",\"agency\":\"NINR NIH HHS\",\"acronym\":\"NR\",\"orderIn\":0},{\"grantId\":\"T32
+        HL07953\",\"agency\":\"National Heart, Lung, and Blood Institute\",\"orderIn\":0},{\"grantId\":\"T32
+        HL07953\",\"agency\":\"NHLBI NIH HHS\",\"acronym\":\"HL\",\"orderIn\":0},{\"grantId\":\"R01
+        NR018215\",\"agency\":\"National Institutes of Health\",\"orderIn\":0},{\"grantId\":\"R01
+        NR018215\",\"agency\":\"NIH HHS\",\"acronym\":\"NH\",\"orderIn\":0}]},\"meshHeadingList\":{\"meshHeading\":[{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Humans\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Neoplasms\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"CO\",\"qualifierName\":\"complications\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Sleep
+        Initiation and Maintenance Disorders\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"ET\",\"qualifierName\":\"etiology\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"NU\",\"qualifierName\":\"nursing\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"TH\",\"qualifierName\":\"therapy\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Treatment
+        Outcome\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Behavior Therapy\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"MT\",\"qualifierName\":\"methods\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Adult\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Aged\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Middle
+        Aged\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Female\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Male\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Cancer
+        Survivors\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"SN\",\"qualifierName\":\"statistics
+        & numerical data\",\"majorTopic_YN\":\"N\"}]}}]},\"keywordList\":{\"keyword\":[\"Longitudinal
+        study\",\"Insomnia\",\"Randomized controlled trial\",\"Cancer Survivors\",\"Sleep
+        Intervention\",\"Brief Behavioral Treatment For Insomnia\"]},\"subsetList\":{\"subset\":[{\"code\":\"IM\",\"name\":\"Index
+        Medicus\"}]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1007/s11764-024-01704-1\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC12970109\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC12970109?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"Y\",\"citedByCount\":3,\"hasData\":\"Y\",\"hasReferences\":\"Y\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"Y\",\"license\":\"cc
+        by-nc-nd\",\"hasEvaluations\":\"N\",\"authMan\":\"Y\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"Y\",\"manuscriptId\":\"NIHMS2147540\",\"hasTMAccessionNumbers\":\"Y\",\"tmAccessionTypeList\":{\"accessionType\":[\"nct\"]},\"dateOfCompletion\":\"2026-05-05\",\"dateOfCreation\":\"2024-11-26\",\"firstIndexDate\":\"2024-11-26\",\"fullTextReceivedDate\":\"2026-03-10\",\"dateOfRevision\":\"2026-05-05\",\"electronicPublicationDate\":\"2024-11-26\",\"firstPublicationDate\":\"2024-11-26\"},{\"id\":\"39506208\",\"source\":\"MED\",\"pmid\":\"39506208\",\"doi\":\"10.1080/02646838.2024.2423178\",\"title\":\"Mental
+        health of parents with infants in NICU receiving cooling therapy for hypoxic-ischaemic
+        encephalopathy.\",\"authorString\":\"Ingram J, Odd D, Beasant L, Chakkarapani
+        E, CoolCuddle and CoolBonding study teams.\",\"authorList\":{\"author\":[{\"fullName\":\"Ingram
+        J\",\"firstName\":\"Jenny\",\"lastName\":\"Ingram\",\"initials\":\"J\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0003-2366-008X\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Bristol
+        Medical School, University of Bristol, Bristol, UK.\"}]}},{\"fullName\":\"Odd
+        D\",\"firstName\":\"David\",\"lastName\":\"Odd\",\"initials\":\"D\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-6416-4966\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Cardiff
+        Medical School, Cardiff University, Cardiff, UK.\"}]}},{\"fullName\":\"Beasant
+        L\",\"firstName\":\"Lucy\",\"lastName\":\"Beasant\",\"initials\":\"L\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-4279-5644\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Bristol
+        Medical School, University of Bristol, Bristol, UK.\"}]}},{\"fullName\":\"Chakkarapani
+        E\",\"firstName\":\"Ela\",\"lastName\":\"Chakkarapani\",\"initials\":\"E\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0003-3380-047X\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Bristol
+        Medical School, University of Bristol, Bristol, UK.\"}]}},{\"collectiveName\":\"CoolCuddle
+        and CoolBonding study teams\"}]},\"authorIdList\":{\"authorId\":[{\"type\":\"ORCID\",\"value\":\"0000-0002-4279-5644\"},{\"type\":\"ORCID\",\"value\":\"0000-0002-6416-4966\"},{\"type\":\"ORCID\",\"value\":\"0000-0003-2366-008X\"},{\"type\":\"ORCID\",\"value\":\"0000-0003-3380-047X\"}]},\"journalInfo\":{\"issue\":\"3\",\"volume\":\"44\",\"journalIssueId\":4194587,\"dateOfPublication\":\"2026
+        Jun\",\"monthOfPublication\":6,\"yearOfPublication\":2026,\"printPublicationDate\":\"2026-06-01\",\"journal\":{\"title\":\"Journal
+        of reproductive and infant psychology\",\"medlineAbbreviation\":\"J Reprod
+        Infant Psychol\",\"isoabbreviation\":\"J Reprod Infant Psychol\",\"nlmid\":\"8501885\",\"issn\":\"0264-6838\",\"essn\":\"1469-672X\"}},\"pubYear\":\"2026\",\"pageInfo\":\"803-817\",\"abstractText\":\"<h4>Background</h4>Parents
+        cuddling their babies during intensive care to promote parent-infant bonding
+        is usual practice in the neonatal intensive care unit (NICU). However, babies
+        undergoing cooling therapy and intensive care are not routinely offered parent-infant
+        cuddles due to concerns of impacting the cooling process or intensive care.
+        We developed the CoolCuddle intervention to enable parents to cuddle babies
+        safely during cooling therapy. We investigated whether CoolCuddle impacted
+        parent-infant bonding and parent's mental health.<h4>Methods</h4>We conducted
+        parental interviews and compared mental health and bonding measures in two
+        cohorts of parents; one with access to CoolCuddle and the other where CoolCuddle
+        was not available.<h4>Results</h4>Ten tertiary NICUs in England and Wales
+        from 2019 to 2023 were involved and 107 families. There were high levels of
+        post-delivery depression amongst all parents. However, at discharge mothers
+        in the CoolCuddle group had significantly less depression, lower EPDS scores,
+        and higher MIBS scores (consistent with better mother-infant bonding) than
+        those where CoolCuddle was not available. All measures appeared similar when
+        re-measured at 8\u2009weeks. Parents reported they were not ready to access
+        psychological support or information whilst on NICU and stressed the need
+        of mental health support following discharge, which was not offered or available.<h4>Conclusion</h4>The
+        CoolCuddle intervention was associated with a lower prevalence of depression
+        and enhanced bonding scores for mothers at discharge compared to those who
+        did not cuddle their babies. Parents highlighted increased levels of postnatal
+        depression following the sudden and traumatic admission of their infant to
+        NICU after birth asphyxia.\",\"affiliation\":\"Bristol Medical School, University
+        of Bristol, Bristol, UK.\",\"publicationStatus\":\"ppublish\",\"language\":\"eng\",\"pubModel\":\"Print-Electronic\",\"pubTypeList\":{\"pubType\":[\"Journal
+        Article\"]},\"grantsList\":{\"grant\":[{\"grantId\":\"NIHR203034\",\"agency\":\"National
+        Institute for Health and Care Research\",\"orderIn\":0},{\"agency\":\"National
+        Institute for Health Research (NIHR)\",\"orderIn\":0}]},\"meshHeadingList\":{\"meshHeading\":[{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Humans\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Hypoxia-Ischemia,
+        Brain\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"TH\",\"qualifierName\":\"therapy\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Hypothermia,
+        Induced\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Mother-Child
+        Relations\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Parents\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Mental
+        Health\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Object Attachment\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Adult\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Infant,
+        Newborn\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Intensive Care Units,
+        Neonatal\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"England\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Wales\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Female\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Male\"}]},\"keywordList\":{\"keyword\":[\"Postnatal
+        Depression\",\"Neonatal Intensive Care\",\"Hypoxic-ischaemic Encephalopathy\",\"Paternal
+        Depression\",\"Mother-infant Bonding\"]},\"subsetList\":{\"subset\":[{\"code\":\"IM\",\"name\":\"Index
+        Medicus\"}]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"doi\",\"site\":\"Unpaywall\",\"url\":\"https://doi.org/10.1080/02646838.2024.2423178\"},{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1080/02646838.2024.2423178\"}]},\"isOpenAccess\":\"N\",\"inEPMC\":\"N\",\"inPMC\":\"N\",\"hasPDF\":\"N\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":1,\"hasData\":\"N\",\"hasReferences\":\"Y\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"N\",\"license\":\"cc
+        by\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2026-05-18\",\"dateOfCreation\":\"2024-11-07\",\"firstIndexDate\":\"2024-11-07\",\"dateOfRevision\":\"2026-05-18\",\"electronicPublicationDate\":\"2024-11-06\",\"firstPublicationDate\":\"2024-11-06\"},{\"id\":\"39425854\",\"source\":\"MED\",\"pmid\":\"39425854\",\"pmcid\":\"PMC12008247\",\"fullTextIdList\":{\"fullTextId\":[\"PMC12008247\"]},\"doi\":\"10.1007/s11764-024-01697-x\",\"title\":\"Role
+        function in postmenopausal women during aromatase inhibitor therapy for breast
+        cancer.\",\"authorString\":\"Melnyk H, Dickson VV, Bender C, Yu G, Djukic
+        M, Merriman J.\",\"authorList\":{\"author\":[{\"fullName\":\"Melnyk H\",\"firstName\":\"Halia\",\"lastName\":\"Melnyk\",\"initials\":\"H\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"New
+        York University Rory Meyers College of Nursing, New York, NY, USA. melnyh01@nyu.edu.\"},{\"affiliation\":\"The
+        Ohio State University College of Medicine, The Center for the Advancement
+        of Team Science, Analytics, and Systems Thinking in Health Services and Implementation
+        Science Research (CATALYST), Columbus, OH, USA. melnyh01@nyu.edu.\"}]}},{\"fullName\":\"Dickson
+        VV\",\"firstName\":\"Victoria Vaughan\",\"lastName\":\"Dickson\",\"initials\":\"VV\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"University
+        of Connecticut School of Nursing, Storrs, CT, USA.\"}]}},{\"fullName\":\"Bender
+        C\",\"firstName\":\"Catherine\",\"lastName\":\"Bender\",\"initials\":\"C\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"University
+        of Pittsburgh School of Nursing, Pittsburgh, PA, USA.\"}]}},{\"fullName\":\"Yu
+        G\",\"firstName\":\"Gary\",\"lastName\":\"Yu\",\"initials\":\"G\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Columbia
+        University, New York, NY, USA.\"}]}},{\"fullName\":\"Djukic M\",\"firstName\":\"Maja\",\"lastName\":\"Djukic\",\"initials\":\"M\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"The
+        University of Texas Health Science Center at Houston, Jane and Robert Cizik
+        School of Nursing, Houston, TX, USA.\"}]}},{\"fullName\":\"Merriman J\",\"firstName\":\"John\",\"lastName\":\"Merriman\",\"initials\":\"J\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-7113-5389\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"New
+        York University Rory Meyers College of Nursing, New York, NY, USA.\"}]}}]},\"authorIdList\":{\"authorId\":[{\"type\":\"ORCID\",\"value\":\"0000-0002-7113-5389\"}]},\"journalInfo\":{\"issue\":\"3\",\"volume\":\"20\",\"journalIssueId\":4189280,\"dateOfPublication\":\"2026
+        Jun\",\"monthOfPublication\":6,\"yearOfPublication\":2026,\"printPublicationDate\":\"2026-06-01\",\"journal\":{\"title\":\"Journal
+        of cancer survivorship : research and practice\",\"medlineAbbreviation\":\"J
+        Cancer Surviv\",\"isoabbreviation\":\"J Cancer Surviv\",\"nlmid\":\"101307557\",\"issn\":\"1932-2259\",\"essn\":\"1932-2267\"}},\"pubYear\":\"2026\",\"pageInfo\":\"927-939\",\"abstractText\":\"<h4>Objective</h4>Few
+        studies have examined aromatase inhibitor therapy relating to role function
+        in breast cancer survivors of working age. Our study sought to identify how
+        pre-therapy sociodemographic and health/treatment-related characteristics,
+        as well as patient-reported symptoms measured every six-months, influence
+        role function during 18\_months of AI therapy for early-stage breast cancer.<h4>Methods</h4>We
+        performed a secondary analysis of longitudinal study data using linear mixed-effects
+        modeling to examine role physical (RP) and role emotional (RE) functioning
+        measured with the Medical Outcome Study Short Form 36 v2. The sample of postmenopausal
+        women (N\u2009=\u2009351) consisted of three cohorts: chemotherapy followed
+        by anastrozole (CFAI), anastrozole only (AI only), and non-cancer controls.
+        Our choice of variables and interpretation of findings was theoretically based
+        on the Cancer Survivorship and Work Model. Stepwise backward deletion determined
+        which predictors to include in the final model, accounting for treatment group.<h4>Results</h4>Both
+        treatment groups were associated with greater limitations in RP functioning
+        than controls. CFAI had twice the impact on RP compared to AI only. While
+        the RP model displayed significant predictors across sociodemographic, health/treatment,
+        and symptom characteristics, only symptoms were associated with greater limitations
+        in RE functioning. Findings were significant at p\u2009<\u2009.05.<h4>Conclusion</h4>Transitioning
+        from acute to extended survivorship is a critical juncture in which multiple
+        factors place breast cancer survivors at risk of diminished role function.<h4>Implications
+        for cancer survivors</h4>Early interventions to address role function limitations
+        during systemic treatment may lead to better work outcomes and improve the
+        quality of long-term survivorship.\",\"affiliation\":\"New York University
+        Rory Meyers College of Nursing, New York, NY, USA. melnyh01@nyu.edu.\",\"publicationStatus\":\"ppublish\",\"language\":\"eng\",\"pubModel\":\"Print-Electronic\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"grantsList\":{\"grant\":[{\"grantId\":\"R01CA107408\",\"agency\":\"NCI
+        NIH HHS\",\"acronym\":\"CA\",\"orderIn\":0},{\"grantId\":\"R01 CA107408\",\"agency\":\"NCI
+        NIH HHS\",\"acronym\":\"CA\",\"orderIn\":0},{\"grantId\":\"R01CA107408\",\"agency\":\"National
+        Cancer Institute\",\"orderIn\":0},{\"grantId\":\"T42 OH008422\",\"agency\":\"NIOSH
+        CDC HHS\",\"acronym\":\"OH\",\"orderIn\":0},{\"grantId\":\"T42OH008422\",\"agency\":\"National
+        Institute of Occupational Safety and Health\",\"orderIn\":0}]},\"meshHeadingList\":{\"meshHeading\":[{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Humans\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Breast
+        Neoplasms\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"DT\",\"qualifierName\":\"drug
+        therapy\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"MO\",\"qualifierName\":\"mortality\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Aromatase
+        Inhibitors\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"TU\",\"qualifierName\":\"therapeutic
+        use\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Longitudinal
+        Studies\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Postmenopause\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Quality
+        of Life\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Aged\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Middle
+        Aged\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Female\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Cancer
+        Survivors\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Anastrozole\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"TU\",\"qualifierName\":\"therapeutic
+        use\",\"majorTopic_YN\":\"N\"}]}}]},\"keywordList\":{\"keyword\":[\"Breast
+        Cancer Survivorship\",\"Health-related Quality Of Life (Hrqol)\",\"Aromatase
+        Inhibitor Therapy\",\"Role Function\",\"Everyday And Work Life Participation\"]},\"chemicalList\":{\"chemical\":[{\"name\":\"Aromatase
+        Inhibitors\",\"registryNumber\":\"0\"},{\"name\":\"anastrozole\",\"registryNumber\":\"2Z07MYW1AZ\"}]},\"subsetList\":{\"subset\":[{\"code\":\"IM\",\"name\":\"Index
+        Medicus\"}]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1007/s11764-024-01697-x\"},{\"availability\":\"Free\",\"availabilityCode\":\"F\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC12008247\"},{\"availability\":\"Free\",\"availabilityCode\":\"F\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC12008247?pdf=render\"},{\"availability\":\"Free\",\"availabilityCode\":\"F\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1007/s11764-024-01697-x\"}]},\"isOpenAccess\":\"N\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"Y\",\"citedByCount\":0,\"hasData\":\"Y\",\"hasReferences\":\"Y\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"N\",\"hasEvaluations\":\"N\",\"authMan\":\"Y\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"Y\",\"manuscriptId\":\"NIHMS2037330\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2026-05-05\",\"dateOfCreation\":\"2024-10-19\",\"firstIndexDate\":\"2024-10-20\",\"fullTextReceivedDate\":\"2026-04-22\",\"dateOfRevision\":\"2026-05-07\",\"electronicPublicationDate\":\"2024-10-19\",\"firstPublicationDate\":\"2024-10-19\"},{\"id\":\"39217237\",\"source\":\"MED\",\"pmid\":\"39217237\",\"pmcid\":\"PMC13201343\",\"fullTextIdList\":{\"fullTextId\":[\"PMC13201343\"]},\"doi\":\"10.1007/s10578-024-01752-9\",\"title\":\"Prospective
+        Associations of Maternal Depressive Symptoms and Emotion Dysregulation with
+        Children's Internalizing Problems: The Moderating Role of Fathers.\",\"authorString\":\"Gong
+        Y, Feng X, Chan MH, Slesnick N.\",\"authorList\":{\"author\":[{\"fullName\":\"Gong
+        Y\",\"firstName\":\"Yihui\",\"lastName\":\"Gong\",\"initials\":\"Y\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-9686-5441\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Human Sciences, The Ohio State University, Columbus, OH, USA. Gong.371@osu.edu.\"}]}},{\"fullName\":\"Feng
+        X\",\"firstName\":\"Xin\",\"lastName\":\"Feng\",\"initials\":\"X\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Human Sciences, The Ohio State University, Columbus, OH, USA.\"}]}},{\"fullName\":\"Chan
+        MH\",\"firstName\":\"Meingold Hiu-Ming\",\"lastName\":\"Chan\",\"initials\":\"MH\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"University
+        of British Columbia, British Columbia, Vancouver, Canada.\"}]}},{\"fullName\":\"Slesnick
+        N\",\"firstName\":\"Natasha\",\"lastName\":\"Slesnick\",\"initials\":\"N\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Human Sciences, The Ohio State University, Columbus, OH, USA.\"}]}}]},\"authorIdList\":{\"authorId\":[{\"type\":\"ORCID\",\"value\":\"0000-0002-9686-5441\"}]},\"journalInfo\":{\"issue\":\"3\",\"volume\":\"57\",\"journalIssueId\":4200989,\"dateOfPublication\":\"2026
+        Jun\",\"monthOfPublication\":6,\"yearOfPublication\":2026,\"printPublicationDate\":\"2026-06-01\",\"journal\":{\"title\":\"Child
+        psychiatry and human development\",\"medlineAbbreviation\":\"Child Psychiatry
+        Hum Dev\",\"isoabbreviation\":\"Child Psychiatry Hum Dev\",\"nlmid\":\"1275332\",\"issn\":\"0009-398X\",\"essn\":\"1573-3327\"}},\"pubYear\":\"2026\",\"pageInfo\":\"869-880\",\"abstractText\":\"Parents,
+        including fathers, contribute to the early development of internalizing symptoms,
+        which is observable and prevalent among young children. This longitudinal
+        study examined the moderating role of paternal depressive symptoms/emotion
+        dysregulation in the prospective associations between maternal depressive
+        symptoms/emotion dysregulation and children's internalizing problems (depressive
+        and anxiety symptoms). Ninety-four preschoolers and their mothers and fathers
+        participated. Parents completed online questionnaires when their children
+        were four years old and one year later. Results indicated that higher paternal
+        depressive symptoms were associated with an increase, while lower paternal
+        symptoms were associated with a decrease, in the negative impact of maternal
+        emotion dysregulation on children's later depressive, but not anxiety, symptoms.
+        We also tested the moderating role of paternal emotion dysregulation, these
+        pathways were not significant. The findings enhance our understanding of the
+        interaction between maternal and paternal psychological characteristics in
+        contributing to children's anxiety and depressive symptoms.\",\"affiliation\":\"Department
+        of Human Sciences, The Ohio State University, Columbus, OH, USA. Gong.371@osu.edu.\",\"publicationStatus\":\"ppublish\",\"language\":\"eng\",\"pubModel\":\"Print-Electronic\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"grantsList\":{\"grant\":[{\"grantId\":\"R21 HD095179\",\"agency\":\"Eunice
+        Kennedy Shriver National Institute of Child Health and Human Development\",\"orderIn\":0},{\"grantId\":\"R21
+        HD095179\",\"agency\":\"NICHD NIH HHS\",\"acronym\":\"HD\",\"orderIn\":0}]},\"meshHeadingList\":{\"meshHeading\":[{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Humans\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Longitudinal
+        Studies\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Prospective Studies\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Depression\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Anxiety\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Fathers\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Mothers\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Adult\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Child,
+        Preschool\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Female\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Male\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Emotional
+        Regulation\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PH\",\"qualifierName\":\"physiology\",\"majorTopic_YN\":\"N\"}]}}]},\"keywordList\":{\"keyword\":[\"Preschoolers\",\"Parental
+        Depression\",\"Internalizing\",\"Parental Emotion Dysregulation\"]},\"subsetList\":{\"subset\":[{\"code\":\"IM\",\"name\":\"Index
+        Medicus\"}]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1007/s10578-024-01752-9\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13201343\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13201343?pdf=render\"}]},\"commentCorrectionList\":{\"commentCorrection\":[{\"id\":\"38659889\",\"source\":\"MED\",\"reference\":\"Res
+        Sq. 2024 Apr 09:rs.3.rs-4209113. doi: 10.21203/rs.3.rs-4209113/v1.\",\"type\":\"Update
+        of\",\"orderIn\":1},{\"id\":\"PPR834773\",\"source\":\"PPR\",\"type\":\"Preprint
+        in\",\"note\":\"CrossRef Pre-print loader\",\"orderIn\":10002}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":1,\"hasData\":\"N\",\"hasReferences\":\"Y\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"N\",\"license\":\"cc
+        by\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2026-05-25\",\"dateOfCreation\":\"2024-08-31\",\"firstIndexDate\":\"2024-09-03\",\"fullTextReceivedDate\":\"2026-05-27\",\"dateOfRevision\":\"2026-05-25\",\"electronicPublicationDate\":\"2024-08-31\",\"firstPublicationDate\":\"2024-08-31\"},{\"id\":\"39180376\",\"source\":\"MED\",\"pmid\":\"39180376\",\"pmcid\":\"PMC13076977\",\"fullTextIdList\":{\"fullTextId\":[\"PMC13076977\"]},\"doi\":\"10.1177/00332941241277096\",\"title\":\"Sex
+        Differences in the Associations of mental Health, Suicidality, Screentime,
+        and Sleep: A Mediation Effect Analysis of Sleep Using Youth Risk Behavioral
+        Surveillance Survey 2021.\",\"authorString\":\"Feng S, Liu R, Tomar A, Ma
+        P.\",\"authorList\":{\"author\":[{\"fullName\":\"Feng S\",\"firstName\":\"Shuo\",\"lastName\":\"Feng\",\"initials\":\"S\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-3276-7586\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Health Behavior, School of Public Health, Texas A&M University, College
+        Station, Texas, USA.\"}]}},{\"fullName\":\"Liu R\",\"firstName\":\"Renming\",\"lastName\":\"Liu\",\"initials\":\"R\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Educational Psychology, Baylor University, Waco, TX, USA.\"}]}},{\"fullName\":\"Tomar
+        A\",\"firstName\":\"Aditi\",\"lastName\":\"Tomar\",\"initials\":\"A\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Gillings
+        School of Global Public Health, University of North Carolina, Chapel Hill,
+        NC, USA.\"}]}},{\"fullName\":\"Ma P\",\"firstName\":\"Ping\",\"lastName\":\"Ma\",\"initials\":\"P\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Health Behavior, School of Public Health, Texas A&M University, College
+        Station, Texas, USA.\"}]}}]},\"authorIdList\":{\"authorId\":[{\"type\":\"ORCID\",\"value\":\"0000-0002-3276-7586\"}]},\"journalInfo\":{\"issue\":\"3\",\"volume\":\"129\",\"journalIssueId\":4186929,\"dateOfPublication\":\"2026
+        Jun\",\"monthOfPublication\":6,\"yearOfPublication\":2026,\"printPublicationDate\":\"2026-06-01\",\"journal\":{\"title\":\"Psychological
+        reports\",\"medlineAbbreviation\":\"Psychol Rep\",\"isoabbreviation\":\"Psychol
+        Rep\",\"nlmid\":\"0376475\",\"issn\":\"0033-2941\",\"essn\":\"1558-691X\"}},\"pubYear\":\"2026\",\"pageInfo\":\"2061-2079\",\"abstractText\":\"<b>Objective</b>:
+        This study was conducted to explore the sex differences in the direct and
+        indirect associations among mental health/suicidality, sleep, and screen time.
+        <b>Methods</b>: Using the 2021 Youth Risk Behavior Survey (YRBS) data, 9408
+        participants were included in the analyses. The associations of endogenous
+        variables (mental health and suicidality), exogenous variable (screen time),
+        mediator (sleep), and covariates (demographic features and risky behaviors)
+        were analyzed using the Structural Equation Model and \\\"medsem\\\" package,
+        as well as logistic regression and bootstrapping methods. To explore the sex
+        differences in the mediation effect, the Likelihood Ratio Test was used for
+        the multiple-group analysis to compare the unconstrained model with the mediation
+        path-constrained model. <b>Results</b>: Screen time had a significant negative
+        association with sleep duration (female: \u03B2 = -.09, <i>p</i> < .001; male:
+        \u03B2 = -.04, <i>p</i> < .001), positive relations to mental health problems
+        (female: \u03B2 = .10, <i>p</i> < .001; male: \u03B2 = .12; <i>p</i> < .001),
+        and suicidality (female: OR: 1.07, 95% CI: 1.02-1.13; male: OR: 1.06, 95%
+        CI: 1.01-1.23). Sleep duration is negatively associated with mental health
+        problems (female: \u03B2 = -.16, <i>p</i> < .001; male: \u03B2 = -.14; <i>p</i>
+        < .001) and negatively associated with the likelihood of suicidality (female:
+        .89, 95% CI: .85-.94; male: OR: .84, 95% CI: .79-.90). Furthermore, female
+        adolescents had higher frequencies in mental health problems, higher odds
+        ratio in suicidality, shorter sleep duration, and bigger mediation effects
+        of sleep, compared to their male counterparts. <b>Conclusion</b>: Mental health
+        and suicidality were affected differently by screen time and sleep between
+        female and male adolescents. Future research may continue to explore sex differences
+        and their underlying reasons.\",\"affiliation\":\"Department of Health Behavior,
+        School of Public Health, Texas A&M University, College Station, Texas, USA.\",\"publicationStatus\":\"ppublish\",\"language\":\"eng\",\"pubModel\":\"Print-Electronic\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"meshHeadingList\":{\"meshHeading\":[{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Humans\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Adolescent
+        Behavior\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Suicide\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"SN\",\"qualifierName\":\"statistics
+        & numerical data\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Risk-Taking\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Mental
+        Health\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"SN\",\"qualifierName\":\"statistics
+        & numerical data\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Sleep\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PH\",\"qualifierName\":\"physiology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Sex
+        Factors\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Adolescent\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Female\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Male\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Suicidal
+        Ideation\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Screen Time\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Mediation
+        Analysis\"}]},\"keywordList\":{\"keyword\":[\"Sleep\",\"Sex differences\",\"Adolescents\",\"Screen
+        Time\",\"Mental Health/suicidality\"]},\"subsetList\":{\"subset\":[{\"code\":\"IM\",\"name\":\"Index
+        Medicus\"}]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1177/00332941241277096\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13076977\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13076977?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"Y\",\"citedByCount\":2,\"hasData\":\"Y\",\"hasReferences\":\"Y\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"N\",\"license\":\"cc
+        by-nc\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2026-04-30\",\"dateOfCreation\":\"2024-08-24\",\"firstIndexDate\":\"2024-08-27\",\"fullTextReceivedDate\":\"2026-04-20\",\"dateOfRevision\":\"2026-04-30\",\"electronicPublicationDate\":\"2024-08-24\",\"firstPublicationDate\":\"2024-08-24\"},{\"id\":\"38907636\",\"source\":\"MED\",\"pmid\":\"38907636\",\"pmcid\":\"PMC13176500\",\"fullTextIdList\":{\"fullTextId\":[\"PMC13176500\"]},\"doi\":\"10.1177/00302228241263367\",\"title\":\"Supporting
+        Bereaved Family Members: A Qualitative Interview Study on the Experience of
+        Bereavement Counselling by the Bereavement Network Lower Saxony (BNLS) in
+        Germany for Parents Who Have Lost Children or Teenagers.\",\"authorString\":\"Kruse
+        RF, Stiel S, Schwabe S.\",\"authorList\":{\"author\":[{\"fullName\":\"Kruse
+        RF\",\"firstName\":\"Rebecca F\",\"lastName\":\"Kruse\",\"initials\":\"RF\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0009-0005-1744-4876\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Institute
+        for General Practice and Palliative Care, Hannover Medical School, Hannover,
+        Germany.\"}]}},{\"fullName\":\"Stiel S\",\"firstName\":\"Stephanie\",\"lastName\":\"Stiel\",\"initials\":\"S\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Institute
+        for General Practice and Palliative Care, Hannover Medical School, Hannover,
+        Germany.\"}]}},{\"fullName\":\"Schwabe S\",\"firstName\":\"Sven\",\"lastName\":\"Schwabe\",\"initials\":\"S\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-3575-3817\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Institute
+        for General Practice and Palliative Care, Hannover Medical School, Hannover,
+        Germany.\"}]}}]},\"authorIdList\":{\"authorId\":[{\"type\":\"ORCID\",\"value\":\"0000-0002-3575-3817\"},{\"type\":\"ORCID\",\"value\":\"0009-0005-1744-4876\"}]},\"journalInfo\":{\"issue\":\"2\",\"volume\":\"93\",\"journalIssueId\":4196036,\"dateOfPublication\":\"2026
+        Jun\",\"monthOfPublication\":6,\"yearOfPublication\":2026,\"printPublicationDate\":\"2026-06-01\",\"journal\":{\"title\":\"Omega\",\"medlineAbbreviation\":\"Omega
+        (Westport)\",\"isoabbreviation\":\"Omega (Westport)\",\"nlmid\":\"1272106\",\"issn\":\"0030-2228\",\"essn\":\"1541-3764\"}},\"pubYear\":\"2026\",\"pageInfo\":\"1354-1377\",\"abstractText\":\"The
+        \\\"Trauer Netzwerk Niedersachsen\\\" (\\\"Bereavement Network Lower Saxony\\\"
+        (BNLS)) aims at supporting families after the loss of a child or teenager
+        due to various causes. This study aims to describe the experiences of bereaved
+        family members with the BNLS counsellors. 12 semi-structured interviews were
+        conducted with parents who had received or were currently receiving BNLS counselling.
+        The interviews revealed the vital role counselling played aiding individuals
+        cope with their grief. Participants valued the bereavement support, which
+        was often lacking in their personal support networks. Counselling assisted
+        parents in returning to daily life and caring for loved ones. Discussing \\\"death\\\"
+        and \\\"dying\\\" helped participants find peace with their loss. Our findings
+        suggest that bereavement counselling should be considered an essential component
+        of healthcare for family members dealing with the loss of a child. Additionally,
+        there is need for awareness and publicity for both the BNLS and its bereavement
+        counselling services.\",\"affiliation\":\"Institute for General Practice and
+        Palliative Care, Hannover Medical School, Hannover, Germany.\",\"publicationStatus\":\"ppublish\",\"language\":\"eng\",\"pubModel\":\"Print-Electronic\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"meshHeadingList\":{\"meshHeading\":[{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Humans\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Adaptation,
+        Psychological\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Attitude to
+        Death\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Bereavement\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Parents\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Counseling\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"MT\",\"qualifierName\":\"methods\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Qualitative
+        Research\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Social Support\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Adolescent\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Adult\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Middle
+        Aged\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Child\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Germany\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Female\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Male\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Interviews
+        as Topic\"}]},\"keywordList\":{\"keyword\":[\"Surviving\",\"Suicide\",\"Grief\",\"Infant
+        Death\",\"Prevention Of Mental Illness\"]},\"subsetList\":{\"subset\":[{\"code\":\"IM\",\"name\":\"Index
+        Medicus\"}]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"doi\",\"site\":\"Unpaywall\",\"url\":\"https://doi.org/10.1177/00302228241263367\"},{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1177/00302228241263367\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13176500\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13176500?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":0,\"hasData\":\"N\",\"hasReferences\":\"Y\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"N\",\"license\":\"cc
+        by\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2026-05-20\",\"dateOfCreation\":\"2024-06-22\",\"firstIndexDate\":\"2024-06-23\",\"fullTextReceivedDate\":\"2026-05-20\",\"dateOfRevision\":\"2026-05-20\",\"electronicPublicationDate\":\"2024-06-22\",\"firstPublicationDate\":\"2024-06-22\"},{\"id\":\"38844415\",\"source\":\"MED\",\"pmid\":\"38844415\",\"pmcid\":\"PMC13176474\",\"fullTextIdList\":{\"fullTextId\":[\"PMC13176474\"]},\"doi\":\"10.1177/00302228241259647\",\"title\":\"From
+        Grief to Growth: The Role of Coping Strategies, Kinship and Cause of Death.\",\"authorString\":\"Pereira
+        M, Moreira A, Neto DD.\",\"authorList\":{\"author\":[{\"fullName\":\"Pereira
+        M\",\"firstName\":\"Marta\",\"lastName\":\"Pereira\",\"initials\":\"M\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0009-0000-1999-8411\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"ISPA
+        - Instituto Universit\xE1rio, Lisboa, Portugal.\"}]}},{\"fullName\":\"Moreira
+        A\",\"firstName\":\"Ana\",\"lastName\":\"Moreira\",\"initials\":\"A\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-4799-874X\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"ISPA
+        - Instituto Universit\xE1rio, Lisboa, Portugal.\"},{\"affiliation\":\"Faculdade
+        de Ci\xEAncias e Tecnologia, Universidade Europeia, Lisboa, Portugal.\"},{\"affiliation\":\"APPsyCI
+        - Applied Psychology Research Center Capabilities & Inclusion, Lisboa, Portugal.\"}]}},{\"fullName\":\"Neto
+        DD\",\"firstName\":\"David Dias\",\"lastName\":\"Neto\",\"initials\":\"DD\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-3129-262X\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"ISPA
+        - Instituto Universit\xE1rio, Lisboa, Portugal.\"},{\"affiliation\":\"APPsyCI
+        - Applied Psychology Research Center Capabilities & Inclusion, Lisboa, Portugal.\"}]}}]},\"authorIdList\":{\"authorId\":[{\"type\":\"ORCID\",\"value\":\"0000-0002-3129-262X\"},{\"type\":\"ORCID\",\"value\":\"0000-0002-4799-874X\"},{\"type\":\"ORCID\",\"value\":\"0009-0000-1999-8411\"}]},\"journalInfo\":{\"issue\":\"2\",\"volume\":\"93\",\"journalIssueId\":4196036,\"dateOfPublication\":\"2026
+        Jun\",\"monthOfPublication\":6,\"yearOfPublication\":2026,\"printPublicationDate\":\"2026-06-01\",\"journal\":{\"title\":\"Omega\",\"medlineAbbreviation\":\"Omega
+        (Westport)\",\"isoabbreviation\":\"Omega (Westport)\",\"nlmid\":\"1272106\",\"issn\":\"0030-2228\",\"essn\":\"1541-3764\"}},\"pubYear\":\"2026\",\"pageInfo\":\"1233-1249\",\"abstractText\":\"<b>Background:</b>
+        Research has predominantly focused on the post-traumatic consequences of grief.
+        Less is known about the factors associated with the capacity for recovery
+        and growth. <b>Objective:</b> The main goal of this study is to analyse the
+        mediating role of coping strategies in the relationship between the impact
+        of the event and posttraumatic growth, considering the degree of kinship and
+        the cause of death. <b>Methods:</b> This exploratory and correlational study,
+        which used a cross-sectional design, involved a community sample of 889 adults
+        who had lost a loved one. <b>Results:</b> Emotion and problem-focused coping
+        strategies mediate the relationship between the impact of loss and posttraumatic
+        growth, specifically when a spouse or a child dies. <b>Conclusions:</b> Individuals
+        who experience greater suffering also undergo higher levels of post-traumatic
+        growth. Coping strategies are crucial in post-trauma reconstruction and growth.
+        Furthermore, the degree of kinship and the cause of death are decisive factors.\",\"affiliation\":\"ISPA
+        - Instituto Universit\xE1rio, Lisboa, Portugal.\",\"publicationStatus\":\"ppublish\",\"language\":\"eng\",\"pubModel\":\"Print-Electronic\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"meshHeadingList\":{\"meshHeading\":[{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Humans\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Cause
+        of Death\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Cross-Sectional
+        Studies\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Adaptation, Psychological\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Grief\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Family\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Adult\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Aged\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Middle
+        Aged\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Female\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Male\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Posttraumatic
+        Growth, Psychological\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Coping
+        Skills\"}]},\"keywordList\":{\"keyword\":[\"Grief\",\"Coping Strategies\",\"Post-traumatic
+        Growth\"]},\"subsetList\":{\"subset\":[{\"code\":\"IM\",\"name\":\"Index Medicus\"}]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1177/00302228241259647\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13176474\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13176474?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"Y\",\"citedByCount\":6,\"hasData\":\"Y\",\"hasReferences\":\"Y\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"N\",\"license\":\"cc
+        by\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2026-05-20\",\"dateOfCreation\":\"2024-06-06\",\"firstIndexDate\":\"2024-06-08\",\"fullTextReceivedDate\":\"2026-05-20\",\"dateOfRevision\":\"2026-05-20\",\"electronicPublicationDate\":\"2024-06-06\",\"firstPublicationDate\":\"2024-06-06\"},{\"id\":\"38834179\",\"source\":\"MED\",\"pmid\":\"38834179\",\"pmcid\":\"PMC13176475\",\"fullTextIdList\":{\"fullTextId\":[\"PMC13176475\"]},\"doi\":\"10.1177/00302228241257306\",\"title\":\"Prolonged
+        Grief Disorder, but Not Death From COVID-19, Elicits Public Stigma: A Vignette-Based
+        Experiment.\",\"authorString\":\"Zammit T, Mancini VO, Reid C, Singer J, Staniland
+        L, Breen LJ.\",\"authorList\":{\"author\":[{\"fullName\":\"Zammit T\",\"firstName\":\"Tamara\",\"lastName\":\"Zammit\",\"initials\":\"T\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Curtin
+        School of Population Health, Curtin University, Perth, Australia.\"}]}},{\"fullName\":\"Mancini
+        VO\",\"firstName\":\"Vincent O\",\"lastName\":\"Mancini\",\"initials\":\"VO\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-4845-8104\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Curtin
+        School of Population Health, Curtin University, Perth, Australia.\"},{\"affiliation\":\"UWA
+        Medical School, Division of Paediatrics, University of Western Australia,
+        Perth, Australia.\"},{\"affiliation\":\"Telethon Kids Institute, Nedlands,
+        Australia.\"}]}},{\"fullName\":\"Reid C\",\"firstName\":\"Carly\",\"lastName\":\"Reid\",\"initials\":\"C\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Curtin
+        School of Population Health, Curtin University, Perth, Australia.\"}]}},{\"fullName\":\"Singer
+        J\",\"firstName\":\"Jonathan\",\"lastName\":\"Singer\",\"initials\":\"J\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Psychological Sciences, Texas Tech University, Lubbock, TX, USA.\"}]}},{\"fullName\":\"Staniland
+        L\",\"firstName\":\"Lexy\",\"lastName\":\"Staniland\",\"initials\":\"L\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-0161-144X\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Curtin
+        enAble Institute, Faculty of Health Sciences, Curtin University, Perth, Australia.\"}]}},{\"fullName\":\"Breen
+        LJ\",\"firstName\":\"Lauren J\",\"lastName\":\"Breen\",\"initials\":\"LJ\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-0463-0363\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Curtin
+        School of Population Health, Curtin University, Perth, Australia.\"},{\"affiliation\":\"Curtin
+        enAble Institute, Faculty of Health Sciences, Curtin University, Perth, Australia.\"}]}}]},\"authorIdList\":{\"authorId\":[{\"type\":\"ORCID\",\"value\":\"0000-0002-0161-144X\"},{\"type\":\"ORCID\",\"value\":\"0000-0002-0463-0363\"},{\"type\":\"ORCID\",\"value\":\"0000-0002-4845-8104\"}]},\"dataLinksTagsList\":{\"dataLinkstag\":[\"altmetrics\"]},\"journalInfo\":{\"issue\":\"2\",\"volume\":\"93\",\"journalIssueId\":4196036,\"dateOfPublication\":\"2026
+        Jun\",\"monthOfPublication\":6,\"yearOfPublication\":2026,\"printPublicationDate\":\"2026-06-01\",\"journal\":{\"title\":\"Omega\",\"medlineAbbreviation\":\"Omega
+        (Westport)\",\"isoabbreviation\":\"Omega (Westport)\",\"nlmid\":\"1272106\",\"issn\":\"0030-2228\",\"essn\":\"1541-3764\"}},\"pubYear\":\"2026\",\"pageInfo\":\"1201-1221\",\"abstractText\":\"We
+        investigated the effects of cause of death (COVID-19 with an underlying medical
+        condition vs. without) and prolonged grief disorder status (PGD present or
+        absent) on participants' reported public stigma towards the bereaved. Participants
+        (<i>N =</i> 304, 66% women; <i>M</i><sub>age</sub> = 39.39 years) were randomly
+        assigned to read one of four vignettes describing a bereaved man. Participants
+        completed stigma measures assessing negative attributions, desired social
+        distance, and emotional reactions. Participants reported significantly stronger
+        stigmatizing responses towards an individual with PGD (vs. without PGD) across
+        all stigma measures. There was no significant difference in stigma based on
+        cause of death; however, stigma was reported regardless of cause of death.
+        There was no significant interaction between cause of death and PGD on stigma.
+        This study supports the robust finding of public stigma being reported toward
+        an individual with PGD, suggesting these individuals are at risk of public
+        stigma and not receiving adequate bereavement support.\",\"affiliation\":\"Curtin
+        School of Population Health, Curtin University, Perth, Australia.\",\"publicationStatus\":\"ppublish\",\"language\":\"eng\",\"pubModel\":\"Print-Electronic\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"grantsList\":{\"grant\":[{\"agency\":\"Curtin Strategic Scholarship\",\"orderIn\":0}]},\"meshHeadingList\":{\"meshHeading\":[{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Humans\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Bereavement\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Grief\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Adult\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Middle
+        Aged\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Female\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Male\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Social
+        Stigma\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"COVID-19\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"SARS-CoV-2\"}]},\"keywordList\":{\"keyword\":[\"stigma\",\"Bereavement\",\"Prolonged
+        Grief Disorder\",\"Widow/widower\",\"Covid-19\"]},\"subsetList\":{\"subset\":[{\"code\":\"IM\",\"name\":\"Index
+        Medicus\"}]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"doi\",\"site\":\"Unpaywall\",\"url\":\"https://doi.org/10.1177/00302228241257306\"},{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1177/00302228241257306\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13176475\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13176475?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":1,\"hasData\":\"N\",\"hasReferences\":\"Y\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"Y\",\"license\":\"cc
+        by-nc\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2026-05-20\",\"dateOfCreation\":\"2024-06-04\",\"firstIndexDate\":\"2024-06-05\",\"fullTextReceivedDate\":\"2026-05-20\",\"dateOfRevision\":\"2026-05-20\",\"electronicPublicationDate\":\"2024-06-04\",\"firstPublicationDate\":\"2024-06-04\"},{\"id\":\"38697016\",\"source\":\"MED\",\"pmid\":\"38697016\",\"pmcid\":\"PMC13176482\",\"fullTextIdList\":{\"fullTextId\":[\"PMC13176482\"]},\"doi\":\"10.1177/00302228241246417\",\"title\":\"Portuguese
+        Caregivers of Persons With Alzheimer's Disease in the Context of the COVID-19
+        Pandemic: A Qualitative Study of the Grieving Process.\",\"authorString\":\"Brito
+        L, Bernardo AC, Leite \xC2, Pereira MG.\",\"authorList\":{\"author\":[{\"fullName\":\"Brito
+        L\",\"firstName\":\"Laura\",\"lastName\":\"Brito\",\"initials\":\"L\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-5564-5231\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Psychology
+        Research Centre, School of Psychology, University of Minho, Braga, Portugal.\"}]}},{\"fullName\":\"Bernardo
+        AC\",\"firstName\":\"Ana Cristina\",\"lastName\":\"Bernardo\",\"initials\":\"AC\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Psychology
+        Research Centre, School of Psychology, University of Minho, Braga, Portugal.\"}]}},{\"fullName\":\"Leite
+        \xC2\",\"firstName\":\"\xC2ngela\",\"lastName\":\"Leite\",\"initials\":\"\xC2\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0003-0560-1756\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Centre
+        for Philosophical and Humanistic Studies, Portuguese Catholic University,
+        Braga, Portugal.\"}]}},{\"fullName\":\"Pereira MG\",\"firstName\":\"M Gra\xE7a\",\"lastName\":\"Pereira\",\"initials\":\"MG\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0001-7987-2562\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Psychology
+        Research Centre, School of Psychology, University of Minho, Braga, Portugal.\"}]}}]},\"authorIdList\":{\"authorId\":[{\"type\":\"ORCID\",\"value\":\"0000-0001-7987-2562\"},{\"type\":\"ORCID\",\"value\":\"0000-0002-5564-5231\"},{\"type\":\"ORCID\",\"value\":\"0000-0003-0560-1756\"}]},\"dataLinksTagsList\":{\"dataLinkstag\":[\"altmetrics\"]},\"journalInfo\":{\"issue\":\"2\",\"volume\":\"93\",\"journalIssueId\":4196036,\"dateOfPublication\":\"2026
+        Jun\",\"monthOfPublication\":6,\"yearOfPublication\":2026,\"printPublicationDate\":\"2026-06-01\",\"journal\":{\"title\":\"Omega\",\"medlineAbbreviation\":\"Omega
+        (Westport)\",\"isoabbreviation\":\"Omega (Westport)\",\"nlmid\":\"1272106\",\"issn\":\"0030-2228\",\"essn\":\"1541-3764\"}},\"pubYear\":\"2026\",\"pageInfo\":\"773-802\",\"abstractText\":\"This
+        study addresses the experiences of informal caregivers caring for elderly
+        family members with Alzheimer's disease (AD) during the COVID-19 pandemic.
+        The study includes a sample of eight informal caregivers who were evaluated
+        through a semi-structured interview six months after the death of a loved
+        one they cared for. A thematic content analysis was applied to the interviews
+        and yielded two higher-order domains: (1) Experiencing the AD and the death
+        of a family member and (2) The grieving process during the COVID-19 pandemic.
+        The results provide valuable insights into family caregivers' experiences
+        regarding the profound emotional impact of caregiving and grief during the
+        COVID-19 pandemic. Caregivers maintain their identity even after loss, underscoring
+        the enduring impact of caregiving. The identity as a caregiver impacted coping
+        and grief responses, highlighting the need for tailored interventions.\",\"affiliation\":\"Psychology
+        Research Centre, School of Psychology, University of Minho, Braga, Portugal.\",\"publicationStatus\":\"ppublish\",\"language\":\"eng\",\"pubModel\":\"Print-Electronic\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"grantsList\":{\"grant\":[{\"grantId\":\"Portuguese State Budget:
+        UIDB/PSI/01662/2020\",\"agency\":\"Funda\xE7\xE3o para a Ci\xEAncia e a Tecnologia\",\"orderIn\":0}]},\"meshHeadingList\":{\"meshHeading\":[{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Humans\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Alzheimer
+        Disease\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"NU\",\"qualifierName\":\"nursing\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Adaptation,
+        Psychological\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Grief\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Family\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Qualitative
+        Research\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Aged\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Aged,
+        80 and over\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Middle Aged\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Caregivers\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Portugal\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"EP\",\"qualifierName\":\"epidemiology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Female\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Male\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Interviews
+        as Topic\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Pandemics\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"COVID-19\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"SARS-CoV-2\"}]},\"keywordList\":{\"keyword\":[\"Alzheimer
+        disease\",\"Grief\",\"End-of-life\",\"Caregiving\",\"Covid-19\"]},\"subsetList\":{\"subset\":[{\"code\":\"IM\",\"name\":\"Index
+        Medicus\"}]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1177/00302228241246417\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13176482\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13176482?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":0,\"hasData\":\"N\",\"hasReferences\":\"Y\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"Y\",\"license\":\"cc
+        by\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2026-05-20\",\"dateOfCreation\":\"2024-05-02\",\"firstIndexDate\":\"2024-05-03\",\"fullTextReceivedDate\":\"2026-05-20\",\"dateOfRevision\":\"2026-05-20\",\"electronicPublicationDate\":\"2024-05-02\",\"firstPublicationDate\":\"2024-05-02\"}]}}"
+    headers:
+      Access-Control-Allow-Headers:
+      - Content-Type,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Max-Age:
+      - '3600'
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json;charset=UTF-8
+      Date:
+      - Thu, 28 May 2026 15:54:35 GMT
+      Set-Cookie:
+      - JSESSIONID=9B3A508CA70973AD6ACE7B8D2EBE5CB7; Path=/europepmc/webservices/;
+        HttpOnly
+      Strict-Transport-Security:
+      - max-age=0
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
 version: 1

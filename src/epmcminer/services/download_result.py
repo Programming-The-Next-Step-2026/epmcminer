@@ -24,9 +24,9 @@ class DownloadResult:
             finished.
     """
 
-    STATUS_DOWNLOADED: ClassVar[str] = "downloaded"
-    STATUS_SKIPPED: ClassVar[str] = "skipped"
-    STATUS_FAILED: ClassVar[str] = "failed"
+    STATUS_DOWNLOADED: ClassVar[Literal["downloaded"]] = "downloaded"
+    STATUS_SKIPPED: ClassVar[Literal["skipped"]] = "skipped"
+    STATUS_FAILED: ClassVar[Literal["failed"]] = "failed"
 
     paper: Paper
     status: Literal["downloaded", "skipped", "failed"]

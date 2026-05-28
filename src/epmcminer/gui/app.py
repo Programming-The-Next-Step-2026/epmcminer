@@ -22,6 +22,7 @@ from epmcminer.gui.screens.screen_preview import ScreenPreview
 from epmcminer.gui.screens.screen_search import ScreenSearch
 from epmcminer.gui.screens.screen_summary import ScreenSummary
 from epmcminer.services import create_application_services
+from epmcminer.services.download_result import DownloadResult
 from epmcminer.services.models import SearchParams
 
 try:
@@ -113,12 +114,12 @@ class _TitleBar(QWidget):
         btn_layout.setSpacing(_TRAFFIC_LIGHT_SPACING)
 
         for color, action in [
-            (_CLOSE_COLOR, lambda: self.window().close()),
-            (_MINIMIZE_COLOR, lambda: self.window().showMinimized()),
+            (_CLOSE_COLOR, lambda: self.window().close()),  # type: ignore[union-attr]
+            (_MINIMIZE_COLOR, lambda: self.window().showMinimized()),  # type: ignore[union-attr]
             (_ZOOM_COLOR, lambda: (
-                self.window().showNormal()
-                if self.window().isMaximized()
-                else self.window().showMaximized()
+                self.window().showNormal()  # type: ignore[union-attr]
+                if self.window().isMaximized()  # type: ignore[union-attr]
+                else self.window().showMaximized()  # type: ignore[union-attr]
             )),
         ]:
             btn = QPushButton()
@@ -232,19 +233,19 @@ class _TitleBar(QWidget):
             else:
                 line.setStyleSheet("background-color: rgba(255,255,255,15); border: none;")
 
-    def mousePressEvent(self, event: QMouseEvent) -> None:
+    def mousePressEvent(self, event: QMouseEvent) -> None:  # type: ignore[override]
         if event.button() == Qt.MouseButton.LeftButton:
             self._drag_pos = (
-                event.globalPosition().toPoint() - self.window().frameGeometry().topLeft()
+                event.globalPosition().toPoint() - self.window().frameGeometry().topLeft()  # type: ignore[union-attr]
             )
             event.accept()
 
-    def mouseMoveEvent(self, event: QMouseEvent) -> None:
+    def mouseMoveEvent(self, event: QMouseEvent) -> None:  # type: ignore[override]
         if event.buttons() == Qt.MouseButton.LeftButton and self._drag_pos is not None:
-            self.window().move(event.globalPosition().toPoint() - self._drag_pos)
+            self.window().move(event.globalPosition().toPoint() - self._drag_pos)  # type: ignore[union-attr]
             event.accept()
 
-    def mouseReleaseEvent(self, event: QMouseEvent) -> None:
+    def mouseReleaseEvent(self, event: QMouseEvent) -> None:  # type: ignore[override]
         self._drag_pos = None
 
 
@@ -360,7 +361,7 @@ class MainWindow(QMainWindow):
     def _on_result_loaded(self, total_found: int) -> None:
         self._total_found = total_found
 
-    def _on_download_complete(self, results: list) -> None:
+    def _on_download_complete(self, results: list[DownloadResult]) -> None:
         if self._last_params is not None:
             self._screen_summary.load(results, self._last_params, self._total_found)
             self.navigate_to(3)
