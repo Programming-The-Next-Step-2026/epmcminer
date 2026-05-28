@@ -251,6 +251,7 @@ class ScreenDownload(QWidget):
         self._log_layout = QVBoxLayout(log_container)
         self._log_layout.setContentsMargins(0, 0, 0, 0)
         self._log_layout.setSpacing(0)
+        self._log_layout.addStretch()
 
         self._log_scroll.setWidget(log_container)
         layout.addWidget(self._log_scroll)
@@ -370,15 +371,16 @@ class ScreenDownload(QWidget):
     # ------------------------------------------------------------------
 
     def _clear_log(self) -> None:
-        """Remove all rows from the log layout."""
+        """Remove all rows from the log layout and restore the trailing stretch."""
         while self._log_layout.count():
             item = self._log_layout.takeAt(0)
             if item.widget():
                 item.widget().deleteLater()
+        self._log_layout.addStretch()
 
     def _add_log_row(self, result: DownloadResult) -> None:
-        """Append a completed-download row to the live log."""
-        self._log_layout.addWidget(self._make_log_row(result))
+        """Prepend a completed-download row before the trailing stretch."""
+        self._log_layout.insertWidget(self._log_layout.count() - 1, self._make_log_row(result))
 
     def _downloaded_count(self) -> int:
         """Return the number of successfully downloaded papers so far."""

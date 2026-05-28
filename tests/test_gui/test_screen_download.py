@@ -86,6 +86,15 @@ def _make_screen(
     return ScreenDownload(_make_service(results, exc), _make_report_service())
 
 
+def _log_row_count(w: ScreenDownload) -> int:
+    """Return the number of row *widgets* in the log layout (excludes the trailing stretch)."""
+    return sum(
+        1
+        for i in range(w._log_layout.count())
+        if w._log_layout.itemAt(i).widget() is not None
+    )
+
+
 # ---------------------------------------------------------------------------
 # Session-scoped QApplication
 # ---------------------------------------------------------------------------
@@ -193,7 +202,7 @@ class TestScreenDownloadDefaults:
     def test_log_empty_initially(self, qapp: QApplication) -> None:
         """Log layout contains no rows before start() is called."""
         w = _make_screen()
-        assert w._log_layout.count() == 0
+        assert _log_row_count(w) == 0
 
     def test_progress_widget_present(self, qapp: QApplication) -> None:
         """Screen has a ProgressWidget instance."""
@@ -241,11 +250,11 @@ class TestScreenDownloadStart:
         """start() clears any log rows from a previous run."""
         w = _make_screen()
         w._on_progress(_make_download_result())
-        assert w._log_layout.count() == 1
+        assert _log_row_count(w) == 1
         with patch("epmcminer.gui.screens.screen_download.DownloadWorker") as MockWorker:
             MockWorker.return_value.isRunning.return_value = False
             w.start(_make_params())
-        assert w._log_layout.count() == 0
+        assert _log_row_count(w) == 0
 
     def test_start_resets_completed_count(self, qapp: QApplication) -> None:
         """start() resets the completed counter to zero."""
@@ -270,7 +279,7 @@ class TestScreenDownloadProgress:
         w = _make_screen()
         w._total = 5
         w._on_progress(_make_download_result("downloaded"))
-        assert w._log_layout.count() == 1
+        assert _log_row_count(w) == 1
 
     def test_on_progress_multiple_rows(self, qapp: QApplication) -> None:
         """Multiple _on_progress calls each add a row."""
@@ -278,7 +287,7 @@ class TestScreenDownloadProgress:
         w._total = 5
         for _ in range(3):
             w._on_progress(_make_download_result("downloaded"))
-        assert w._log_layout.count() == 3
+        assert _log_row_count(w) == 3
 
     def test_on_progress_increments_completed(self, qapp: QApplication) -> None:
         """_on_progress increments the completed counter."""
@@ -300,23 +309,21 @@ class TestScreenDownloadProgress:
         w = _make_screen()
         w._total = 5
         w._on_progress(_make_download_result("downloaded"))
-        item = w._log_layout.itemAt(0)
-        assert item is not None
-        assert item.widget() is not None
+        assert _log_row_count(w) == 1
 
     def test_log_row_widget_for_skipped(self, qapp: QApplication) -> None:
         """A skipped result also produces a log row widget."""
         w = _make_screen()
         w._total = 5
         w._on_progress(_make_download_result("skipped"))
-        assert w._log_layout.count() == 1
+        assert _log_row_count(w) == 1
 
     def test_log_row_widget_for_failed(self, qapp: QApplication) -> None:
         """A failed result also produces a log row widget."""
         w = _make_screen()
         w._total = 5
         w._on_progress(_make_download_result("failed"))
-        assert w._log_layout.count() == 1
+        assert _log_row_count(w) == 1
 
     def test_downloaded_count_only_counts_successful(self, qapp: QApplication) -> None:
         """_downloaded_count returns only results with status 'downloaded'."""
