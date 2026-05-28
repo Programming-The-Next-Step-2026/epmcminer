@@ -115,10 +115,10 @@ class DownloadService:
                 page_results = self._download_page(
                     raw_results, pdfs_dir, progress_callback, cancel_event
                 )
-                for result in page_results:
-                    all_results.append(result)
-                    if result.status == DownloadResult.STATUS_DOWNLOADED:
-                        success_count += 1
+                all_results.extend(page_results)
+                success_count += sum(
+                    1 for r in page_results if r.status == DownloadResult.STATUS_DOWNLOADED
+                )
             else:
                 result = self._download_one(raw_results[0], pdfs_dir, cancel_event)
                 progress_callback(result)

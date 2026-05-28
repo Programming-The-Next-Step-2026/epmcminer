@@ -273,7 +273,7 @@ class ReportService:
         params: SearchParams,
         total_found: int,
         styles: dict[str, ParagraphStyle],
-    ) -> list:
+    ) -> list[Any]:
         """Assemble all flowable elements into the PDF story list.
 
         Args:
@@ -449,7 +449,7 @@ class ReportService:
             return []
 
         items: list = [Paragraph("Downloaded papers", styles["section"]), Spacer(1, 4)]
-        for result in downloaded:
+        for i, result in enumerate(downloaded):
             meta_parts = [result.paper.authors, result.paper.journal, result.paper.year]
             meta_str = " · ".join(p for p in meta_parts if p)
             cell_content: list = [
@@ -472,7 +472,8 @@ class ReportService:
                 ("VALIGN", (0, 0), (-1, -1), "TOP"),
             ]))
             items.append(row_table)
-            items.append(Spacer(1, 3))
+            if i < len(downloaded) - 1:
+                items.append(Spacer(1, 3))
         return items
 
     def _pdf_skipped_section(
@@ -497,7 +498,7 @@ class ReportService:
             return []
 
         items: list = [Paragraph("Skipped papers", styles["section"]), Spacer(1, 4)]
-        for result in not_downloaded:
+        for i, result in enumerate(not_downloaded):
             meta_parts = [result.paper.authors, result.paper.journal, result.paper.year]
             meta_str = " · ".join(p for p in meta_parts if p)
             cell_content: list = [
@@ -517,7 +518,8 @@ class ReportService:
                 ("VALIGN", (0, 0), (-1, -1), "TOP"),
             ]))
             items.append(row_table)
-            items.append(Spacer(1, 3))
+            if i < len(not_downloaded) - 1:
+                items.append(Spacer(1, 3))
         return items
 
     # ------------------------------------------------------------------

@@ -421,12 +421,13 @@ class ScreenDownload(QWidget):
         downloaded = sum(1 for r in results if r.status == DownloadResult.STATUS_DOWNLOADED)
         self._progress.set_progress(downloaded, max(self._total, 1), processed=self._completed)
         if self._params is not None:
+            output_folder = self._params.output_folder
+            assert output_folder is not None, "output_folder must be set before download()"
             try:
-                self._report_service.save_csv(
-                    results, self._params, self._params.output_folder
-                )
+                self._report_service.save_csv(results, self._params, output_folder)
             except Exception:  # noqa: BLE001
                 _logger.exception("Failed to save report.csv")
+                self._toast.show_message("Could not save report.csv", success=False)
         self.download_complete.emit(results)
 
     def _on_error(self, message: str) -> None:
