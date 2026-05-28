@@ -1,5 +1,6 @@
 """Europe PMC API HTTP client — raw HTTP calls only, no business logic."""
 
+import threading
 import time
 
 import requests
@@ -99,15 +100,28 @@ class EuropePMCClient:
             raise APIError(response.status_code, response.text)
         return response.json()
 
-    def download_pdf(self, url: str) -> bytes:
+    def download_pdf(
+        self,
+        url: str,
+        cancel_event: threading.Event | None = None,
+    ) -> bytes:
         """Download a PDF from a direct URL.
 
-        Retries up to ``_PDF_MAX_RETRIES`` times on connection errors and HTTP
-        5xx responses with exponential backoff. HTTP 4xx errors are not retried
-        as they indicate a client-side problem unlikely to resolve on retry.
+        Retries up to ``_PDF_MAX_RETRIES`` times on connection errors, timeouts,
+        and HTTP 5xx responses with exponential backoff.  HTTP 4xx errors are not
+        retried as they indicate a client-side problem unlikely to resolve on
+        retry.
+
+        Backoff sleeps are interruptible: when ``cancel_event`` is provided,
+        ``Event.wait`` is used instead of ``time.sleep`` so that setting the
+        event wakes the sleeping thread immediately.
 
         Args:
             url: The direct URL to the open-access PDF file.
+            cancel_event: Optional cancellation signal.  When set, the retry
+                loop exits as soon as the current backoff sleep finishes (or
+                immediately if set before the next attempt) and raises
+                ``ConnectionError``.
 
         Returns:
             The raw bytes of the PDF file.
@@ -115,24 +129,32 @@ class EuropePMCClient:
         Raises:
             APIError: If the server returns a non-retryable HTTP status code,
                 or if a 5xx error persists after all retry attempts.
-            ConnectionError: If the connection fails on all retry attempts.
+            ConnectionError: If the connection fails on all retry attempts, if a
+                timeout persists after all retry attempts, or if ``cancel_event``
+                is set.
         """
         last_exc: Exception | None = None
         for attempt in range(_PDF_MAX_RETRIES):
+            if cancel_event is not None and cancel_event.is_set():
+                break
             try:
                 response = self._session.get(url, timeout=REQUEST_TIMEOUT)
-            except requests.exceptions.ConnectionError as exc:
+            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:
                 last_exc = exc
                 if attempt < _PDF_MAX_RETRIES - 1:
                     delay = _PDF_RETRY_BACKOFF_BASE * (2 ** attempt)
                     _logger.warning(
-                        "download_pdf connection error (attempt %d/%d), retrying in %ds: %s",
+                        "download_pdf transient error (attempt %d/%d), retrying in %ds: %s",
                         attempt + 1,
                         _PDF_MAX_RETRIES,
                         delay,
                         exc,
                     )
-                    time.sleep(delay)
+                    if cancel_event is not None:
+                        if cancel_event.wait(timeout=delay):
+                            break  # cancelled during sleep — exit immediately
+                    else:
+                        time.sleep(delay)
                 continue
             else:
                 if response.status_code == 200:
@@ -150,7 +172,16 @@ class EuropePMCClient:
                         _PDF_MAX_RETRIES,
                         delay,
                     )
-                    time.sleep(delay)
-        if isinstance(last_exc, requests.exceptions.ConnectionError):
+                    if cancel_event is not None:
+                        if cancel_event.wait(timeout=delay):
+                            break  # cancelled during sleep — exit immediately
+                    else:
+                        time.sleep(delay)
+        if cancel_event is not None and cancel_event.is_set():
+            raise ConnectionError("Download cancelled")
+        if isinstance(
+            last_exc,
+            (requests.exceptions.ConnectionError, requests.exceptions.Timeout),
+        ):
             raise ConnectionError(str(last_exc)) from last_exc
         raise last_exc if last_exc is not None else APIError(0, "unknown")

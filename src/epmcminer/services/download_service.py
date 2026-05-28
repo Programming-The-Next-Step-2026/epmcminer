@@ -118,7 +118,7 @@ class DownloadService:
                     if result.status == DownloadResult.STATUS_DOWNLOADED:
                         success_count += 1
             else:
-                result = self._download_one(raw_results[0], pdfs_dir)
+                result = self._download_one(raw_results[0], pdfs_dir, cancel_event)
                 progress_callback(result)
                 all_results.append(result)
                 if result.status == DownloadResult.STATUS_DOWNLOADED:
@@ -180,7 +180,7 @@ class DownloadService:
                 )
             with lock:
                 active += 1
-            result = self._download_one(raw, pdfs_dir)
+            result = self._download_one(raw, pdfs_dir, cancel_event)
             with lock:
                 active -= 1
                 result.active_threads = active
@@ -194,12 +194,21 @@ class DownloadService:
                 progress_callback(result)
         return results
 
-    def _download_one(self, raw: dict, pdfs_dir: Path) -> DownloadResult:
+    def _download_one(
+        self,
+        raw: dict,
+        pdfs_dir: Path,
+        cancel_event: threading.Event | None = None,
+    ) -> DownloadResult:
         """Attempt to download a single paper's PDF.
 
         Args:
             raw: A single result dict from the Europe PMC core search response.
             pdfs_dir: Directory where the PDF should be saved.
+            cancel_event: Optional cancellation signal forwarded to the HTTP
+                client so that backoff sleeps are interruptible.  When set
+                during a retry, the result will have status ``STATUS_SKIPPED``
+                with reason ``"Cancelled"`` rather than ``STATUS_FAILED``.
 
         Returns:
             A DownloadResult describing the outcome.
@@ -240,7 +249,7 @@ class DownloadService:
             )
 
         try:
-            pdf_bytes = self._client.download_pdf(pdf_url)
+            pdf_bytes = self._client.download_pdf(pdf_url, cancel_event=cancel_event)
         except APIError as exc:
             _logger.warning("Failed to download %s: HTTP %s", pmid, exc.status_code)
             return DownloadResult(
@@ -250,6 +259,14 @@ class DownloadService:
                 file_path=None,
             )
         except ConnectionError as exc:
+            if cancel_event is not None and cancel_event.is_set():
+                _logger.info("Download of %s cancelled during retry", pmid)
+                return DownloadResult(
+                    paper=paper,
+                    status=DownloadResult.STATUS_SKIPPED,
+                    reason="Cancelled",
+                    file_path=None,
+                )
             _logger.warning("Connection error downloading %s: %s", pmid, exc)
             return DownloadResult(
                 paper=paper,

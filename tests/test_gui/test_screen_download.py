@@ -441,3 +441,19 @@ class TestScreenDownloadError:
         w._on_error("connection timeout")
         assert not w._toast.isHidden()
         assert "connection timeout" in w._toast._msg_lbl.text()
+
+    def test_on_error_hides_thread_row(self, qapp: QApplication) -> None:
+        """_on_error calls set_progress so the thread-count row is hidden.
+
+        This prevents the UI from freezing on a stale thread count when the
+        worker exits via an unhandled exception rather than the normal finish
+        path (which calls _on_finished and clears the display itself).
+        """
+        w = _make_screen()
+        w._total = 5
+        # Show a live thread count first (simulates mid-download state).
+        w._progress.set_progress(1, 5, thread_count=2, processed=1)
+        assert not w._progress._thread_row.isHidden()
+        # Error fires — thread row must be cleared.
+        w._on_error("connection timeout")
+        assert w._progress._thread_row.isHidden()

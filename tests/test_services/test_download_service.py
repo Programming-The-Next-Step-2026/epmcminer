@@ -602,3 +602,67 @@ class TestDownload:
                 progress_callback=lambda r: None,
                 cancel_event=threading.Event(),
             )
+
+    def test_cancel_during_retry_returns_skipped_not_failed(
+        self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
+    ) -> None:
+        """ConnectionError raised while cancel_event is set → STATUS_SKIPPED 'Cancelled'."""
+        cancel_event = threading.Event()
+        mock_client.search.return_value = make_search_response(
+            [make_raw_paper()], next_cursor="*"
+        )
+
+        def fail_with_cancel(url: str, cancel_event: threading.Event | None = None) -> bytes:
+            if cancel_event is not None:
+                cancel_event.set()
+            raise ConnectionError("Download cancelled")
+
+        mock_client.download_pdf.side_effect = fail_with_cancel
+
+        results = service.download(
+            make_params(tmp_path, count=1),
+            progress_callback=lambda r: None,
+            cancel_event=cancel_event,
+        )
+
+        assert len(results) == 1
+        assert results[0].status == DownloadResult.STATUS_SKIPPED
+        assert results[0].reason == "Cancelled"
+
+    def test_connection_error_without_cancel_returns_failed(
+        self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
+    ) -> None:
+        """ConnectionError when cancel_event is NOT set → STATUS_FAILED 'Connection error'."""
+        cancel_event = threading.Event()  # not set
+        mock_client.search.return_value = make_search_response(
+            [make_raw_paper()], next_cursor="*"
+        )
+        mock_client.download_pdf.side_effect = ConnectionError("network unreachable")
+
+        results = service.download(
+            make_params(tmp_path, count=1),
+            progress_callback=lambda r: None,
+            cancel_event=cancel_event,
+        )
+
+        assert results[0].status == DownloadResult.STATUS_FAILED
+        assert results[0].reason == "Connection error"
+
+    def test_cancel_event_forwarded_to_download_pdf(
+        self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
+    ) -> None:
+        """cancel_event is passed as a keyword argument to client.download_pdf."""
+        cancel_event = threading.Event()
+        mock_client.search.return_value = make_search_response(
+            [make_raw_paper()], next_cursor="*"
+        )
+        mock_client.download_pdf.return_value = _PDF_BYTES
+
+        service.download(
+            make_params(tmp_path, count=1),
+            progress_callback=lambda r: None,
+            cancel_event=cancel_event,
+        )
+
+        _, kwargs = mock_client.download_pdf.call_args
+        assert kwargs.get("cancel_event") is cancel_event

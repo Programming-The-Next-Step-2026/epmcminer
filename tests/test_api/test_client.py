@@ -1,5 +1,6 @@
 """Tests for epmcminer.api.client."""
 
+import threading
 import urllib.parse
 from unittest.mock import patch
 
@@ -281,3 +282,81 @@ class TestDownloadPdf:
 
         mock_sleep.assert_not_called()
         assert len(responses.calls) == 1
+
+    @responses.activate
+    def test_timeout_is_retried_and_succeeds(self, client: EuropePMCClient) -> None:
+        """A transient Timeout is retried and succeeds on a later attempt."""
+        responses.add(
+            responses.GET, self.PDF_URL, body=requests.exceptions.Timeout("timed out")
+        )
+        responses.add(responses.GET, self.PDF_URL, body=self.PDF_BYTES, status=200)
+
+        with patch("epmcminer.api.client.time.sleep"):
+            result = client.download_pdf(url=self.PDF_URL)
+
+        assert result == self.PDF_BYTES
+        assert len(responses.calls) == 2
+
+    @responses.activate
+    def test_timeout_exhausted_raises_connection_error(self, client: EuropePMCClient) -> None:
+        """A persistent Timeout raises ConnectionError after all retries are exhausted."""
+        for _ in range(3):
+            responses.add(
+                responses.GET, self.PDF_URL, body=requests.exceptions.Timeout("timed out")
+            )
+
+        with patch("epmcminer.api.client.time.sleep"):
+            with pytest.raises(ConnectionError):
+                client.download_pdf(url=self.PDF_URL)
+
+        assert len(responses.calls) == 3
+
+    @responses.activate
+    def test_cancel_event_set_before_first_attempt_skips_all_requests(
+        self, client: EuropePMCClient
+    ) -> None:
+        """When cancel_event is already set, no HTTP request is made."""
+        cancel_event = threading.Event()
+        cancel_event.set()
+
+        with pytest.raises(ConnectionError):
+            client.download_pdf(url=self.PDF_URL, cancel_event=cancel_event)
+
+        assert len(responses.calls) == 0
+
+    @responses.activate
+    def test_cancel_event_during_backoff_sleep_aborts_retries(
+        self, client: EuropePMCClient
+    ) -> None:
+        """Setting cancel_event during a backoff sleep aborts further retry attempts."""
+        cancel_event = threading.Event()
+        responses.add(
+            responses.GET, self.PDF_URL, body=requests.exceptions.ConnectionError("drop")
+        )
+
+        def fake_wait(timeout: float) -> bool:
+            cancel_event.set()
+            return True  # True means the event fired (cancelled)
+
+        with patch.object(cancel_event, "wait", side_effect=fake_wait):
+            with pytest.raises(ConnectionError):
+                client.download_pdf(url=self.PDF_URL, cancel_event=cancel_event)
+
+        # Only one HTTP attempt — cancelled during the sleep after the first failure.
+        assert len(responses.calls) == 1
+
+    @responses.activate
+    def test_cancel_event_not_set_uses_time_sleep(self, client: EuropePMCClient) -> None:
+        """When cancel_event is not provided, time.sleep is used for backoff."""
+        cancel_event = threading.Event()  # not set
+        responses.add(
+            responses.GET, self.PDF_URL, body=requests.exceptions.ConnectionError("drop")
+        )
+        responses.add(responses.GET, self.PDF_URL, body=self.PDF_BYTES, status=200)
+
+        with patch("epmcminer.api.client.time.sleep") as mock_sleep:
+            result = client.download_pdf(url=self.PDF_URL, cancel_event=cancel_event)
+
+        assert result == self.PDF_BYTES
+        # cancel_event was not set, so time.sleep was NOT used (cancel_event.wait was used)
+        mock_sleep.assert_not_called()

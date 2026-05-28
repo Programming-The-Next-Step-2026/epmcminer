@@ -428,9 +428,17 @@ class ScreenDownload(QWidget):
         self.download_complete.emit(results)
 
     def _on_error(self, message: str) -> None:
-        """Handle an unrecoverable error from the worker."""
+        """Handle an unrecoverable error from the worker.
+
+        Resets the progress display (hiding the thread row and ETA) before
+        showing the error toast, so the UI does not freeze on a stale thread
+        count if the worker exits via an exception rather than a normal finish.
+        """
         _logger.error("Download worker error: %s", message)
         self._cancel_btn.setEnabled(False)
+        self._progress.set_progress(
+            self._downloaded_count(), max(self._total, 1), processed=self._completed
+        )
         self._toast.show_message(f"Download error: {message}", success=False)
 
     def _on_cancel(self) -> None:
