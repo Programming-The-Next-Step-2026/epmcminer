@@ -13,8 +13,8 @@ from pathlib import Path
 import pytest
 
 from epmcminer.api.client import EuropePMCClient
-from epmcminer.api.download_result import DownloadResult
-from epmcminer.api.models import SearchParams
+from epmcminer.api.search_params import SearchParams
+from epmcminer.services.download_result import DownloadResult
 from epmcminer.services.download_service import DownloadService
 from epmcminer.services.search_service import SearchService
 

@@ -1647,4 +1647,557 @@ interactions:
     status:
       code: 200
       message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - JSESSIONID=1D9EF976213906FD41ABD22E9C01B333
+      User-Agent:
+      - python-requests/2.32.5
+    method: GET
+    uri: https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%28depression+AND+%28FIRST_PDATE%3A%5B2020-01-01+TO+2024-12-31%5D%29%29+AND+%28HAS_FT%3AY+OR+HAS_FREE_FULLTEXT%3AY%29&format=json&resultType=core&pageSize=10&cursorMark=%2A
+  response:
+    body:
+      string: "{\"version\":\"6.9\",\"hitCount\":491620,\"nextCursorMark\":\"AoIIP8eDnCg1MjE0NDk5NQ==\",\"nextPageUrl\":\"https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=(depression
+        AND (FIRST_PDATE:[2020-01-01 TO 2024-12-31])) AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)&cursorMark=AoIIP8eDnCg1MjE0NDk5NQ==&resultType=core&pageSize=10&format=json\",\"request\":{\"queryString\":\"(depression
+        AND (FIRST_PDATE:[2020-01-01 TO 2024-12-31])) AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)\",\"resultType\":\"core\",\"cursorMark\":\"%2A\",\"pageSize\":10,\"sort\":\"\",\"synonym\":false},\"resultList\":{\"result\":[{\"id\":\"39756474\",\"source\":\"MED\",\"pmid\":\"39756474\",\"pmcid\":\"PMC11700722\",\"fullTextIdList\":{\"fullTextId\":[\"PMC11700722\"]},\"doi\":\"10.4069/whn.2024.10.18.1\",\"title\":\"Are
+        the effects of stress on antenatal depression mediated by self-esteem and
+        moderated by social support?: a cross-sectional study.\",\"authorString\":\"Lee
+        E.\",\"authorList\":{\"author\":[{\"fullName\":\"Lee E\",\"firstName\":\"Eunjoo\",\"lastName\":\"Lee\",\"initials\":\"E\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Nursing, Kyungnam University, Changwon, Korea.\"}]}}]},\"journalInfo\":{\"issue\":\"4\",\"volume\":\"30\",\"journalIssueId\":3880578,\"dateOfPublication\":\"2024
+        Dec\",\"monthOfPublication\":12,\"yearOfPublication\":2024,\"printPublicationDate\":\"2024-12-01\",\"journal\":{\"title\":\"Women's
+        health nursing (Seoul, Korea)\",\"medlineAbbreviation\":\"Womens Health Nurs\",\"isoabbreviation\":\"Womens
+        Health Nurs\",\"nlmid\":\"9918804087906676\",\"essn\":\"3022-8247\",\"issn\":\"3022-8247\"}},\"pubYear\":\"2024\",\"pageInfo\":\"299-308\",\"abstractText\":\"<h4>Purpose</h4>Social
+        support and self-esteem play crucial roles in influencing the mental health
+        of pregnant women. This study explored the moderating role of social support
+        and the mediating role of self-esteem in the relationship between pregnancy-related
+        stress and antenatal depression among pregnant women.<h4>Methods</h4>This
+        cross-sectional study included 180 pregnant women who visited the obstetrics
+        outpatient clinic at a hospital in Changwon, Korea, between November 22 and
+        December 30, 2022. Data were collected through structured questionnaires that
+        assessed antenatal depression, pregnancy stress, self-esteem, and social support.
+        The data were analyzed using descriptive statistics, Pearson correlation coefficients,
+        and PROCESS Macro model 5.<h4>Results</h4>The mean gestational age of the
+        participants was 23 weeks. The mean score for pregnancy stress was 63.51\xB114.33,
+        indicating a moderate level of self-esteem and social support were high, with
+        scores of 31.06\xB14.83 and 41.96\xB17.73, respectively. Prenatal depression
+        was notably low, averaging 6.51\xB14.59. It showed a significant positive
+        correlation with pregnancy stress (r=.52, p<.001) and negative correlations
+        with self-esteem (r=-.49, p<.001) and social support (r=-.24, p=.001). Self-esteem
+        acted as a mediator in the relationship between pregnancy stress and antepartum
+        depression among pregnant women, with an indirect effect of .05 and a 95%
+        confidence interval of .02 to .08. Additionally, social support moderated
+        the impact of pregnancy stress on antepartum depression (B=-.01, p=.036).<h4>Conclusion</h4>The
+        study emphasizes the need for a comprehensive approach to maternal mental
+        health during pregnancy, which should include stress management, self-esteem
+        enhancement, and social support interventions. Addressing these interconnected
+        factors is crucial for promoting maternal well-being and reducing the incidence
+        of prenatal depression.\",\"affiliation\":\"Department of Nursing, Kyungnam
+        University, Changwon, Korea.\",\"publicationStatus\":\"ppublish\",\"language\":\"eng\",\"pubModel\":\"Print-Electronic\",\"pubTypeList\":{\"pubType\":[\"Research
+        Support, Non-U.S. Gov't\",\"research-article\",\"Journal Article\"]},\"meshHeadingList\":{\"meshHeading\":[{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Humans\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Pregnancy
+        Complications\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Cross-Sectional
+        Studies\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Depression\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"EP\",\"qualifierName\":\"epidemiology\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Stress,
+        Psychological\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"EP\",\"qualifierName\":\"epidemiology\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Self
+        Concept\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Pregnancy\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Social
+        Support\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Adult\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Female\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Republic
+        of Korea\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"EP\",\"qualifierName\":\"epidemiology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Surveys
+        and Questionnaires\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Pregnant
+        People\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}}]},\"keywordList\":{\"keyword\":[\"Stress\",\"Pregnancy\",\"Depression\",\"Self
+        Concept\",\"Social Support\"]},\"subsetList\":{\"subset\":[{\"code\":\"IM\",\"name\":\"Index
+        Medicus\"}]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Unpaywall\",\"url\":\"https://www.e-whn.org/upload/pdf/whn-2024-10-18-1.pdf\"},{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.4069/whn.2024.10.18.1\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC11700722\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC11700722?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"Y\",\"citedByCount\":1,\"hasData\":\"Y\",\"hasReferences\":\"Y\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"N\",\"license\":\"cc
+        by\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2025-01-06\",\"dateOfCreation\":\"2025-01-05\",\"firstIndexDate\":\"2025-01-06\",\"fullTextReceivedDate\":\"2025-12-04\",\"dateOfRevision\":\"2026-01-12\",\"electronicPublicationDate\":\"2024-12-30\",\"firstPublicationDate\":\"2024-12-30\"},{\"id\":\"39735591\",\"source\":\"MED\",\"pmid\":\"39735591\",\"pmcid\":\"PMC11682662\",\"fullTextIdList\":{\"fullTextId\":[\"PMC11682662\"]},\"doi\":\"10.2147/rmhp.s499489\",\"title\":\"Relationship
+        Between Physical Exercise and Risk of Depression: An Assessment of Intermediate
+        Variables Through Self-Assessed Health Status and Life Satisfaction in the
+        Chinese Family Tracking Survey (CFPS) Data.\",\"authorString\":\"Gong C, Li
+        Y, Chen G.\",\"authorList\":{\"author\":[{\"fullName\":\"Gong C\",\"firstName\":\"Chaoming\",\"lastName\":\"Gong\",\"initials\":\"C\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Xu
+        Hai College, China University of Mining and Technology, Xuzhou, People's Republic
+        of China.\"}]}},{\"fullName\":\"Li Y\",\"firstName\":\"Yue\",\"lastName\":\"Li\",\"initials\":\"Y\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"School
+        of Physical Education, Huaibei Normal University, Huaibei, People's Republic
+        of China.\"}]}},{\"fullName\":\"Chen G\",\"firstName\":\"Gaopeng\",\"lastName\":\"Chen\",\"initials\":\"G\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"School
+        of Physical Education, Huaibei Normal University, Huaibei, People's Republic
+        of China.\"}]}}]},\"journalInfo\":{\"volume\":\"17\",\"journalIssueId\":3693678,\"dateOfPublication\":\"2024
+        \",\"monthOfPublication\":0,\"yearOfPublication\":2024,\"printPublicationDate\":\"2024-01-01\",\"journal\":{\"title\":\"Risk
+        management and healthcare policy\",\"medlineAbbreviation\":\"Risk Manag Healthc
+        Policy\",\"isoabbreviation\":\"Risk Manag Healthc Policy\",\"nlmid\":\"101566264\",\"essn\":\"1179-1594\",\"issn\":\"1179-1594\"}},\"pubYear\":\"2024\",\"pageInfo\":\"3315-3325\",\"abstractText\":\"<h4>Objective</h4>Depression
+        is a potential health killer. As an important means of preventing various
+        human diseases, physical exercise plays an important role in reducing the
+        risk of depression. Using data from the Chinese Household Tracking Survey,
+        this study analyzed the mechanisms by which physical exercise, self-rated
+        health and life satisfaction reduce the risk of depression.<h4>Methods</h4>The
+        data for this study comes from the China Family Panel Studies (CFPS) released
+        by the China Social Science Survey Centre of Peking University. The 2020 survey
+        data was used as the sample, which contained a total of 21,057 individuals.
+        The study variables were analyzed in sequence for reliability and validity,
+        correlation analysis, regression analysis, structural equation model testing,
+        and bias-corrected percentile Bootstrap testing using SPSS 23.0 software and
+        Hayes' (2013) Process plug-in.<h4>Results</h4>Physical exercise was significantly
+        positively correlated with self-assessed health status and satisfaction of
+        life (<i>\u03B2</i> = 0.049, <i>p</i> < 0.01; <i>\u03B2</i> = 0.075, <i>p</i>
+        < 0.01), and significantly negatively correlated with risk of depression (<i>\u03B2</i>
+        = -0.022, <i>p</i> < 0.01); self-assessed health status was significantly
+        positively correlated with satisfaction of life (<i>\u03B2</i> = 0.440, <i>p</i>
+        < 0.01), and significantly negatively correlated with risk of depression (<i>\u03B2</i>
+        = -0.047, <i>p</i> < 0.01); satisfaction of life was significantly negatively
+        correlated with risk of depression (<i>\u03B2</i> = -0.137, <i>p</i> < 0.01).<h4>Conclusion</h4>Physical
+        exercise not only negatively predicted the risk of depression, but also indirectly
+        predicted the risk of depression through the independent mediating effects
+        of self-assessed health status and satisfaction of life, as well as chain
+        mediating effects. There were no differences in the effects of physical exercise
+        on depression risk by age, gender and marital status. Significant differences
+        in the effect of physical exercise on depression risk were found among groups
+        with different places of residence.\",\"affiliation\":\"Xu Hai College, China
+        University of Mining and Technology, Xuzhou, People's Republic of China.\",\"publicationStatus\":\"epublish\",\"language\":\"eng\",\"pubModel\":\"Electronic-eCollection\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"keywordList\":{\"keyword\":[\"Physical Exercise\",\"Life Satisfaction\",\"Cfps\",\"Self-assessed
+        Health Status\",\"Risk Of Depression\"]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Free\",\"availabilityCode\":\"F\",\"documentStyle\":\"doi\",\"site\":\"Unpaywall\",\"url\":\"https://doi.org/10.2147/rmhp.s499489\"},{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.2147/RMHP.S499489\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC11682662\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC11682662?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":1,\"hasData\":\"N\",\"hasReferences\":\"Y\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"N\",\"license\":\"cc
+        by-nc\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCreation\":\"2024-12-30\",\"firstIndexDate\":\"2024-12-30\",\"fullTextReceivedDate\":\"2024-12-31\",\"dateOfRevision\":\"2025-01-04\",\"electronicPublicationDate\":\"2024-12-25\",\"firstPublicationDate\":\"2024-12-25\"},{\"id\":\"39733031\",\"source\":\"MED\",\"pmid\":\"39733031\",\"pmcid\":\"PMC11682131\",\"fullTextIdList\":{\"fullTextId\":[\"PMC11682131\"]},\"doi\":\"10.1038/s41598-024-82776-y\",\"title\":\"A
+        chain mediation model reveals the association between depression and cognitive
+        function in the elderly.\",\"authorString\":\"Fan P, Li H, Xu H, Rong C.\",\"authorList\":{\"author\":[{\"fullName\":\"Fan
+        P\",\"firstName\":\"Penghao\",\"lastName\":\"Fan\",\"initials\":\"P\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"School
+        of Humanities and Management, Zhejiang Chinese Medical University, Hangzhou,
+        310053, China.\"}]}},{\"fullName\":\"Li H\",\"firstName\":\"Hongying\",\"lastName\":\"Li\",\"initials\":\"H\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"School
+        of Humanities and Management, Zhejiang Chinese Medical University, Hangzhou,
+        310053, China.\"}]}},{\"fullName\":\"Xu H\",\"firstName\":\"Hongyan\",\"lastName\":\"Xu\",\"initials\":\"H\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"School
+        of Humanities and Management, Zhejiang Chinese Medical University, Hangzhou,
+        310053, China.\"}]}},{\"fullName\":\"Rong C\",\"firstName\":\"Chao\",\"lastName\":\"Rong\",\"initials\":\"C\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"School
+        of Humanities and Management, Zhejiang Chinese Medical University, Hangzhou,
+        310053, China. rcnj2008@126.com.\"}]}}]},\"dataLinksTagsList\":{\"dataLinkstag\":[\"altmetrics\"]},\"journalInfo\":{\"issue\":\"1\",\"volume\":\"14\",\"journalIssueId\":3862029,\"dateOfPublication\":\"2024
+        Dec\",\"monthOfPublication\":12,\"yearOfPublication\":2024,\"printPublicationDate\":\"2024-12-01\",\"journal\":{\"title\":\"Scientific
+        reports\",\"medlineAbbreviation\":\"Sci Rep\",\"isoabbreviation\":\"Sci Rep\",\"nlmid\":\"101563288\",\"essn\":\"2045-2322\",\"issn\":\"2045-2322\"}},\"pubYear\":\"2024\",\"pageInfo\":\"31375\",\"abstractText\":\"The
+        purpose of this study was to explore the relationship between depression,
+        cognitive function, social activities and activities of daily living ( ADL
+        ), and verify whether social activities and ADL have a chain mediating effect
+        between depression and cognitive function. Using the data of the fourth phase
+        of the China Health and Retirement Longitudinal Study ( CHARLS ), 7547 elderly
+        samples were studied. Correlation analysis and Bootstrap method were used
+        to analyze the data to test whether social activities and ADL played a chain
+        mediating role between depression and cognitive function in the elderly. In
+        this study, the direct effect of depression on the cognitive function of the
+        elderly accounted for 36.85% of the total effect. The indirect effects of
+        social activities and ADL on depression and cognitive function of the elderly
+        accounted for 15.99% and 44.64% of the total effects, respectively. At the
+        same time, the chain mediating effect of social activities and ADL was significant,
+        accounting for 2.44% of the total effect. The effect of depression on the
+        cognitive function of the elderly is achieved through social activities, ADL
+        and the chain mediating effect of social activities and ADL.\",\"affiliation\":\"School
+        of Humanities and Management, Zhejiang Chinese Medical University, Hangzhou,
+        310053, China.\",\"publicationStatus\":\"epublish\",\"language\":\"eng\",\"pubModel\":\"Electronic\",\"pubTypeList\":{\"pubType\":[\"Research
+        Support, Non-U.S. Gov't\",\"research-article\",\"Journal Article\"]},\"grantsList\":{\"grant\":[{\"grantId\":\"21QNYC16ZD\",\"agency\":\"Zhejiang
+        Provincial social sciences leading talent cultivation special project in China\",\"orderIn\":0}]},\"meshHeadingList\":{\"meshHeading\":[{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Humans\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Activities
+        of Daily Living\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Longitudinal
+        Studies\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Depression\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Cognition\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PH\",\"qualifierName\":\"physiology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Aged\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Aged,
+        80 and over\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Middle Aged\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"China\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"EP\",\"qualifierName\":\"epidemiology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Female\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Male\"}]},\"subsetList\":{\"subset\":[{\"code\":\"IM\",\"name\":\"Index
+        Medicus\"}]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"doi\",\"site\":\"Unpaywall\",\"url\":\"https://doi.org/10.1038/s41598-024-82776-y\"},{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1038/s41598-024-82776-y\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC11682131\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC11682131?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":7,\"hasData\":\"N\",\"hasReferences\":\"Y\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"Y\",\"license\":\"cc
+        by-nc-nd\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2024-12-29\",\"dateOfCreation\":\"2024-12-29\",\"firstIndexDate\":\"2024-12-29\",\"fullTextReceivedDate\":\"2025-11-27\",\"dateOfRevision\":\"2025-03-21\",\"electronicPublicationDate\":\"2024-12-28\",\"firstPublicationDate\":\"2024-12-28\"},{\"id\":\"39791660\",\"source\":\"MED\",\"pmid\":\"39791660\",\"pmcid\":\"PMC11719469\",\"fullTextIdList\":{\"fullTextId\":[\"PMC11719469\"]},\"doi\":\"10.3390/healthcare13010053\",\"title\":\"Bidirectional
+        Associations Between Alcohol Drinking and Depressive Symptoms Among US Adults
+        Aged 50 to 75: The US Health and Retirement Study.\",\"authorString\":\"Yu
+        X, Gain EP, Ajoku MJ, Kedia SK.\",\"authorList\":{\"author\":[{\"fullName\":\"Yu
+        X\",\"firstName\":\"Xinhua\",\"lastName\":\"Yu\",\"initials\":\"X\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0003-2392-3740\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Division
+        of Epidemiology, Biostatistics and Environmental Health, School of Public
+        Health, University of Memphis, Memphis, TN 38152, USA.\"}]}},{\"fullName\":\"Gain
+        EP\",\"firstName\":\"Easter P\",\"lastName\":\"Gain\",\"initials\":\"EP\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Division
+        of Epidemiology, Biostatistics and Environmental Health, School of Public
+        Health, University of Memphis, Memphis, TN 38152, USA.\"}]}},{\"fullName\":\"Ajoku
+        MJ\",\"firstName\":\"Mark'Quest J\",\"lastName\":\"Ajoku\",\"initials\":\"MJ\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-8548-159X\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Division
+        of Epidemiology, Biostatistics and Environmental Health, School of Public
+        Health, University of Memphis, Memphis, TN 38152, USA.\"}]}},{\"fullName\":\"Kedia
+        SK\",\"firstName\":\"Satish K\",\"lastName\":\"Kedia\",\"initials\":\"SK\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-7114-5843\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Division
+        of Social Behavioral Sciences, School of Public Health, University of Memphis,
+        Memphis, TN 38152, USA.\"}]}}]},\"authorIdList\":{\"authorId\":[{\"type\":\"ORCID\",\"value\":\"0000-0002-7114-5843\"},{\"type\":\"ORCID\",\"value\":\"0000-0002-8548-159X\"},{\"type\":\"ORCID\",\"value\":\"0000-0003-2392-3740\"}]},\"dataLinksTagsList\":{\"dataLinkstag\":[\"altmetrics\"]},\"journalInfo\":{\"issue\":\"1\",\"volume\":\"13\",\"journalIssueId\":3884661,\"dateOfPublication\":\"2024
+        Dec\",\"monthOfPublication\":12,\"yearOfPublication\":2024,\"printPublicationDate\":\"2024-12-01\",\"journal\":{\"title\":\"Healthcare
+        (Basel, Switzerland)\",\"medlineAbbreviation\":\"Healthcare (Basel)\",\"isoabbreviation\":\"Healthcare
+        (Basel)\",\"nlmid\":\"101666525\",\"essn\":\"2227-9032\",\"issn\":\"2227-9032\"}},\"pubYear\":\"2024\",\"pageInfo\":\"53\",\"abstractText\":\"<b>Background/Objectives</b>:
+        Low or moderate alcohol drinking may reduce the risk of depression, but depression
+        may induce alcohol drinking. However, the bidirectional associations between
+        alcohol drinking and depression were inconsistent, and many prior analyses
+        were not properly conducted. This study explored the within-individual bidirectional
+        associations between alcohol drinking and depressive symptoms under a causal
+        analytic framework. <b>Methods</b>: Using data for the baby boomer cohorts
+        (born between 1948 and 1965) from the Health and Retirement Study (HRS), we
+        employed the unit fixed-effect models with lagged measures to examine the
+        within-individual bidirectional associations between the number of alcohol
+        drinks per week and the changes in the eight-item Center for Epidemiological
+        Studies-Depression (CES-D) scores. <b>Results</b>: Among 11,057 participants
+        at baseline, about 48% were drinkers and 19% had a CES-D \u22654, i.e., at
+        a high risk of depression. Among male low/moderate drinkers, increasing alcohol
+        drinking between consecutive visits was significantly associated with a decrease
+        in depression scores after adjusting for prior alcohol drinking (-0.15 points
+        per 7 drinks/week increase, <i>p</i> = 0.009). Conversely, among male drinkers
+        and female heavy drinkers, increasing depression scores between visits increased
+        alcohol drinking after adjusting for prior depression scores (ranging from
+        0.22 to 0.79 drinks/week per 1 point increase of depression score, all <i>p</i>
+        values < 0.01). <b>Conclusions</b>: The bidirectional associations between
+        alcohol drinking and depressive symptoms were evident only among male drinkers,
+        and alcohol drinking should not be recommended as a solution for preventing
+        or relieving depressive symptoms. <b>Limitations</b>: Measures of alcohol
+        drinking and depression were coarse, and the study cohorts were limited to
+        the US baby boomer generation. Generalizing findings to other populations
+        should be cautious.\",\"affiliation\":\"Division of Epidemiology, Biostatistics
+        and Environmental Health, School of Public Health, University of Memphis,
+        Memphis, TN 38152, USA.\",\"publicationStatus\":\"epublish\",\"language\":\"eng\",\"pubModel\":\"Electronic\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"keywordList\":{\"keyword\":[\"Depression\",\"Alcohol drinking\",\"Middle-aged
+        Adults\",\"Causal Association\",\"Bidirectional Association\"]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Unpaywall\",\"url\":\"https://www.mdpi.com/2227-9032/13/1/53/pdf?version=1735630368\"},{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.3390/healthcare13010053\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC11719469\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC11719469?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":0,\"hasData\":\"N\",\"hasReferences\":\"Y\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"Y\",\"license\":\"cc
+        by\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCreation\":\"2025-01-10\",\"firstIndexDate\":\"2025-01-11\",\"fullTextReceivedDate\":\"2025-01-13\",\"dateOfRevision\":\"2025-01-12\",\"electronicPublicationDate\":\"2024-12-31\",\"firstPublicationDate\":\"2024-12-31\"},{\"id\":\"39731058\",\"source\":\"MED\",\"pmid\":\"39731058\",\"pmcid\":\"PMC11674200\",\"fullTextIdList\":{\"fullTextId\":[\"PMC11674200\"]},\"doi\":\"10.1186/s12888-024-06424-5\",\"title\":\"The
+        relationship between life's essential 8 score and depression symptom severity:
+        evidence from a nationally representative sample of U.S. adults.\",\"authorString\":\"Liu
+        X, Li Y, Chang Y, Wang Y, Li W, Chen N, Cui J.\",\"authorList\":{\"author\":[{\"fullName\":\"Liu
+        X\",\"firstName\":\"Xiangliang\",\"lastName\":\"Liu\",\"initials\":\"X\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"The
+        First Hospital of Jilin University, No.1 Xinmin Street, Changchun, China.\"}]}},{\"fullName\":\"Li
+        Y\",\"firstName\":\"Yuguang\",\"lastName\":\"Li\",\"initials\":\"Y\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"The
+        First Hospital of Jilin University, No.1 Xinmin Street, Changchun, China.\"}]}},{\"fullName\":\"Chang
+        Y\",\"firstName\":\"Yu\",\"lastName\":\"Chang\",\"initials\":\"Y\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"The
+        First Hospital of Jilin University, No.1 Xinmin Street, Changchun, China.\"}]}},{\"fullName\":\"Wang
+        Y\",\"firstName\":\"Yao\",\"lastName\":\"Wang\",\"initials\":\"Y\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"The
+        First Hospital of Jilin University, No.1 Xinmin Street, Changchun, China.\"}]}},{\"fullName\":\"Li
+        W\",\"firstName\":\"Wei\",\"lastName\":\"Li\",\"initials\":\"W\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"The
+        First Hospital of Jilin University, No.1 Xinmin Street, Changchun, China.\"}]}},{\"fullName\":\"Chen
+        N\",\"firstName\":\"Naifei\",\"lastName\":\"Chen\",\"initials\":\"N\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"The
+        First Hospital of Jilin University, No.1 Xinmin Street, Changchun, China.
+        chennaifei@jlu.edu.cn.\"}]}},{\"fullName\":\"Cui J\",\"firstName\":\"Jiuwei\",\"lastName\":\"Cui\",\"initials\":\"J\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"The
+        First Hospital of Jilin University, No.1 Xinmin Street, Changchun, China.
+        cuijw@jlu.edu.cn.\"}]}}]},\"dataLinksTagsList\":{\"dataLinkstag\":[\"altmetrics\",\"supporting_data\"]},\"journalInfo\":{\"issue\":\"1\",\"volume\":\"24\",\"journalIssueId\":3862097,\"dateOfPublication\":\"2024
+        Dec\",\"monthOfPublication\":12,\"yearOfPublication\":2024,\"printPublicationDate\":\"2024-12-01\",\"journal\":{\"title\":\"BMC
+        psychiatry\",\"medlineAbbreviation\":\"BMC Psychiatry\",\"isoabbreviation\":\"BMC
+        Psychiatry\",\"nlmid\":\"100968559\",\"essn\":\"1471-244X\",\"issn\":\"1471-244X\"}},\"pubYear\":\"2024\",\"pageInfo\":\"953\",\"abstractText\":\"<h4>Background</h4>Many
+        studies have indicated that adverse cardiovascular health (CVH) behaviors
+        are associated with an elevated risk of depression. However, the dose-response
+        relationship between the two and the relative contributions of individual
+        CVH components to depression risk remain unclear.<h4>Methods</h4>We utilized
+        data from the National Health and Nutrition Examination Survey (NHANES) conducted
+        between 2015 and 2018. Quantified CVH was assessed using the Life's Simple
+        8 (LE8) instrument, depression symptoms were measured through the Patient
+        Health Questionnaire-9 (PHQ-9), and a weighted logistic regression, restrictive
+        cubic splines (RCS), subgroup analyses on sociodemographic factors, weighted
+        quantile sum (WQS) regression were employed to evaluate the association between
+        CVH and depression.<h4>Results</h4>In a fully adjusted logistic regression
+        model, for each unit increase in LE8 score, there was a corresponding decrease
+        of 0.07 in depression score (\u03B2=-0.07, 95%CI -0.07 to -0.06, p\u2009<\u20090.001).
+        The RCS model indicated a significant non-linear relationship between CVH
+        and depression. Subgroup analyses revealed that the association between CVH
+        and depression was strongest among women, ethnic minorities, individuals with
+        low education levels, and those living in poverty. WQS regression analysis
+        indicated that tobacco exposure and sleep health accounted for more than 60%
+        of the cumulative effects of CVH indicators on depression.<h4>Conclusion</h4>This
+        study indicates a significant negative correlation between overall cardiovascular
+        health measured by LE8 scores and depression. Prioritizing interventions targeting
+        lifestyle modifications to alleviate the burden of depression in public health
+        initiatives is crucial.\",\"affiliation\":\"The First Hospital of Jilin University,
+        No.1 Xinmin Street, Changchun, China.\",\"publicationStatus\":\"epublish\",\"language\":\"eng\",\"pubModel\":\"Electronic\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"meshHeadingList\":{\"meshHeading\":[{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Humans\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Cardiovascular
+        Diseases\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"EP\",\"qualifierName\":\"epidemiology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Severity
+        of Illness Index\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Nutrition
+        Surveys\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Depression\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"EP\",\"qualifierName\":\"epidemiology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Adult\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Aged\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Middle
+        Aged\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"United States\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"EP\",\"qualifierName\":\"epidemiology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Female\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Male\"}]},\"keywordList\":{\"keyword\":[\"Depression\",\"Nhanes\",\"Patient
+        Health Questionnaire (Phq-9)\",\"Cardiovascular Health (Cvh)\",\"Life\u2019s
+        Essential 8 (Le8)\"]},\"subsetList\":{\"subset\":[{\"code\":\"IM\",\"name\":\"Index
+        Medicus\"}]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1186/s12888-024-06424-5\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC11674200\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC11674200?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"Y\",\"citedByCount\":0,\"hasData\":\"Y\",\"hasReferences\":\"Y\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"Y\",\"license\":\"cc
+        by-nc-nd\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2024-12-28\",\"dateOfCreation\":\"2024-12-28\",\"firstIndexDate\":\"2024-12-29\",\"fullTextReceivedDate\":\"2025-11-29\",\"dateOfRevision\":\"2025-01-04\",\"electronicPublicationDate\":\"2024-12-27\",\"firstPublicationDate\":\"2024-12-27\"},{\"id\":\"39757817\",\"source\":\"MED\",\"pmid\":\"39757817\",\"pmcid\":\"PMC11704802\",\"fullTextIdList\":{\"fullTextId\":[\"PMC11704802\"]},\"doi\":\"10.30773/pi.2024.0088\",\"title\":\"Effect
+        of the Interaction Between Depression and Sleep Disorders on Stroke Occurrence:
+        A 17-Year Prospective Cohort Study in Korea.\",\"authorString\":\"Jung E,
+        Ryu HH, Ryu SJ.\",\"authorList\":{\"author\":[{\"fullName\":\"Jung E\",\"firstName\":\"Eujene\",\"lastName\":\"Jung\",\"initials\":\"E\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0003-3802-5636\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Emergency Medicine, Chonnam National University Hospital, Gwangju, Republic
+        of Korea.\"},{\"affiliation\":\"Department of Emergency Medicine, Chonnam
+        National University Medical School, Gwangju, Republic of Korea.\"}]}},{\"fullName\":\"Ryu
+        HH\",\"firstName\":\"Hyun Ho\",\"lastName\":\"Ryu\",\"initials\":\"HH\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Emergency Medicine, Chonnam National University Hospital, Gwangju, Republic
+        of Korea.\"},{\"affiliation\":\"Department of Emergency Medicine, Chonnam
+        National University Medical School, Gwangju, Republic of Korea.\"}]}},{\"fullName\":\"Ryu
+        SJ\",\"firstName\":\"Seok Jin\",\"lastName\":\"Ryu\",\"initials\":\"SJ\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Emergency Medicine, Chonnam National University Hospital, Gwangju, Republic
+        of Korea.\"}]}}]},\"authorIdList\":{\"authorId\":[{\"type\":\"ORCID\",\"value\":\"0000-0003-3802-5636\"}]},\"journalInfo\":{\"issue\":\"12\",\"volume\":\"21\",\"journalIssueId\":3880806,\"dateOfPublication\":\"2024
+        Dec\",\"monthOfPublication\":12,\"yearOfPublication\":2024,\"printPublicationDate\":\"2024-12-01\",\"journal\":{\"title\":\"Psychiatry
+        investigation\",\"medlineAbbreviation\":\"Psychiatry Investig\",\"isoabbreviation\":\"Psychiatry
+        Investig\",\"nlmid\":\"101242994\",\"essn\":\"1976-3026\",\"issn\":\"1738-3684\"}},\"pubYear\":\"2024\",\"pageInfo\":\"1391-1397\",\"abstractText\":\"<h4>Objective</h4>Previous
+        studies have provided inconclusive results on the association between depression
+        and stroke risk, and the potential modifying effect of comorbid insomnia on
+        this association remains unclear. Our study aimed to clarify the independent
+        roles of depression and insomnia as risk factors for stroke and to investigate
+        the possibility of an interaction effect between these two conditions on stroke
+        incidence.<h4>Methods</h4>We used data from the Korean Genome and Epidemiology
+        Study. The primary exposure was depression, measured by the Beck Depression
+        Inventory. The secondary exposure was insomnia. The main outcome was the occurrence
+        of stroke observed in biennial follow-up surveys. Cox proportional regression
+        analysis was performed to estimate the effects of depression and insomnia
+        on stroke incidence. We also conducted interaction analysis to investigate
+        the interaction between depression and insomnia on stroke incidence.<h4>Results</h4>During
+        16 years of follow-up involving 3,301 individuals, we documented 172 cases
+        of new-onset stroke (4.3 cases per 1,000 person-years). Cox proportional logistic
+        regression analysis showed that severe depression significantly increased
+        the risk of stroke (hazard ratio [HR]: 2.06, 95% confidence interval [CI]:
+        1.13-3.75), whereas mild and moderate depression did not increase this risk.
+        Interaction analysis demonstrated that stroke risk was increased with only
+        moderate (HR: 2.04, 95% CI: 1.04-4.00) and severe (HR: 3.01, 95% CI: 1.43-6.31)
+        depression among individuals without insomnia.<h4>Conclusion</h4>Although
+        general depression does not significantly increase stroke risk, moderate-to-severe
+        depression may increase this risk, particularly in individuals without insomnia.\",\"affiliation\":\"Department
+        of Emergency Medicine, Chonnam National University Hospital, Gwangju, Republic
+        of Korea.\",\"publicationStatus\":\"ppublish\",\"language\":\"eng\",\"pubModel\":\"Print-Electronic\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"grantsList\":{\"grant\":[{\"grantId\":\"BCRI-24071\",\"agency\":\"Chonnam
+        National University Hospital Biomedical Research Institute\",\"orderIn\":0}]},\"keywordList\":{\"keyword\":[\"Depression\",\"Risk
+        factor\",\"Stroke\",\"Sleep Disorder\"]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.30773/pi.2024.0088\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC11704802\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC11704802?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":2,\"hasData\":\"N\",\"hasReferences\":\"Y\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"N\",\"license\":\"cc
+        by-nc\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCreation\":\"2025-01-06\",\"firstIndexDate\":\"2025-01-06\",\"fullTextReceivedDate\":\"2025-11-29\",\"dateOfRevision\":\"2025-01-09\",\"electronicPublicationDate\":\"2024-12-23\",\"firstPublicationDate\":\"2024-12-23\"},{\"id\":\"39738694\",\"source\":\"MED\",\"pmid\":\"39738694\",\"pmcid\":\"PMC11686155\",\"fullTextIdList\":{\"fullTextId\":[\"PMC11686155\"]},\"doi\":\"10.1038/s41598-024-83655-2\",\"title\":\"Exploring
+        the relationship between the uric acid to high-density lipoprotein cholesterol
+        ratio and depression: a cross-sectional study from NHANES.\",\"authorString\":\"Liu
+        J, Zhang X, Meng T, Wang X, Wang L.\",\"authorList\":{\"author\":[{\"fullName\":\"Liu
+        J\",\"firstName\":\"Jiawen\",\"lastName\":\"Liu\",\"initials\":\"J\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Heilongjiang
+        University of Chinese Medicine, Harbin, 150006, China.\"}]}},{\"fullName\":\"Zhang
+        X\",\"firstName\":\"Xiaobing\",\"lastName\":\"Zhang\",\"initials\":\"X\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Heilongjiang
+        University of Chinese Medicine, Harbin, 150006, China.\"}]}},{\"fullName\":\"Meng
+        T\",\"firstName\":\"Tianwei\",\"lastName\":\"Meng\",\"initials\":\"T\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Heilongjiang
+        University of Chinese Medicine, Harbin, 150006, China.\"}]}},{\"fullName\":\"Wang
+        X\",\"firstName\":\"Xingyi\",\"lastName\":\"Wang\",\"initials\":\"X\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Heilongjiang
+        University of Chinese Medicine, Harbin, 150006, China.\"}]}},{\"fullName\":\"Wang
+        L\",\"firstName\":\"Long\",\"lastName\":\"Wang\",\"initials\":\"L\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"First
+        Affiliated Hospital, Heilongjiang University of Chinese Medicine, Harbin,
+        150040, China. wlkeyan@163.com.\"}]}}]},\"journalInfo\":{\"issue\":\"1\",\"volume\":\"14\",\"journalIssueId\":3862029,\"dateOfPublication\":\"2024
+        Dec\",\"monthOfPublication\":12,\"yearOfPublication\":2024,\"printPublicationDate\":\"2024-12-01\",\"journal\":{\"title\":\"Scientific
+        reports\",\"medlineAbbreviation\":\"Sci Rep\",\"isoabbreviation\":\"Sci Rep\",\"nlmid\":\"101563288\",\"essn\":\"2045-2322\",\"issn\":\"2045-2322\"}},\"pubYear\":\"2024\",\"pageInfo\":\"32018\",\"abstractText\":\"Depression
+        is one of the most burdensome diseases worldwide, garnering significant attention.
+        The uric acid to high-density lipoprotein cholesterol ratio (UHR) is a novel
+        and easily obtainable indicator used to assess the body's inflammatory and
+        metabolic status. It has attracted interest due to its potential role in the
+        prevention and treatment of depression. This study aims to explore the potential
+        correlation between UHR and depression. A cross-sectional study was conducted
+        using data from the National Health and Nutrition Examination Survey (NHANES)
+        from 2005 to 2018. Depression occurrence was defined as the dependent variable,
+        and UHR was defined as the independent variable. Multivariable logistic regression
+        was performed to assess the relationship between the independent and dependent
+        variables. Smooth curve fitting and threshold effect analyses were used to
+        evaluate the nonlinear relationship and effect size between UHR and depression.
+        Subgroup and sensitivity analyses were conducted to determine the stability
+        of the results. This study included 24,272 adults based on NHANES data. Multivariable
+        logistic regression analysis showed that, in the fully adjusted model, individuals
+        with the highest UHR had a 42% increased likelihood of depression compared
+        to those with the lowest UHR (OR\u2009=\u20091.42; 95% CI, 1.23-1.64; P\u2009<\u20090.001).
+        Subgroup analyses indicated no significant interaction between UHR and specific
+        subgroups (all interaction P\u2009>\u20090.05). Moreover, there is a nonlinear
+        association between UHR and depression. When the UHR level was>10.21, the
+        correlation between UHR and depression increased by 3% (OR\u2009=\u20091.03;
+        95% CI, 1.01-1.04; P\u2009<\u20090.01). The study found that UHR is significantly
+        associated with a higher risk of depression among American adults. However,
+        further prospective studies are needed to accurately elucidate the causal
+        relationship between elevated UHR levels and depression risk. Therefore, larger
+        cohort studies are required to support these findings.\",\"affiliation\":\"Heilongjiang
+        University of Chinese Medicine, Harbin, 150006, China.\",\"publicationStatus\":\"epublish\",\"language\":\"eng\",\"pubModel\":\"Electronic\",\"pubTypeList\":{\"pubType\":[\"Research
+        Support, Non-U.S. Gov't\",\"research-article\",\"Journal Article\"]},\"grantsList\":{\"grant\":[{\"grantId\":\"LH2022H082\",\"agency\":\"Natural
+        Science Foundation of Heilongjiang Province Project\",\"orderIn\":0},{\"grantId\":\"LBH-Q19185\",\"agency\":\"Heilongjiang
+        Province Postdoctoral Research Start-up Fund Project\",\"orderIn\":0},{\"grantId\":\"81303044\",\"agency\":\"National
+        Natural Science Foundation of China Project\",\"orderIn\":0},{\"grantId\":\"ZHY2020-120\",\"agency\":\"Heilongjiang
+        Province Administration of Traditional Chinese Medicine Project\",\"orderIn\":0}]},\"meshHeadingList\":{\"meshHeading\":[{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Humans\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Uric
+        Acid\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"BL\",\"qualifierName\":\"blood\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Nutrition
+        Surveys\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Logistic Models\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Risk
+        Factors\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Cross-Sectional Studies\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Depression\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"BL\",\"qualifierName\":\"blood\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"EP\",\"qualifierName\":\"epidemiology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Adult\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Middle
+        Aged\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Female\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Male\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Cholesterol,
+        HDL\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"BL\",\"qualifierName\":\"blood\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Young
+        Adult\"}]},\"keywordList\":{\"keyword\":[\"Depression\",\"Cross-sectional
+        study\",\"Nhanes Database\",\"Uhr Index\"]},\"chemicalList\":{\"chemical\":[{\"name\":\"Cholesterol,
+        HDL\",\"registryNumber\":\"0\"},{\"name\":\"Uric Acid\",\"registryNumber\":\"268B43MJ25\"}]},\"subsetList\":{\"subset\":[{\"code\":\"IM\",\"name\":\"Index
+        Medicus\"}]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1038/s41598-024-83655-2\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC11686155\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC11686155?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":5,\"hasData\":\"N\",\"hasReferences\":\"Y\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"N\",\"license\":\"cc
+        by-nc-nd\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2024-12-31\",\"dateOfCreation\":\"2024-12-31\",\"firstIndexDate\":\"2025-01-01\",\"fullTextReceivedDate\":\"2025-01-03\",\"dateOfRevision\":\"2025-03-25\",\"electronicPublicationDate\":\"2024-12-30\",\"firstPublicationDate\":\"2024-12-30\"},{\"id\":\"41661904\",\"source\":\"MED\",\"pmid\":\"41661904\",\"pmcid\":\"PMC12798553\",\"fullTextIdList\":{\"fullTextId\":[\"PMC12798553\"]},\"doi\":\"10.1371/journal.pmen.0000086\",\"title\":\"Why
+        U.S. science and engineering undergraduates who struggle with mental health
+        are left without role models.\",\"authorString\":\"Busch CA, Barstow M, Brownell
+        SE, Cooper KM.\",\"authorList\":{\"author\":[{\"fullName\":\"Busch CA\",\"firstName\":\"Carly
+        A\",\"lastName\":\"Busch\",\"initials\":\"CA\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-3744-1702\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"School
+        of Life Sciences, Arizona State University, Tempe, Arizona, United States
+        of America.\"}]}},{\"fullName\":\"Barstow M\",\"firstName\":\"Margaret\",\"lastName\":\"Barstow\",\"initials\":\"M\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"School
+        of Life Sciences, Arizona State University, Tempe, Arizona, United States
+        of America.\"}]}},{\"fullName\":\"Brownell SE\",\"firstName\":\"Sara E\",\"lastName\":\"Brownell\",\"initials\":\"SE\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"School
+        of Life Sciences, Arizona State University, Tempe, Arizona, United States
+        of America.\"}]}},{\"fullName\":\"Cooper KM\",\"firstName\":\"Katelyn M\",\"lastName\":\"Cooper\",\"initials\":\"KM\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0001-8427-7741\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"School
+        of Life Sciences, Arizona State University, Tempe, Arizona, United States
+        of America.\"}]}}]},\"authorIdList\":{\"authorId\":[{\"type\":\"ORCID\",\"value\":\"0000-0001-8427-7741\"},{\"type\":\"ORCID\",\"value\":\"0000-0002-3744-1702\"}]},\"dataLinksTagsList\":{\"dataLinkstag\":[\"altmetrics\"]},\"journalInfo\":{\"issue\":\"7\",\"volume\":\"1\",\"journalIssueId\":3967002,\"dateOfPublication\":\"2024
+        \",\"monthOfPublication\":0,\"yearOfPublication\":2024,\"printPublicationDate\":\"2024-01-01\",\"journal\":{\"title\":\"PLOS
+        mental health\",\"medlineAbbreviation\":\"PLOS Ment Health\",\"isoabbreviation\":\"PLOS
+        Ment Health\",\"nlmid\":\"9918844789006676\",\"essn\":\"2837-8156\",\"issn\":\"2837-8156\"}},\"pubYear\":\"2024\",\"pageInfo\":\"e0000086\",\"abstractText\":\"Depression
+        and anxiety are among the most common mental health concerns for science and
+        engineering (S&E) undergraduates in the United States (U.S.), and students
+        perceive they would benefit from knowing a S&E instructor with depression
+        or anxiety. However, it is unknown how prevalent depression and anxiety are
+        among S&E instructors and whether instructors disclose their depression or
+        anxiety to their undergraduates. These identities are unique because they
+        are concealable stigmatized identities (CSIs), meaning they can be kept hidden
+        and carry negative stereotypes. To address these gaps, we surveyed 2013 S&E
+        faculty instructors across U.S. very high research activity doctoral-granting
+        institutions. The survey assessed the extent to which they had and revealed
+        depression or anxiety to undergraduates, why they chose to reveal or conceal
+        their depression or anxiety, and the benefits of revealing depression or anxiety.
+        These items were developed based on prior studies exploring why individuals
+        conceal or reveal CSIs including mental health conditions. Of the university
+        S&E instructors surveyed, 23.9% (n = 482) reported having depression and 32.8%
+        (n = 661) reported having anxiety. Instructors who are women, white, Millennials,
+        or LGBTQ+ are more likely to report depression or anxiety than their counterparts.
+        Very few participants revealed their depression (5.4%) or anxiety (8.3%) to
+        undergraduates. Instructors reported concealing their depression and anxiety
+        because they do not typically disclose to others or because it is not relevant
+        to course content. Instructors anticipated that undergraduates would benefit
+        from disclosure because it would normalize struggling with mental health and
+        provide an example of someone with depression and anxiety who is successful
+        in S&E. Despite undergraduates reporting a need for role models in academic
+        S&E who struggle with mental health and depression/anxiety being relatively
+        common among U.S. S&E instructors, our study found that instructors rarely
+        reveal these identities to their undergraduates.\",\"affiliation\":\"School
+        of Life Sciences, Arizona State University, Tempe, Arizona, United States
+        of America.\",\"publicationStatus\":\"epublish\",\"language\":\"eng\",\"pubModel\":\"Electronic-eCollection\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"grantsList\":{\"grant\":[{\"grantId\":\"00035931\",\"agency\":\"Division
+        of Undergraduate Education\",\"orderIn\":0},{\"grantId\":\"026257-001\",\"agency\":\"National
+        Science Foundation Graduate Research Fellowship Program\",\"orderIn\":0},{\"grantId\":\"00037072\",\"agency\":\"Division
+        of Undergraduate Education\",\"orderIn\":0}]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1371/journal.pmen.0000086\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC12798553\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC12798553?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"Y\",\"citedByCount\":0,\"hasData\":\"Y\",\"hasReferences\":\"Y\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"Y\",\"license\":\"cc
+        by\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2026-02-09\",\"dateOfCreation\":\"2026-02-09\",\"firstIndexDate\":\"2026-02-10\",\"fullTextReceivedDate\":\"2026-01-14\",\"dateOfRevision\":\"2026-02-13\",\"electronicPublicationDate\":\"2024-12-19\",\"firstPublicationDate\":\"2024-12-19\"},{\"id\":\"39742132\",\"source\":\"MED\",\"pmid\":\"39742132\",\"pmcid\":\"PMC11687684\",\"fullTextIdList\":{\"fullTextId\":[\"PMC11687684\"]},\"doi\":\"10.4103/ijpvm.ijpvm_311_23\",\"title\":\"Translation,
+        Validity, and Reliability of Depression Literacy Questionnaire in Iranian
+        Young Adults.\",\"authorString\":\"Raiisi F, Ebrahimi M, Ghahvehchi Hosseini
+        F, Jafari K, Rahmati F.\",\"authorList\":{\"author\":[{\"fullName\":\"Raiisi
+        F\",\"firstName\":\"Fatteme\",\"lastName\":\"Raiisi\",\"initials\":\"F\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Ph.D
+        of Cognitive Science, Institute of Cognitive Science Studies, Tehran, Iran.\"}]}},{\"fullName\":\"Ebrahimi
+        M\",\"firstName\":\"Mohamad\",\"lastName\":\"Ebrahimi\",\"initials\":\"M\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Ph.D
+        Candidate, Health Research Center, Life Style Institute, Baqiyatallah University
+        of Medical Sciences, Tehran, Iran.\"}]}},{\"fullName\":\"Ghahvehchi Hosseini
+        F\",\"firstName\":\"Fahimeh\",\"lastName\":\"Ghahvehchi Hosseini\",\"initials\":\"F\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Ph.D
+        Candidate, Behavioral Sciences Research Center, Life Style Institute, Baqiyatallah
+        University of Medical Sciences, Tehran, Iran.\"}]}},{\"fullName\":\"Jafari
+        K\",\"firstName\":\"Kosar\",\"lastName\":\"Jafari\",\"initials\":\"K\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Students'
+        Research Committee, Baqiyatallah University of Medical Sciences, Tehran, Iran.\"}]}},{\"fullName\":\"Rahmati
+        F\",\"firstName\":\"Fatemeh\",\"lastName\":\"Rahmati\",\"initials\":\"F\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Ph.D
+        of Health Education, Health Research Center, Life Style Institute, Baqiyatallah
+        University of Medical Sciences, Tehran, Iran.\"}]}}]},\"journalInfo\":{\"volume\":\"15\",\"journalIssueId\":3740731,\"dateOfPublication\":\"2024
+        \",\"monthOfPublication\":0,\"yearOfPublication\":2024,\"printPublicationDate\":\"2024-01-01\",\"journal\":{\"title\":\"International
+        journal of preventive medicine\",\"medlineAbbreviation\":\"Int J Prev Med\",\"isoabbreviation\":\"Int
+        J Prev Med\",\"nlmid\":\"101535380\",\"essn\":\"2008-8213\",\"issn\":\"2008-7802\"}},\"pubYear\":\"2024\",\"pageInfo\":\"72\",\"abstractText\":\"<h4>Background</h4>Depression
+        literacy has notable advantages in the early identification and treatment
+        of depression. The current study was conducted with the aim of translating
+        and investigating the validity and reliability of the Depression Literacy
+        Questionnaire (D-Lit) in Iranian young adults.<h4>Methods</h4>The current
+        study entailed a descriptive-analytical study in which the translation, validation,
+        and preparation of the Persian version of D-Lit were conducted. It had two
+        stages: translation and validation. In order to check the composite reliability,
+        the statistical population consisted of Iranian adults in the city of Mashhad,
+        and 300 people participated in this study in the form of a census. The content
+        validity ratio (CVR) and content validity index (CVI) indices were used for
+        content validity.<h4>Results</h4>The results of the content validity evaluation
+        of this questionnaire indicated that both the CVR and CVI indices have higher-than-average
+        coefficients (0.78 and 0.83). Furthermore, the Cronbach's alpha value for
+        the components of the D-Lit was found to be higher than 0.70. In the present
+        study, the questionnaire's reliability was assessed using the intra-cluster
+        correlation coefficient (ICC), and the difficulty coefficient for the whole
+        questionnaire and its sub-components was at a favorable level. Out of 22 questions,
+        17 questions of this questionnaire were retained and questions 1, 17, and
+        22 were removed due to low CVR and CVI in the validity stage, and questions
+        5 and 13 were removed due to common factor load in the factor analysis stage.<h4>Conclusion</h4>According
+        to the content validity and reliability in this study, this tool can be used
+        to identify underlying factors, etiology, and treatment of depression.\",\"affiliation\":\"Ph.D
+        of Cognitive Science, Institute of Cognitive Science Studies, Tehran, Iran.\",\"publicationStatus\":\"epublish\",\"language\":\"eng\",\"pubModel\":\"Electronic-eCollection\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"keywordList\":{\"keyword\":[\"Validity\",\"reliability\",\"Depression
+        Literacy Questionnaire\"]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.4103/ijpvm.ijpvm_311_23\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC11687684\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC11687684?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":0,\"hasData\":\"N\",\"hasReferences\":\"Y\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"N\",\"license\":\"cc
+        by-nc-sa\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCreation\":\"2025-01-01\",\"firstIndexDate\":\"2025-01-02\",\"fullTextReceivedDate\":\"2025-01-03\",\"dateOfRevision\":\"2025-01-04\",\"electronicPublicationDate\":\"2024-12-23\",\"firstPublicationDate\":\"2024-12-23\"},{\"id\":\"39738390\",\"source\":\"MED\",\"pmid\":\"39738390\",\"pmcid\":\"PMC11685965\",\"fullTextIdList\":{\"fullTextId\":[\"PMC11685965\"]},\"doi\":\"10.1038/s41598-024-83617-8\",\"title\":\"Utilising
+        AI technique to identify depression risk among doctoral students.\",\"authorString\":\"Teng
+        C, Yang C, Liu Q.\",\"authorList\":{\"author\":[{\"fullName\":\"Teng C\",\"firstName\":\"Changhong\",\"lastName\":\"Teng\",\"initials\":\"C\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"School
+        of Education, Beijing Institute of Technology, Beijing, 100081, China.\"}]}},{\"fullName\":\"Yang
+        C\",\"firstName\":\"Chunmei\",\"lastName\":\"Yang\",\"initials\":\"C\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"School
+        of Education, Beijing Institute of Technology, Beijing, 100081, China. ycm70@bit.edu.cn.\"}]}},{\"fullName\":\"Liu
+        Q\",\"firstName\":\"Qiushi\",\"lastName\":\"Liu\",\"initials\":\"Q\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"MediaTek
+        Inc, Beijing, 10016, China.\"}]}}]},\"dataLinksTagsList\":{\"dataLinkstag\":[\"altmetrics\"]},\"journalInfo\":{\"issue\":\"1\",\"volume\":\"14\",\"journalIssueId\":3862029,\"dateOfPublication\":\"2024
+        Dec\",\"monthOfPublication\":12,\"yearOfPublication\":2024,\"printPublicationDate\":\"2024-12-01\",\"journal\":{\"title\":\"Scientific
+        reports\",\"medlineAbbreviation\":\"Sci Rep\",\"isoabbreviation\":\"Sci Rep\",\"nlmid\":\"101563288\",\"essn\":\"2045-2322\",\"issn\":\"2045-2322\"}},\"pubYear\":\"2024\",\"pageInfo\":\"31978\",\"abstractText\":\"The
+        phenomenon that the depression risk among doctoral students is higher than
+        that of other groups should not be ignored. Despite this, studies specifically
+        addressing depression risk in doctoral students are relatively scarce, and
+        existing findings are not universally applicable. Using neural network feature
+        extraction technology, this study aims to investigate the factors contributing
+        to the high depression risk of doctoral students and effectively identify
+        doctoral students at depression risk, so as to propose corresponding improvement
+        strategies to prevent and intervene doctoral students with depression risk
+        for universities. Based on the data from the 2019 Nature Global Doctoral Student
+        Survey, we first screened 13 highly relevant features from a total of 37 features
+        potentially related to the risk of depression among doctoral students by Random
+        Forest algorithm. Subsequently, we trained the optimal prediction model to
+        predict the doctoral students with depression risk using a Multilayer Perceptron
+        (MLP), achieving an accuracy of 89.09% on the test set. Additionally, this
+        study constructed a group portrait of doctoral students at risk of depression,
+        and found that overwork, poor work-life balance, and poor supervisor-student
+        relationship, etc., were typical characteristics among these students. Finally,
+        we proposed several improvement strategies for higher education institutions.
+        Our research offers a new perspective on utilising artificial intelligence
+        (AI) methods to tackle educational challenges, particularly in the identification
+        and support of doctoral students at risk of depression, thereby enhancing
+        their mental health.\",\"affiliation\":\"School of Education, Beijing Institute
+        of Technology, Beijing, 100081, China.\",\"publicationStatus\":\"epublish\",\"language\":\"eng\",\"pubModel\":\"Electronic\",\"pubTypeList\":{\"pubType\":[\"Research
+        Support, Non-U.S. Gov't\",\"research-article\",\"Journal Article\"]},\"grantsList\":{\"grant\":[{\"grantId\":\"2024CX13003\",\"agency\":\"Beijing
+        Institute of Technology\",\"orderIn\":0}]},\"meshHeadingList\":{\"meshHeading\":[{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Humans\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Risk
+        Factors\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Depression\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"DI\",\"qualifierName\":\"diagnosis\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"EP\",\"qualifierName\":\"epidemiology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Students\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Education,
+        Graduate\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Universities\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Artificial
+        Intelligence\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Adult\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Female\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Male\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Neural
+        Networks, Computer\"}]},\"keywordList\":{\"keyword\":[\"Machine Learning\",\"Depression
+        Risk\",\"Doctoral Students\",\"Group Portrait\"]},\"subsetList\":{\"subset\":[{\"code\":\"IM\",\"name\":\"Index
+        Medicus\"}]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"doi\",\"site\":\"Unpaywall\",\"url\":\"https://doi.org/10.1038/s41598-024-83617-8\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"doi\",\"site\":\"Unpaywall\",\"url\":\"https://doi.org/10.1038/s41598-024-83617-8\"},{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1038/s41598-024-83617-8\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC11685965\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC11685965?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":0,\"hasData\":\"N\",\"hasReferences\":\"Y\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"Y\",\"license\":\"cc
+        by-nc-nd\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2024-12-31\",\"dateOfCreation\":\"2024-12-31\",\"firstIndexDate\":\"2025-01-01\",\"fullTextReceivedDate\":\"2025-01-03\",\"dateOfRevision\":\"2025-03-25\",\"electronicPublicationDate\":\"2024-12-30\",\"firstPublicationDate\":\"2024-12-30\"}]}}"
+    headers:
+      Access-Control-Allow-Headers:
+      - Content-Type,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Max-Age:
+      - '3600'
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json;charset=UTF-8
+      Date:
+      - Thu, 28 May 2026 15:13:23 GMT
+      Server:
+      - nginx/1.17.7
+      Set-Cookie:
+      - JSESSIONID=7F410A651B547CF70BE028561548FC0A; Path=/europepmc/webservices/;
+        HttpOnly
+      Strict-Transport-Security:
+      - max-age=0
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
 version: 1

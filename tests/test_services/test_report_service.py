@@ -6,8 +6,9 @@ from pathlib import Path
 import openpyxl
 import pytest
 
-from epmcminer.api.download_result import DownloadResult
-from epmcminer.api.models import Paper, SearchParams
+from epmcminer.api.paper import Paper
+from epmcminer.api.search_params import SearchParams
+from epmcminer.services.download_result import DownloadResult
 from epmcminer.services.report_service import REPORT_COLUMNS, ReportService
 
 # ---------------------------------------------------------------------------

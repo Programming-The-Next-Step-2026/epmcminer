@@ -2,6 +2,7 @@
 
 import dataclasses
 import os
+import threading
 from pathlib import Path
 
 from PyQt6.QtCore import QPoint, Qt, QThread, pyqtSignal
@@ -149,8 +150,9 @@ class PreviewWorker(QThread):
     """Background thread that calls SearchService.preview().
 
     Attributes:
-        result_ready: Emitted with the SearchResult on success.
-        error_occurred: Emitted with an error message string on failure.
+        result_ready: Emitted with the SearchResult on success (unless cancelled).
+        error_occurred: Emitted with an error message string on failure (unless cancelled).
+        cancel_event: Set this to discard the result when it arrives instead of emitting.
     """
 
     result_ready = pyqtSignal(SearchResult)
@@ -166,15 +168,23 @@ class PreviewWorker(QThread):
         super().__init__()
         self._service = service
         self._params = params
+        self.cancel_event = threading.Event()
 
     def run(self) -> None:
-        """Execute the preview call and emit the appropriate signal."""
+        """Execute the preview call and emit the appropriate signal.
+
+        If ``cancel_event`` is set before the HTTP call returns, the result is
+        silently discarded so that a superseded search does not overwrite the
+        UI state produced by a newer one.
+        """
         try:
             result = self._service.preview(self._params)
-            self.result_ready.emit(result)
+            if not self.cancel_event.is_set():
+                self.result_ready.emit(result)
         except Exception as exc:  # noqa: BLE001
-            _logger.exception("PreviewWorker failed: %s", exc)
-            self.error_occurred.emit(str(exc))
+            if not self.cancel_event.is_set():
+                _logger.exception("PreviewWorker failed: %s", exc)
+                self.error_occurred.emit(str(exc))
 
 
 # ---------------------------------------------------------------------------
@@ -244,8 +254,10 @@ class ScreenPreview(QWidget):
         self._show_loading()
 
         if self._worker is not None and self._worker.isRunning():
-            self._worker.quit()
-            self._worker.wait()
+            # Signal the old worker to discard its result and let it finish in
+            # the background.  quit()+wait() would block the main thread for
+            # the full HTTP timeout; cancel_event avoids that.
+            self._worker.cancel_event.set()
 
         self._worker = PreviewWorker(self._service, params)
         self._worker.result_ready.connect(self._on_result)

@@ -8,7 +8,9 @@ from epmcminer.api.client import (
     SORT_BY_DATE,
     EuropePMCClient,
 )
-from epmcminer.api.models import Paper, SearchParams, SearchResult
+from epmcminer.api.paper import Paper
+from epmcminer.api.search_params import SearchParams
+from epmcminer.api.search_result import SearchResult
 
 PREVIEW_PAGE_SIZE = 10
 

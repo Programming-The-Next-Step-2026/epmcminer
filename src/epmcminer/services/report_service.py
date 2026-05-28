@@ -11,8 +11,8 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import cm
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
-from epmcminer.api.download_result import DownloadResult
-from epmcminer.api.models import SearchParams
+from epmcminer.api.search_params import SearchParams
+from epmcminer.services.download_result import DownloadResult
 from epmcminer.utils.logger import get_logger
 
 _logger = get_logger(__name__)

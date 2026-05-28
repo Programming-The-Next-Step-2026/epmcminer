@@ -1,5 +1,7 @@
 """Reusable progress and loading widget used on the Preview and Download screens."""
 
+from typing import NamedTuple
+
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import (
     QFrame,
@@ -12,6 +14,19 @@ from PyQt6.QtWidgets import (
 )
 
 import epmcminer.gui.theme as theme
+
+
+class _StatsWidgets(NamedTuple):
+    """Named container for the widgets returned by :meth:`ProgressWidget._make_stats_row`."""
+
+    row: QWidget
+    pct_label: QLabel
+    count_label: QLabel
+    thread_row: QWidget
+    thread_dots: list[QFrame]
+    thread_label: QLabel
+    eta_col: QWidget
+    eta_value: QLabel
 
 # Colour tokens from ui.jsx / handoff.jsx.
 # Qt QSS rgba() uses 0-255 integer alpha; 0.06×255≈15.
@@ -163,16 +178,15 @@ class ProgressWidget(QWidget):
         )
         layout.addWidget(self._loading_row)
 
-        (
-            self._stats_row,
-            self._pct_label,
-            self._count_label,
-            self._thread_row,
-            self._thread_dots,
-            self._thread_label,
-            self._eta_col,
-            self._eta_value,
-        ) = self._make_stats_row()
+        stats = self._make_stats_row()
+        self._stats_row = stats.row
+        self._pct_label = stats.pct_label
+        self._count_label = stats.count_label
+        self._thread_row = stats.thread_row
+        self._thread_dots = stats.thread_dots
+        self._thread_label = stats.thread_label
+        self._eta_col = stats.eta_col
+        self._eta_value = stats.eta_value
         layout.addWidget(self._stats_row)
 
     def _make_bar(self) -> QProgressBar:
@@ -203,11 +217,7 @@ class ProgressWidget(QWidget):
         layout.addStretch()
         return row, dot_frames, msg
 
-    def _make_stats_row(
-        self,
-    ) -> tuple[
-        QWidget, QLabel, QLabel, QWidget, list[QFrame], QLabel, QWidget, QLabel
-    ]:
+    def _make_stats_row(self) -> _StatsWidgets:
         row = QWidget()
         layout = QHBoxLayout(row)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -239,8 +249,15 @@ class ProgressWidget(QWidget):
         eta_col, eta_value = self._make_eta_col()
         layout.addWidget(eta_col)
 
-        return (
-            row, pct_label, count_label, thread_row, thread_dots, thread_label, eta_col, eta_value
+        return _StatsWidgets(
+            row=row,
+            pct_label=pct_label,
+            count_label=count_label,
+            thread_row=thread_row,
+            thread_dots=thread_dots,
+            thread_label=thread_label,
+            eta_col=eta_col,
+            eta_value=eta_value,
         )
 
     def _make_thread_row(self) -> tuple[QWidget, list[QFrame], QLabel]:

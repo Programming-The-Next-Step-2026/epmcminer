@@ -12,7 +12,8 @@ from pathlib import Path
 import pytest
 
 from epmcminer.api.client import EuropePMCClient
-from epmcminer.api.models import SearchParams, SearchResult
+from epmcminer.api.search_params import SearchParams
+from epmcminer.api.search_result import SearchResult
 from epmcminer.services.search_service import SearchService
 
 pytestmark = [pytest.mark.vcr, pytest.mark.integration]

@@ -11,8 +11,8 @@ from epmcminer.api.client import (
     EuropePMCClient,
     InvalidPdfContentError,
 )
-from epmcminer.api.download_result import DownloadResult
-from epmcminer.api.models import SearchParams
+from epmcminer.api.search_params import SearchParams
+from epmcminer.services.download_result import DownloadResult
 from epmcminer.services.search_service import SORT_ORDER_MAP, SearchService, paper_from_raw
 from epmcminer.utils.file_utils import build_pdf_filename
 from epmcminer.utils.logger import get_logger, setup_logger
@@ -173,8 +173,8 @@ class DownloadService:
                 active += 1
             result = self._download_one(raw, pdfs_dir, cancel_event)
             with lock:
-                active -= 1
                 result.active_threads = active
+                active -= 1
             return result
 
         with ThreadPoolExecutor(max_workers=self.MAX_WORKERS) as executor:

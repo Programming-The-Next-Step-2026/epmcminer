@@ -8,8 +8,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from PyQt6.QtWidgets import QApplication
 
-from epmcminer.api.models import Paper, SearchParams, SearchResult
 from epmcminer.gui.screens.screen_preview import PreviewWorker, ScreenPreview
+from epmcminer.services.models import Paper, SearchParams, SearchResult
 
 # ---------------------------------------------------------------------------
 # Helpers

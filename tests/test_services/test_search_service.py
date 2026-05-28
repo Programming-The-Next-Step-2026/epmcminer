@@ -6,7 +6,8 @@ from unittest.mock import MagicMock
 import pytest
 
 from epmcminer.api.client import SORT_BY_CITATIONS, SORT_BY_DATE, APIError
-from epmcminer.api.models import SearchParams, SearchResult
+from epmcminer.api.search_params import SearchParams
+from epmcminer.api.search_result import SearchResult
 from epmcminer.services.search_service import PREVIEW_PAGE_SIZE, SearchService
 
 # ---------------------------------------------------------------------------

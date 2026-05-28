@@ -1689,4 +1689,613 @@ interactions:
     status:
       code: 200
       message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - JSESSIONID=E5C04E8B6B646D5B403328C09E3B7320
+      User-Agent:
+      - python-requests/2.32.5
+    method: GET
+    uri: https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%28depression%29+AND+%28HAS_FT%3AY+OR+HAS_FREE_FULLTEXT%3AY%29&format=json&resultType=core&pageSize=5&cursorMark=%2A
+  response:
+    body:
+      string: "{\"version\":\"6.9\",\"hitCount\":1173773,\"nextCursorMark\":\"AoIIQAjWNyg1NTYzNzc5NA==\",\"nextPageUrl\":\"https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=(depression)
+        AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)&cursorMark=AoIIQAjWNyg1NTYzNzc5NA==&resultType=core&pageSize=5&format=json\",\"request\":{\"queryString\":\"(depression)
+        AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)\",\"resultType\":\"core\",\"cursorMark\":\"%2A\",\"pageSize\":5,\"sort\":\"\",\"synonym\":false},\"resultList\":{\"result\":[{\"id\":\"PMC13199367\",\"source\":\"PMC\",\"pmcid\":\"PMC13199367\",\"fullTextIdList\":{\"fullTextId\":[\"PMC13199367\"]},\"title\":\"Depression
+        among married individuals: new evidence in T\xFCrkiye\",\"authorString\":\"\xDCnver
+        \u015E, Alkan \xD6, A\u011F\u0131rman E.\",\"authorList\":{\"author\":[{\"fullName\":\"\xDCnver
+        \u015E\",\"firstName\":\"\u015Eeyda\",\"lastName\":\"\xDCnver\",\"initials\":\"\u015E\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Econometrics, Faculty of Economics and Administrative Sciences, Ataturk
+        University , ,\_\"}]}},{\"fullName\":\"Alkan \xD6\",\"firstName\":\"\xD6mer\",\"lastName\":\"Alkan\",\"initials\":\"\xD6\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Econometrics, Faculty of Economics and Administrative Sciences, Ataturk
+        University , ,\_\"}]}},{\"fullName\":\"A\u011F\u0131rman E\",\"firstName\":\"Ensar\",\"lastName\":\"A\u011F\u0131rman\",\"initials\":\"E\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Business Administration, Faculty of Economics and Administrative Sciences,
+        Ataturk University , ,\_\"}]}}]},\"journalInfo\":{\"volume\":\"17\",\"journalIssueId\":4201317,\"dateOfPublication\":\"
+        \",\"monthOfPublication\":0,\"yearOfPublication\":0,\"journal\":{\"title\":\"Frontiers
+        in psychiatry\",\"medlineAbbreviation\":\"Front Psychiatry\",\"isoabbreviation\":\"Front
+        Psychiatry\",\"nlmid\":\"101545006\",\"essn\":\"1664-0640\",\"issn\":\"1664-0640\"}},\"language\":\"eng\",\"pubModel\":\"Undetermined\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"keywordList\":{\"keyword\":[\"Depression\",\"Binary Logistic
+        Regression\",\"Married Individuals\",\"T\xFCrkiye\",\"T\xFCrkiye Health Survey\"]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Free\",\"availabilityCode\":\"F\",\"documentStyle\":\"html\",\"site\":\"PubMedCentral\",\"url\":\"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC13199367/?tool=EBI\"},{\"availability\":\"Free\",\"availabilityCode\":\"F\",\"documentStyle\":\"pdf\",\"site\":\"PubMedCentral\",\"url\":\"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC13199367/pdf/?tool=EBI\"},{\"availability\":\"Free\",\"availabilityCode\":\"F\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13199367\"},{\"availability\":\"Free\",\"availabilityCode\":\"F\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13199367?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":0,\"hasData\":\"N\",\"hasReferences\":\"N\",\"hasTextMinedTerms\":\"N\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"N\",\"license\":\"cc
+        by\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCreation\":\"2026-05-27\",\"firstIndexDate\":\"2026-05-27\",\"fullTextReceivedDate\":\"2026-05-27\",\"dateOfRevision\":\"2026-05-27\",\"firstPublicationDate\":\"2026-05-27\"},{\"id\":\"42143768\",\"source\":\"MED\",\"pmid\":\"42143768\",\"pmcid\":\"PMC13180441\",\"fullTextIdList\":{\"fullTextId\":[\"PMC13180441\"]},\"doi\":\"10.1002/cre2.70379\",\"title\":\"Evaluation
+        of Osteoprotegerin (OPG) and Receptor Activator of Nuclear Factor Kappa-B
+        Ligand (RANKL) Biomarker Concentrations in the Saliva of Patients with Periodontitis
+        and Depression.\",\"authorString\":\"Esmaeilnejad A, Lafzi A, Neishabouri
+        SM, Bigham MM.\",\"authorList\":{\"author\":[{\"fullName\":\"Esmaeilnejad
+        A\",\"firstName\":\"Azadeh\",\"lastName\":\"Esmaeilnejad\",\"initials\":\"A\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Periodontics, School of Dentistry, Shahid Beheshti University of Medical
+        Sciences, Tehran, Iran.\"}]}},{\"fullName\":\"Lafzi A\",\"firstName\":\"Ardeshir\",\"lastName\":\"Lafzi\",\"initials\":\"A\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Periodontics, School of Dentistry, Shahid Beheshti University of Medical
+        Sciences, Tehran, Iran.\"}]}},{\"fullName\":\"Neishabouri SM\",\"firstName\":\"Seyedeh
+        Morvarid\",\"lastName\":\"Neishabouri\",\"initials\":\"SM\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Psychiatry, Kermanshah University of Medical Science, Kermanshah, Iran.\"}]}},{\"fullName\":\"Bigham
+        MM\",\"firstName\":\"Mohammad Mohsen\",\"lastName\":\"Bigham\",\"initials\":\"MM\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0009-0002-4906-3865\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"School
+        of Dentistry, Shahid Beheshti University of Medical Sciences, Tehran, Iran.\"}]}}]},\"authorIdList\":{\"authorId\":[{\"type\":\"ORCID\",\"value\":\"0009-0002-4906-3865\"}]},\"dataLinksTagsList\":{\"dataLinkstag\":[\"altmetrics\"]},\"journalInfo\":{\"issue\":\"3\",\"volume\":\"12\",\"journalIssueId\":4188463,\"dateOfPublication\":\"2026
+        Jun\",\"monthOfPublication\":6,\"yearOfPublication\":2026,\"printPublicationDate\":\"2026-06-01\",\"journal\":{\"title\":\"Clinical
+        and experimental dental research\",\"medlineAbbreviation\":\"Clin Exp Dent
+        Res\",\"isoabbreviation\":\"Clin Exp Dent Res\",\"nlmid\":\"101692332\",\"essn\":\"2057-4347\",\"issn\":\"2057-4347\"}},\"pubYear\":\"2026\",\"pageInfo\":\"e70379\",\"abstractText\":\"<h4>Background
+        and objectives</h4>Periodontitis is a chronic inflammatory disease affecting
+        tooth-supporting structures, while depression is a common mental disorder
+        with emotional and behavioral disturbances. Previous studies suggest a potential
+        association between the two conditions. This study aimed to evaluate salivary
+        concentrations of Receptor Activator of Nuclear Factor Kappa-B Ligand (RANKL)
+        and Osteoprotegerin (OPG)-key regulators of osteoclast activity and periodontal
+        bone resorption-in patients with periodontitis and depression.<h4>Materials
+        and methods</h4>In this cross-sectional study, 80 patients from Shahid Beheshti
+        University Dental School were categorized into four groups based on the presence
+        or absence of periodontitis and depression. Periodontitis was defined as having
+        \u2265\u20092 teeth in \u2265\u20092 quadrants with bleeding on probing, pocket
+        depth >\u20093\u2009mm, and interdental clinical attachment loss \u2265\u20091\u2009mm.
+        Depression was assessed using the Persian PHQ-9, and individuals meeting criteria
+        for major depressive disorder(MDD) were classified as depressed. Unstimulated
+        saliva samples (1\u2009mL) were collected, stored at -20\xB0C, and analyzed
+        for OPG and RANKL using ELISA kits. Statistical analyses included two-way
+        ANOVA (SPSS v27; p\u2009<\u20090.05 significant).<h4>Results</h4>Among 80
+        participants (43 females, 37 males; mean age 45.3 years), RANKL, OPG, and
+        the RANKL/OPG ratio were higher in depressed individuals, but differences
+        were not statistically significant (p\u2009>\u20090.05). RANKL levels and
+        the RANKL/OPG ratio were significantly higher in patients with periodontitis
+        and increased with disease severity (p\u2009\u2264\u20090.05), while OPG showed
+        no significant change.<h4>Conclusion</h4>Periodontitis and its severity significantly
+        influence salivary RANKL and the RANKL/OPG ratio, while depression does not.
+        Within the limits of this cross-sectional design, no evidence was found that
+        RANKL and OPG act as intermediary biomarkers linking depression and periodontitis.\",\"affiliation\":\"Department
+        of Periodontics, School of Dentistry, Shahid Beheshti University of Medical
+        Sciences, Tehran, Iran.\",\"publicationStatus\":\"ppublish\",\"language\":\"eng\",\"pubModel\":\"Print\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"grantsList\":{\"grant\":[{\"agency\":\"Shahid Beheshti University
+        of Medical Sciences\",\"orderIn\":0}]},\"meshHeadingList\":{\"meshHeading\":[{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Saliva\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"ME\",\"qualifierName\":\"metabolism\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"CH\",\"qualifierName\":\"chemistry\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Humans\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Periodontitis\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"CO\",\"qualifierName\":\"complications\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"ME\",\"qualifierName\":\"metabolism\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Cross-Sectional
+        Studies\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Depression\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"CO\",\"qualifierName\":\"complications\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"ME\",\"qualifierName\":\"metabolism\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Adult\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Middle
+        Aged\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Female\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Male\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"RANK
+        Ligand\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"AN\",\"qualifierName\":\"analysis\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"ME\",\"qualifierName\":\"metabolism\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Osteoprotegerin\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"AN\",\"qualifierName\":\"analysis\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"ME\",\"qualifierName\":\"metabolism\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Biomarkers\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"AN\",\"qualifierName\":\"analysis\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"ME\",\"qualifierName\":\"metabolism\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Major
+        Depressive Disorder\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"ME\",\"qualifierName\":\"metabolism\",\"majorTopic_YN\":\"N\"}]}}]},\"keywordList\":{\"keyword\":[\"Saliva\",\"Depression\",\"Biomarker\",\"Periodontitis\",\"Rankl\",\"Opg\"]},\"chemicalList\":{\"chemical\":[{\"name\":\"osteoprotegerin\",\"registryNumber\":\"0\"},{\"name\":\"TNFRSF11B
+        protein, human\",\"registryNumber\":\"0\"},{\"name\":\"RANK ligand\",\"registryNumber\":\"0\"},{\"name\":\"TNFSF11
+        protein, human\",\"registryNumber\":\"0\"},{\"name\":\"Biomarkers\",\"registryNumber\":\"0\"}]},\"subsetList\":{\"subset\":[{\"code\":\"IM\",\"name\":\"Index
+        Medicus\"}]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1002/cre2.70379\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13180441\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13180441?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":0,\"hasData\":\"N\",\"hasReferences\":\"N\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"Y\",\"license\":\"cc
+        by\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2026-05-17\",\"dateOfCreation\":\"2026-05-17\",\"firstIndexDate\":\"2026-05-19\",\"fullTextReceivedDate\":\"2026-05-20\",\"dateOfRevision\":\"2026-05-20\",\"firstPublicationDate\":\"2026-06-01\"},{\"id\":\"42057765\",\"source\":\"MED\",\"pmid\":\"42057765\",\"pmcid\":\"PMC13129703\",\"fullTextIdList\":{\"fullTextId\":[\"PMC13129703\"]},\"doi\":\"10.1002/npr2.70125\",\"title\":\"Glutathione-Related
+        Metabolite Levels and Enzyme Activities in Depression: A Systematic Review
+        and Meta-Analysis.\",\"authorString\":\"Etani T, Hondo N, Moriguchi S, Yoshida
+        K, Moriyama S, Takahashi K, Moritake T, Nakamura Y, Kani R, Honda S, Wada
+        M, Tsugawa S, Mori Y, Segawa H, Kaku T, Uchida H, Nakajima S.\",\"authorList\":{\"author\":[{\"fullName\":\"Etani
+        T\",\"firstName\":\"Takahide\",\"lastName\":\"Etani\",\"initials\":\"T\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0003-0027-2551\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Keio
+        University Hospital, Shinjuku-ku, Tokyo, Japan.\"},{\"affiliation\":\"Japanese
+        Red Cross Ashikaga Hospital, Ashikaga-shi, Tochigi, Japan.\"},{\"affiliation\":\"Graduate
+        School of Media and Governance, Keio University, Fujisawa-shi, Kanagawa, Japan.\"}]}},{\"fullName\":\"Hondo
+        N\",\"firstName\":\"Nobuaki\",\"lastName\":\"Hondo\",\"initials\":\"N\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0009-0000-2452-7841\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Neuropsychiatry, Keio University School of Medicine, Shinjuku-ku, Tokyo,
+        Japan.\"}]}},{\"fullName\":\"Moriguchi S\",\"firstName\":\"Sho\",\"lastName\":\"Moriguchi\",\"initials\":\"S\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0001-7536-9708\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Neuropsychiatry, Keio University School of Medicine, Shinjuku-ku, Tokyo,
+        Japan.\"},{\"affiliation\":\"National Institutes for Quantum Science and Technology,
+        Chiba-shi, Chiba, Japan.\"}]}},{\"fullName\":\"Yoshida K\",\"firstName\":\"Kazunari\",\"lastName\":\"Yoshida\",\"initials\":\"K\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-1965-9484\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Neuropsychiatry, Keio University School of Medicine, Shinjuku-ku, Tokyo,
+        Japan.\"}]}},{\"fullName\":\"Moriyama S\",\"firstName\":\"Sotaro\",\"lastName\":\"Moriyama\",\"initials\":\"S\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0001-8142-5665\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Neuropsychiatry, Keio University School of Medicine, Shinjuku-ku, Tokyo,
+        Japan.\"}]}},{\"fullName\":\"Takahashi K\",\"firstName\":\"Koki\",\"lastName\":\"Takahashi\",\"initials\":\"K\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0009-0002-8890-9325\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Neuropsychiatry, Keio University School of Medicine, Shinjuku-ku, Tokyo,
+        Japan.\"}]}},{\"fullName\":\"Moritake T\",\"firstName\":\"Tahichi\",\"lastName\":\"Moritake\",\"initials\":\"T\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Neuropsychiatry, Keio University School of Medicine, Shinjuku-ku, Tokyo,
+        Japan.\"}]}},{\"fullName\":\"Nakamura Y\",\"firstName\":\"Yumina\",\"lastName\":\"Nakamura\",\"initials\":\"Y\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Neuropsychiatry, Keio University School of Medicine, Shinjuku-ku, Tokyo,
+        Japan.\"}]}},{\"fullName\":\"Kani R\",\"firstName\":\"Ryoma\",\"lastName\":\"Kani\",\"initials\":\"R\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0009-0005-4540-445X\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Postgraduate
+        Education Center Kameda Medical Center, Kamogawa-shi, Chiba, Japan.\"}]}},{\"fullName\":\"Honda
+        S\",\"firstName\":\"Shiori\",\"lastName\":\"Honda\",\"initials\":\"S\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Neuropsychiatry, Keio University School of Medicine, Shinjuku-ku, Tokyo,
+        Japan.\"},{\"affiliation\":\"Department of Psychiatry and Behavioral Health,
+        Renaissance School of Medicine, Stony Brook University, Stony Brook, New York,
+        USA.\"}]}},{\"fullName\":\"Wada M\",\"firstName\":\"Masataka\",\"lastName\":\"Wada\",\"initials\":\"M\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-3937-3619\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Neuropsychiatry, Keio University School of Medicine, Shinjuku-ku, Tokyo,
+        Japan.\"},{\"affiliation\":\"Department of Psychiatry and Behavioral Sciences,
+        Stanford University, Stanford, California, USA.\"}]}},{\"fullName\":\"Tsugawa
+        S\",\"firstName\":\"Sakiko\",\"lastName\":\"Tsugawa\",\"initials\":\"S\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0001-9974-316X\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Neuropsychiatry, Keio University School of Medicine, Shinjuku-ku, Tokyo,
+        Japan.\"},{\"affiliation\":\"Department of Physiology, Graduate School of
+        Medicine, Yokohama City University, Yokohama-shi, Yokohama, Japan.\"}]}},{\"fullName\":\"Mori
+        Y\",\"firstName\":\"Yukino\",\"lastName\":\"Mori\",\"initials\":\"Y\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"National
+        Kohnodai Hospital Medical Center, Ichikawa-shi, Chiba, Japan.\"}]}},{\"fullName\":\"Segawa
+        H\",\"firstName\":\"Hikari\",\"lastName\":\"Segawa\",\"initials\":\"H\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"National
+        Hospital Organizations Saitama Hospital, Wako-shi, Saitama, Japan.\"}]}},{\"fullName\":\"Kaku
+        T\",\"firstName\":\"Tony\",\"lastName\":\"Kaku\",\"initials\":\"T\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0009-0000-4870-4021\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Neuropsychiatry, Keio University School of Medicine, Shinjuku-ku, Tokyo,
+        Japan.\"}]}},{\"fullName\":\"Uchida H\",\"firstName\":\"Hiroyuki\",\"lastName\":\"Uchida\",\"initials\":\"H\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-0628-7036\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Neuropsychiatry, Keio University School of Medicine, Shinjuku-ku, Tokyo,
+        Japan.\"}]}},{\"fullName\":\"Nakajima S\",\"firstName\":\"Shinichiro\",\"lastName\":\"Nakajima\",\"initials\":\"S\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0003-4229-1910\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Neuropsychiatry, Keio University School of Medicine, Shinjuku-ku, Tokyo,
+        Japan.\"},{\"affiliation\":\"Multimodal Imaging Group, Research Imaging Centre,
+        Centre for Addiction and Mental Health, Toronto, Ontario, Canada.\"}]}}]},\"authorIdList\":{\"authorId\":[{\"type\":\"ORCID\",\"value\":\"0000-0001-7536-9708\"},{\"type\":\"ORCID\",\"value\":\"0000-0001-8142-5665\"},{\"type\":\"ORCID\",\"value\":\"0000-0001-9974-316X\"},{\"type\":\"ORCID\",\"value\":\"0000-0002-0628-7036\"},{\"type\":\"ORCID\",\"value\":\"0000-0002-1965-9484\"},{\"type\":\"ORCID\",\"value\":\"0000-0002-3937-3619\"},{\"type\":\"ORCID\",\"value\":\"0000-0003-0027-2551\"},{\"type\":\"ORCID\",\"value\":\"0000-0003-4229-1910\"},{\"type\":\"ORCID\",\"value\":\"0009-0000-2452-7841\"},{\"type\":\"ORCID\",\"value\":\"0009-0000-4870-4021\"},{\"type\":\"ORCID\",\"value\":\"0009-0002-8890-9325\"},{\"type\":\"ORCID\",\"value\":\"0009-0005-4540-445X\"}]},\"dataLinksTagsList\":{\"dataLinkstag\":[\"altmetrics\"]},\"journalInfo\":{\"issue\":\"2\",\"volume\":\"46\",\"journalIssueId\":4150977,\"dateOfPublication\":\"2026
+        Jun\",\"monthOfPublication\":6,\"yearOfPublication\":2026,\"printPublicationDate\":\"2026-06-01\",\"journal\":{\"title\":\"Neuropsychopharmacology
+        reports\",\"medlineAbbreviation\":\"Neuropsychopharmacol Rep\",\"isoabbreviation\":\"Neuropsychopharmacol
+        Rep\",\"nlmid\":\"101719700\",\"essn\":\"2574-173X\",\"issn\":\"2574-173X\"}},\"pubYear\":\"2026\",\"pageInfo\":\"e70125\",\"abstractText\":\"Recently,
+        an increasing number of studies have reported abnormal levels of glutathione
+        (GSH)-related metabolites and enzyme activities in neuroimaging and peripheral
+        samples in patients with depression, indicating abnormalities in the GSH cycle
+        in patients with depression. However, the abnormalities in the GSH cycle have
+        not been comprehensively investigated. Here, we conducted a systematic review
+        and meta-analysis to compare the levels of GSH-related metabolites (GSH and
+        GSH disulfide [GSSG]) and the activities of GSH-related enzymes (Glutathione-peroxidase
+        [GPx], GSH reductase [GR], glutamate-cysteine ligase [GCL], GSH synthetase
+        [GS], and GSH S-transferase [GST]) between patients with depression and healthy
+        controls (HC). The search was performed with MEDLINE, Embase, and PsychINFO.
+        The inclusion criteria were studies comparing levels of GSH-related metabolites
+        and enzyme activities between patients with depression and HC. Standardized
+        mean differences were calculated to assess group differences. Thirty studies
+        met the eligibility criteria, which included 1019 patients and 947 HC. Our
+        meta-analysis indicated significantly decreased activity of GPx in patients
+        with depression compared with HC, while the levels of GSH and GR were not
+        significantly different between the groups. Because no studies, or an insufficient
+        number of studies, have been conducted on GSSG, GST, GCL, and GS, meta-analyses
+        were not performed for these metabolites and enzyme activities. Our findings
+        suggest that abnormal cycling of the GSH system, particularly decreased GPx
+        activity, is involved in the pathophysiology of depression and may serve as
+        a potential biomarker for this illness. Furthermore, given that no or insufficient
+        studies have been conducted on GSSG, GST, GCL, and GS, this study highlights
+        the need for further research to fully elucidate the GSH cycle in patients
+        with depression.\",\"affiliation\":\"Keio University Hospital, Shinjuku-ku,
+        Tokyo, Japan.\",\"publicationStatus\":\"ppublish\",\"language\":\"eng\",\"pubModel\":\"Print\",\"pubTypeList\":{\"pubType\":[\"Meta-Analysis\",\"Systematic
+        Review\",\"review-article\",\"Review\",\"Journal Article\"]},\"grantsList\":{\"grant\":[{\"grantId\":\"22H03002\",\"agency\":\"Japan
+        Society for the Promotion of Science\",\"orderIn\":0},{\"agency\":\"Takeda
+        Science Foundation\",\"orderIn\":0},{\"agency\":\"Naito Foundation\",\"orderIn\":0},{\"grantId\":\"18H02755\",\"agency\":\"Japan
+        Society for the Promotion of Science\",\"orderIn\":0},{\"grantId\":\"JP24wm0625302\",\"agency\":\"Japan
+        Agency for Medical Research and Development\",\"orderIn\":0},{\"agency\":\"Japan
+        Research Foundation for Clinical Pharmacology\",\"orderIn\":0},{\"agency\":\"Watanabe
+        Foundation\",\"orderIn\":0}]},\"meshHeadingList\":{\"meshHeading\":[{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Humans\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Glutathione
+        Transferase\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"ME\",\"qualifierName\":\"metabolism\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Glutathione\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"ME\",\"qualifierName\":\"metabolism\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Depression\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"EN\",\"qualifierName\":\"enzymology\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"ME\",\"qualifierName\":\"metabolism\",\"majorTopic_YN\":\"N\"}]}}]},\"keywordList\":{\"keyword\":[\"Glutathione\",\"Oxidative
+        stress\",\"Depression\",\"Systematic Review And Meta\u2010analysis\"]},\"chemicalList\":{\"chemical\":[{\"name\":\"Glutathione
+        Transferase\",\"registryNumber\":\"EC 2.5.1.18\"},{\"name\":\"Glutathione\",\"registryNumber\":\"GAN16C9B8O\"}]},\"subsetList\":{\"subset\":[{\"code\":\"IM\",\"name\":\"Index
+        Medicus\"}]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1002/npr2.70125\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13129703\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13129703?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"Y\",\"citedByCount\":0,\"hasData\":\"Y\",\"hasReferences\":\"Y\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"Y\",\"license\":\"cc
+        by\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2026-04-30\",\"dateOfCreation\":\"2026-04-30\",\"firstIndexDate\":\"2026-04-30\",\"fullTextReceivedDate\":\"2026-05-18\",\"dateOfRevision\":\"2026-05-02\",\"firstPublicationDate\":\"2026-06-01\"},{\"id\":\"PMC13182083\",\"source\":\"PMC\",\"pmcid\":\"PMC13182083\",\"fullTextIdList\":{\"fullTextId\":[\"PMC13182083\"]},\"title\":\"Screen
+        time, physical activity, sleep, and depression risk in adolescents: an observational
+        study based on the compositional isotemporal substitution model\",\"authorString\":\"Guo
+        H, Man M, Hu Z, Liu Y, Chen W, Wang S, Tang X, Geng A, Ruan W, Xu W, Jiang
+        K, Shi H, Du J, Jin G, Zhang X, Zhang Z.\",\"authorList\":{\"author\":[{\"fullName\":\"Guo
+        H\",\"firstName\":\"Hao\",\"lastName\":\"Guo\",\"initials\":\"H\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Epidemiology and Biostatistics, School of Public Health, Anhui Medical
+        University , ,\"}]}},{\"fullName\":\"Man M\",\"firstName\":\"Mengting\",\"lastName\":\"Man\",\"initials\":\"M\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Epidemiology and Biostatistics, School of Public Health, Anhui Medical
+        University , ,\"}]}},{\"fullName\":\"Hu Z\",\"firstName\":\"Zheng\",\"lastName\":\"Hu\",\"initials\":\"Z\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Epidemiology and Biostatistics, School of Public Health, Anhui Medical
+        University , ,\"}]}},{\"fullName\":\"Liu Y\",\"firstName\":\"Yun\",\"lastName\":\"Liu\",\"initials\":\"Y\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Epidemiology and Biostatistics, School of Public Health, Anhui Medical
+        University , ,\"}]}},{\"fullName\":\"Chen W\",\"firstName\":\"Wen\",\"lastName\":\"Chen\",\"initials\":\"W\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Epidemiology and Biostatistics, School of Public Health, Anhui Medical
+        University , ,\"}]}},{\"fullName\":\"Wang S\",\"firstName\":\"Sainan\",\"lastName\":\"Wang\",\"initials\":\"S\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Epidemiology and Biostatistics, School of Public Health, Anhui Medical
+        University , ,\"}]}},{\"fullName\":\"Tang X\",\"firstName\":\"Xinmiao\",\"lastName\":\"Tang\",\"initials\":\"X\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Hefei
+        168 High School , ,\"}]}},{\"fullName\":\"Geng A\",\"firstName\":\"Anyi\",\"lastName\":\"Geng\",\"initials\":\"A\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Epidemiology and Biostatistics, School of Public Health, Anhui Medical
+        University , ,\"}]}},{\"fullName\":\"Ruan W\",\"firstName\":\"Wenhua\",\"lastName\":\"Ruan\",\"initials\":\"W\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Epidemiology and Biostatistics, School of Public Health, Anhui Medical
+        University , ,\"}]}},{\"fullName\":\"Xu W\",\"firstName\":\"Wenzhuo\",\"lastName\":\"Xu\",\"initials\":\"W\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Epidemiology and Biostatistics, School of Public Health, Anhui Medical
+        University , ,\"}]}},{\"fullName\":\"Jiang K\",\"firstName\":\"Kele\",\"lastName\":\"Jiang\",\"initials\":\"K\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Epidemiology and Biostatistics, School of Public Health, Anhui Medical
+        University , ,\"}]}},{\"fullName\":\"Shi H\",\"firstName\":\"Haiyan\",\"lastName\":\"Shi\",\"initials\":\"H\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Epidemiology and Biostatistics, School of Public Health, Anhui Medical
+        University , ,\"}]}},{\"fullName\":\"Du J\",\"firstName\":\"Jun\",\"lastName\":\"Du\",\"initials\":\"J\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Epidemiology and Biostatistics, School of Public Health, Anhui Medical
+        University , ,\"}]}},{\"fullName\":\"Jin G\",\"firstName\":\"Guifang\",\"lastName\":\"Jin\",\"initials\":\"G\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Epidemiology and Biostatistics, School of Public Health, Anhui Medical
+        University , ,\"}]}},{\"fullName\":\"Zhang X\",\"firstName\":\"Xiaopeng\",\"lastName\":\"Zhang\",\"initials\":\"X\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Hefei
+        Center for Disease Control and Prevention , ,\"}]}},{\"fullName\":\"Zhang
+        Z\",\"firstName\":\"Zhihua\",\"lastName\":\"Zhang\",\"initials\":\"Z\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Epidemiology and Biostatistics, School of Public Health, Anhui Medical
+        University , ,\"}]}}]},\"journalInfo\":{\"volume\":\"14\",\"journalIssueId\":4196379,\"dateOfPublication\":\"
+        \",\"monthOfPublication\":0,\"yearOfPublication\":0,\"journal\":{\"title\":\"Frontiers
+        in public health\",\"medlineAbbreviation\":\"Front Public Health\",\"isoabbreviation\":\"Front
+        Public Health\",\"nlmid\":\"101616579\",\"essn\":\"2296-2565\",\"issn\":\"2296-2565\"}},\"language\":\"eng\",\"pubModel\":\"Undetermined\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"keywordList\":{\"keyword\":[\"Depression\",\"Adolescents\",\"Physical
+        Activity\",\"Screen Time\",\"Compositional Isotemporal Substitution Model\"]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Free\",\"availabilityCode\":\"F\",\"documentStyle\":\"html\",\"site\":\"PubMedCentral\",\"url\":\"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC13182083/?tool=EBI\"},{\"availability\":\"Free\",\"availabilityCode\":\"F\",\"documentStyle\":\"pdf\",\"site\":\"PubMedCentral\",\"url\":\"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC13182083/pdf/?tool=EBI\"},{\"availability\":\"Free\",\"availabilityCode\":\"F\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13182083\"},{\"availability\":\"Free\",\"availabilityCode\":\"F\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13182083?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":0,\"hasData\":\"N\",\"hasReferences\":\"N\",\"hasTextMinedTerms\":\"N\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"N\",\"license\":\"cc
+        by\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCreation\":\"2026-05-20\",\"firstIndexDate\":\"2026-05-20\",\"fullTextReceivedDate\":\"2026-05-20\",\"dateOfRevision\":\"2026-05-20\",\"firstPublicationDate\":\"2026-05-20\"},{\"id\":\"PMC13199281\",\"source\":\"PMC\",\"pmcid\":\"PMC13199281\",\"fullTextIdList\":{\"fullTextId\":[\"PMC13199281\"]},\"title\":\"The
+        correlation between phubbing and depression anxiety stress of first-year medical
+        students: the mediating role of sedentary behavior\",\"authorString\":\"Peng
+        M, Jiang Y, Lu P, Li N.\",\"authorList\":{\"author\":[{\"fullName\":\"Peng
+        M\",\"firstName\":\"Mengyun\",\"lastName\":\"Peng\",\"initials\":\"M\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"School
+        of Nursing, Suzhou Medical College, Soochow University , ,\_\"}]}},{\"fullName\":\"Jiang
+        Y\",\"firstName\":\"Yingpeng\",\"lastName\":\"Jiang\",\"initials\":\"Y\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Suzhou
+        Medical College, Soochow University , ,\_\"}]}},{\"fullName\":\"Lu P\",\"firstName\":\"Pusen\",\"lastName\":\"Lu\",\"initials\":\"P\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"School
+        of Nursing, Suzhou Medical College, Soochow University , ,\_\"}]}},{\"fullName\":\"Li
+        N\",\"firstName\":\"Na\",\"lastName\":\"Li\",\"initials\":\"N\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Nursing, The Second Hospital of Dalian Medical University , ,\_\"}]}}]},\"journalInfo\":{\"volume\":\"17\",\"journalIssueId\":4201605,\"dateOfPublication\":\"
+        \",\"monthOfPublication\":0,\"yearOfPublication\":0,\"journal\":{\"title\":\"Frontiers
+        in psychiatry\",\"medlineAbbreviation\":\"Front Psychiatry\",\"isoabbreviation\":\"Front
+        Psychiatry\",\"nlmid\":\"101545006\",\"essn\":\"1664-0640\",\"issn\":\"1664-0640\"}},\"language\":\"eng\",\"pubModel\":\"Undetermined\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"keywordList\":{\"keyword\":[\"Stress\",\"Depression\",\"Anxiety\",\"Medical
+        Students\",\"Sedentary\",\"Phubbing\"]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Free\",\"availabilityCode\":\"F\",\"documentStyle\":\"html\",\"site\":\"PubMedCentral\",\"url\":\"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC13199281/?tool=EBI\"},{\"availability\":\"Free\",\"availabilityCode\":\"F\",\"documentStyle\":\"pdf\",\"site\":\"PubMedCentral\",\"url\":\"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC13199281/pdf/?tool=EBI\"},{\"availability\":\"Free\",\"availabilityCode\":\"F\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13199281\"},{\"availability\":\"Free\",\"availabilityCode\":\"F\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13199281?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":0,\"hasData\":\"N\",\"hasReferences\":\"N\",\"hasTextMinedTerms\":\"N\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"N\",\"license\":\"cc
+        by\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCreation\":\"2026-05-27\",\"firstIndexDate\":\"2026-05-27\",\"fullTextReceivedDate\":\"2026-05-27\",\"dateOfRevision\":\"2026-05-27\",\"firstPublicationDate\":\"2026-05-27\"}]}}"
+    headers:
+      Access-Control-Allow-Headers:
+      - Content-Type,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Max-Age:
+      - '3600'
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json;charset=UTF-8
+      Date:
+      - Thu, 28 May 2026 15:11:45 GMT
+      Server:
+      - nginx/1.17.7
+      Set-Cookie:
+      - JSESSIONID=49DF98D21D4F91DA5D1B527486827D93; Path=/europepmc/webservices/;
+        HttpOnly
+      Strict-Transport-Security:
+      - max-age=0
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - JSESSIONID=49DF98D21D4F91DA5D1B527486827D93
+      User-Agent:
+      - python-requests/2.32.5
+    method: GET
+    uri: https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%28depression%29+AND+%28HAS_FT%3AY+OR+HAS_FREE_FULLTEXT%3AY%29&format=json&resultType=core&pageSize=5&cursorMark=AoIIQAjWNyg1NTYzNzc5NA%3D%3D
+  response:
+    body:
+      string: "{\"version\":\"6.9\",\"hitCount\":1173773,\"nextCursorMark\":\"AoIIQAgllSg1NTU5NzM0Mg==\",\"nextPageUrl\":\"https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=(depression)
+        AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)&cursorMark=AoIIQAgllSg1NTU5NzM0Mg==&resultType=core&pageSize=5&format=json\",\"request\":{\"queryString\":\"(depression)
+        AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)\",\"resultType\":\"core\",\"cursorMark\":\"AoIIQAjWNyg1NTYzNzc5NA%3D%3D\",\"pageSize\":5,\"sort\":\"\",\"synonym\":false},\"resultList\":{\"result\":[{\"id\":\"PMC13199007\",\"source\":\"PMC\",\"pmcid\":\"PMC13199007\",\"fullTextIdList\":{\"fullTextId\":[\"PMC13199007\"]},\"title\":\"Dual
+        mediating roles of friend support and self-esteem in the association between
+        bicultural acceptance attitudes and life satisfaction among multicultural
+        adolescents in South Korea: the moderating role of depression\",\"authorString\":\"Jin
+        H, Liu H.\",\"authorList\":{\"author\":[{\"fullName\":\"Jin H\",\"firstName\":\"Hai
+        Lan\",\"lastName\":\"Jin\",\"initials\":\"H\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Global Culture Contents, Hanseo University , ,\"}]}},{\"fullName\":\"Liu
+        H\",\"firstName\":\"Hua Mei\",\"lastName\":\"Liu\",\"initials\":\"H\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Child and Adolescent Counseling Psychology, Hanseo University , ,\"}]}}]},\"journalInfo\":{\"volume\":\"17\",\"journalIssueId\":4201751,\"dateOfPublication\":\"
+        \",\"monthOfPublication\":0,\"yearOfPublication\":0,\"journal\":{\"title\":\"Frontiers
+        in psychology\",\"medlineAbbreviation\":\"Front Psychol\",\"essn\":\"1664-1078\",\"issn\":\"1664-1078\",\"isoabbreviation\":\"Front
+        Psychol\",\"nlmid\":\"101550902\"}},\"language\":\"eng\",\"pubModel\":\"Undetermined\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"keywordList\":{\"keyword\":[\"Depression\",\"Life Satisfaction\",\"Self-esteem\",\"Friend
+        Support\",\"Moderated Mediation Model\",\"Multicultural Adolescents\",\"Bicultural
+        Acceptance Attitude\"]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Free\",\"availabilityCode\":\"F\",\"documentStyle\":\"html\",\"site\":\"PubMedCentral\",\"url\":\"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC13199007/?tool=EBI\"},{\"availability\":\"Free\",\"availabilityCode\":\"F\",\"documentStyle\":\"pdf\",\"site\":\"PubMedCentral\",\"url\":\"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC13199007/pdf/?tool=EBI\"},{\"availability\":\"Free\",\"availabilityCode\":\"F\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13199007\"},{\"availability\":\"Free\",\"availabilityCode\":\"F\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13199007?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":0,\"hasData\":\"N\",\"hasReferences\":\"N\",\"hasTextMinedTerms\":\"N\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"N\",\"license\":\"cc
+        by\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCreation\":\"2026-05-27\",\"firstIndexDate\":\"2026-05-27\",\"fullTextReceivedDate\":\"2026-05-27\",\"dateOfRevision\":\"2026-05-27\",\"firstPublicationDate\":\"2026-05-27\"},{\"id\":\"41979203\",\"source\":\"MED\",\"pmid\":\"41979203\",\"pmcid\":\"PMC13073138\",\"fullTextIdList\":{\"fullTextId\":[\"PMC13073138\"]},\"doi\":\"10.20945/2359-4292-2026-0036\",\"title\":\"Assessment
+        of body composition, quality of life, and depression in women with polycystic
+        ovary syndrome.\",\"authorString\":\"Ponce T, Vig\xE1rio PDS, Almeida CP,
+        Concei\xE7\xE3o FL.\",\"authorList\":{\"author\":[{\"fullName\":\"Ponce T\",\"firstName\":\"Thalita\",\"lastName\":\"Ponce\",\"initials\":\"T\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Universidade
+        Federal do Rio de Janeiro Rio de Janeiro RJ Brasil Programa de P\xF3s-gradua\xE7\xE3o
+        em Endocrinologia, Universidade Federal do Rio de Janeiro, Rio de Janeiro,
+        RJ, Brasil.\"}]}},{\"fullName\":\"Vig\xE1rio PDS\",\"firstName\":\"Patr\xEDcia
+        Dos Santos\",\"lastName\":\"Vig\xE1rio\",\"initials\":\"PDS\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0001-6097-1456\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Centro
+        Universit\xE1rio Augusto Motta Rio de Janeiro RJ Brasil Programa de P\xF3s-gradua\xE7\xE3o
+        em Ci\xEAncias da Reabilita\xE7\xE3o, Programa de P\xF3s-gradua\xE7\xE3o em
+        Desenvolvimento Local, Centro Universit\xE1rio Augusto Motta, Rio de Janeiro,
+        RJ, Brasil.\"}]}},{\"fullName\":\"Almeida CP\",\"firstName\":\"Cloyra de Paiva\",\"lastName\":\"Almeida\",\"initials\":\"CP\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Universidade
+        Federal do Rio de Janeiro Instituto de Psiquiatria Rio de Janeiro RJ Brasil
+        Instituto de Psiquiatria da Universidade Federal do Rio de Janeiro, Rio de
+        Janeiro, RJ, Brasil.\"}]}},{\"fullName\":\"Concei\xE7\xE3o FL\",\"firstName\":\"Fl\xE1via
+        Lucia\",\"lastName\":\"Concei\xE7\xE3o\",\"initials\":\"FL\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-4977-4379\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Universidade
+        Federal do Rio de Janeiro Rio de Janeiro RJ Brasil Programa de P\xF3s-gradua\xE7\xE3o
+        em Endocrinologia, Universidade Federal do Rio de Janeiro, Rio de Janeiro,
+        RJ, Brasil.\"}]}}]},\"authorIdList\":{\"authorId\":[{\"type\":\"ORCID\",\"value\":\"0000-0001-6097-1456\"},{\"type\":\"ORCID\",\"value\":\"0000-0002-4977-4379\"}]},\"journalInfo\":{\"issue\":\"3\",\"volume\":\"70\",\"journalIssueId\":4165270,\"dateOfPublication\":\"2026
+        Jun\",\"monthOfPublication\":6,\"yearOfPublication\":2026,\"printPublicationDate\":\"2026-06-01\",\"journal\":{\"title\":\"Archives
+        of endocrinology and metabolism\",\"medlineAbbreviation\":\"Arch Endocrinol
+        Metab\",\"essn\":\"2359-4292\",\"issn\":\"2359-3997\",\"isoabbreviation\":\"Arch
+        Endocrinol Metab\",\"nlmid\":\"101652058\"}},\"pubYear\":\"2026\",\"abstractText\":\"<h4>Objective</h4>This
+        study aimed to evaluate body composition, quality of life, and depression
+        risk in women with polycystic ovary syndrome (PCOS) compared to women without
+        PCOS.<h4>Subjects and methods</h4>This prospective, cross-sectional study
+        assessed quality of life (QoL) and depressive symptoms in women with polycystic
+        ovary syndrome (PCOS) compared with controls with and without overweight or
+        obesity. Assessments included body composition, QoL, health-related quality
+        of life (HRQoL), and depressive symptoms. Participants without PCOS were divided
+        into two groups according to BMI: < 25 kg/m2 [median age 30 years (27-33)]
+        and \u2265 25 kg/m2 [median age 32 years (29-35)].<h4>Results</h4>The study
+        included 47 women with polycystic ovary syndrome (PCOS) phenotypes A and B.
+        The median age was 29 years (25-35), and the median body mass index (BMI)
+        was 32.08 kg/m2 (28.48-36.40). Women with PCOS showed a higher risk of depression
+        (24% with moderate to severe risk) compared with women without PCOS, both
+        with and without overweight or obesity (5% and 3%, respectively). Additionally,
+        women with PCOS consistently reported lower QoL and HRQoL scores, particularly
+        in the physical, environmental, and overall QoL domains, as well as in functional
+        capacity, pain, general health status, vitality, emotional well-being, and
+        mental health domains of HRQoL.<h4>Conclusion</h4>Based on these findings,
+        we concluded that body composition does not appear to be a determining factor
+        for increased risk of depressive symptoms or poorer perceptions of QoL and
+        HRQoL in women with PCOS.\",\"affiliation\":\"Universidade Federal do Rio
+        de Janeiro Rio de Janeiro RJ Brasil Programa de P\xF3s-gradua\xE7\xE3o em
+        Endocrinologia, Universidade Federal do Rio de Janeiro, Rio de Janeiro, RJ,
+        Brasil.\",\"publicationStatus\":\"epublish\",\"language\":\"eng\",\"pubModel\":\"Electronic\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"meshHeadingList\":{\"meshHeading\":[{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Humans\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Polycystic
+        Ovary Syndrome\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"CO\",\"qualifierName\":\"complications\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"PP\",\"qualifierName\":\"physiopathology\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Obesity\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"CO\",\"qualifierName\":\"complications\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Body
+        Mass Index\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Prospective Studies\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Cross-Sectional
+        Studies\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Depression\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"ET\",\"qualifierName\":\"etiology\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"EP\",\"qualifierName\":\"epidemiology\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Body
+        Composition\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PH\",\"qualifierName\":\"physiology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Quality
+        of Life\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Adult\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Female\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Overweight\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PX\",\"qualifierName\":\"psychology\",\"majorTopic_YN\":\"N\"}]}}]},\"keywordList\":{\"keyword\":[\"Depression\",\"Body
+        composition\",\"Quality of life\",\"Polycystic ovary syndrome\",\"Obesity.\"]},\"subsetList\":{\"subset\":[{\"code\":\"IM\",\"name\":\"Index
+        Medicus\"}]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.20945/2359-4292-2026-0036\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13073138\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13073138?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":0,\"hasData\":\"N\",\"hasReferences\":\"N\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"N\",\"license\":\"cc
+        by\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2026-04-14\",\"dateOfCreation\":\"2026-04-14\",\"firstIndexDate\":\"2026-04-14\",\"fullTextReceivedDate\":\"2026-04-20\",\"dateOfRevision\":\"2026-04-15\",\"electronicPublicationDate\":\"2026-06-01\",\"firstPublicationDate\":\"2026-06-01\"},{\"id\":\"42182572\",\"source\":\"MED\",\"pmid\":\"42182572\",\"pmcid\":\"PMC13195038\",\"fullTextIdList\":{\"fullTextId\":[\"PMC13195038\"]},\"doi\":\"10.2147/ndt.s607481\",\"title\":\"The
+        Fractalkine (FKN/CX3CL1) Pathway in Depression: A Critical Review of Its Role
+        in Neuroinflammation and Therapeutic Potential.\",\"authorString\":\"YanLuan
+        Z, Sa R, Fan Y, Jia H, Ge J, Bai S, Ma R, Tong L.\",\"authorList\":{\"author\":[{\"fullName\":\"YanLuan
+        Z\",\"firstName\":\"ZhiLi\",\"lastName\":\"YanLuan\",\"initials\":\"Z\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0009-0008-9997-0459\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Mental
+        Health College, Inner Mongolia Medical University, Hohhot, Inner Mongolia
+        Autonomous Region, People's Republic of China.\"}]}},{\"fullName\":\"Sa R\",\"firstName\":\"Rula\",\"lastName\":\"Sa\",\"initials\":\"R\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Departnent
+        of Integrated Mongolian Western Medicine, Research Laboratory, Outpatient
+        Department of Psychiatry, Inner Mongolia Autonomous Region Mental Health Center,
+        Hohhot, Inner Mongolia Autonomous Region, People's Republic of China.\"}]}},{\"fullName\":\"Fan
+        Y\",\"firstName\":\"Yanting\",\"lastName\":\"Fan\",\"initials\":\"Y\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0009-0002-6313-7744\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Departnent
+        of Integrated Mongolian Western Medicine, Research Laboratory, Outpatient
+        Department of Psychiatry, Inner Mongolia Autonomous Region Mental Health Center,
+        Hohhot, Inner Mongolia Autonomous Region, People's Republic of China.\"}]}},{\"fullName\":\"Jia
+        H\",\"firstName\":\"Huan\",\"lastName\":\"Jia\",\"initials\":\"H\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0009-0006-6436-3873\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Departnent
+        of Integrated Mongolian Western Medicine, Research Laboratory, Outpatient
+        Department of Psychiatry, Inner Mongolia Autonomous Region Mental Health Center,
+        Hohhot, Inner Mongolia Autonomous Region, People's Republic of China.\"}]}},{\"fullName\":\"Ge
+        J\",\"firstName\":\"Jianmiao\",\"lastName\":\"Ge\",\"initials\":\"J\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0009-0006-6739-4886\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Departnent
+        of Integrated Mongolian Western Medicine, Research Laboratory, Outpatient
+        Department of Psychiatry, Inner Mongolia Autonomous Region Mental Health Center,
+        Hohhot, Inner Mongolia Autonomous Region, People's Republic of China.\"}]}},{\"fullName\":\"Bai
+        S\",\"firstName\":\"Shuying\",\"lastName\":\"Bai\",\"initials\":\"S\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Departnent
+        of Integrated Mongolian Western Medicine, Research Laboratory, Outpatient
+        Department of Psychiatry, Inner Mongolia Autonomous Region Mental Health Center,
+        Hohhot, Inner Mongolia Autonomous Region, People's Republic of China.\"}]}},{\"fullName\":\"Ma
+        R\",\"firstName\":\"RuiTing\",\"lastName\":\"Ma\",\"initials\":\"R\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0009-0002-5460-1808\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Mental
+        Health College, Inner Mongolia Medical University, Hohhot, Inner Mongolia
+        Autonomous Region, People's Republic of China.\"},{\"affiliation\":\"Departnent
+        of Integrated Mongolian Western Medicine, Research Laboratory, Outpatient
+        Department of Psychiatry, Inner Mongolia Autonomous Region Mental Health Center,
+        Hohhot, Inner Mongolia Autonomous Region, People's Republic of China.\"}]}},{\"fullName\":\"Tong
+        L\",\"firstName\":\"LiJun\",\"lastName\":\"Tong\",\"initials\":\"L\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0009-0003-4916-4962\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Mental
+        Health College, Inner Mongolia Medical University, Hohhot, Inner Mongolia
+        Autonomous Region, People's Republic of China.\"}]}}]},\"authorIdList\":{\"authorId\":[{\"type\":\"ORCID\",\"value\":\"0009-0002-5460-1808\"},{\"type\":\"ORCID\",\"value\":\"0009-0002-6313-7744\"},{\"type\":\"ORCID\",\"value\":\"0009-0003-4916-4962\"},{\"type\":\"ORCID\",\"value\":\"0009-0006-6436-3873\"},{\"type\":\"ORCID\",\"value\":\"0009-0006-6739-4886\"},{\"type\":\"ORCID\",\"value\":\"0009-0008-9997-0459\"}]},\"journalInfo\":{\"volume\":\"22\",\"journalIssueId\":4091844,\"dateOfPublication\":\"2026
+        \",\"monthOfPublication\":0,\"yearOfPublication\":2026,\"printPublicationDate\":\"2026-01-01\",\"journal\":{\"title\":\"Neuropsychiatric
+        disease and treatment\",\"medlineAbbreviation\":\"Neuropsychiatr Dis Treat\",\"essn\":\"1178-2021\",\"issn\":\"1176-6328\",\"isoabbreviation\":\"Neuropsychiatr
+        Dis Treat\",\"nlmid\":\"101240304\"}},\"pubYear\":\"2026\",\"pageInfo\":\"607481\",\"abstractText\":\"Major
+        Depressive Disorder (MDD), a global psychiatric disorder, involves complex
+        pathogenesis in which neuroinflammation is considered one of the core pathophysiological
+        processes. The fractalkine (FKN, CX3CL1)/CX3CR1 signaling pathway, a critical
+        mediator of neuron-microglia communication, has been implicated in neuroinflammation
+        and comorbid models depression, yet its precise and dynamic role in MDD remains
+        controversial and insufficiently understood. This review aims to critically
+        synthesize the existing literature to address these gaps. We first analyze
+        the evidence for neuroinflammation in MDD, involving glial cells and pro-inflammatory
+        cytokines. We then focus on the dual and context-dependent roles of the FKN/CX3CR1
+        pathway in regulating microglial function, synaptic plasticity, and inflammatory
+        responses. Through a comparative analysis of existing literature, we suggest
+        that neuroinflammation is a significant driver in the onset and progression
+        of MDD, potentially engaging immune cells like microglia and astrocytes, and
+        triggering the discharge of pro-inflammatory factors. The FKN/CX3CR1 pathway
+        may play a dual role in regulating microglial function, maintaining synaptic
+        homeostasis, and mediating inflammatory responses. Its dysregulation is potentially
+        closely associated with inflammatory responses and synaptic damage in comorbid
+        models, such as depression with diabetes and depression with rheumatoid arthritis.
+        However, its specific role in MDD has not been fully elucidated, and direct
+        evidence linking this pathway to major depressive disorder remains limited,
+        as most current findings are derived from comorbid models or preclinical studies
+        rather than clinical investigations. This review will systematically explore
+        the general role of neuroinflammation in MDD, dissect the mechanisms of the
+        FKN/CX3CR1 pathway in neuroinflammation and existing depression models, and
+        prospectively potential therapeutic strategies and future research directions
+        based on this pathway, thereby attempting to provide a new theoretical basis
+        for the precision diagnosis and treatment of MDD.\",\"affiliation\":\"Mental
+        Health College, Inner Mongolia Medical University, Hohhot, Inner Mongolia
+        Autonomous Region, People's Republic of China.\",\"publicationStatus\":\"epublish\",\"language\":\"eng\",\"pubModel\":\"Electronic-eCollection\",\"pubTypeList\":{\"pubType\":[\"review-article\",\"Review\",\"Journal
+        Article\"]},\"keywordList\":{\"keyword\":[\"Microglia\",\"neuroinflammation\",\"Major
+        Depressive Disorder\",\"Fkn/cx3cr1\"]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.2147/NDT.S607481\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13195038\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13195038?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":0,\"hasData\":\"N\",\"hasReferences\":\"N\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"N\",\"license\":\"cc
+        by-nc\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2026-05-25\",\"dateOfCreation\":\"2026-05-25\",\"firstIndexDate\":\"2026-05-25\",\"fullTextReceivedDate\":\"2026-05-27\",\"dateOfRevision\":\"2026-05-25\",\"electronicPublicationDate\":\"2026-05-17\",\"firstPublicationDate\":\"2026-05-17\"},{\"id\":\"42157918\",\"source\":\"MED\",\"pmid\":\"42157918\",\"pmcid\":\"PMC13180799\",\"fullTextIdList\":{\"fullTextId\":[\"PMC13180799\"]},\"doi\":\"10.1002/hsr2.72531\",\"title\":\"Level
+        of Depression and Associated Risk Factors Among the Elderly People Residing
+        in Old Age Home in Bangladesh: A Cross-Sectional Study Conducted in 2025.\",\"authorString\":\"Naim
+        MH, Tabassum M, Parvej MI.\",\"authorList\":{\"author\":[{\"fullName\":\"Naim
+        MH\",\"firstName\":\"Mehedi Hasan\",\"lastName\":\"Naim\",\"initials\":\"MH\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Statistics Noakhali Science and Technology University Noakhali Bangladesh.\"}]}},{\"fullName\":\"Tabassum
+        M\",\"firstName\":\"Mimma\",\"lastName\":\"Tabassum\",\"initials\":\"M\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-6111-826X\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Statistics Noakhali Science and Technology University Noakhali Bangladesh.\"}]}},{\"fullName\":\"Parvej
+        MI\",\"firstName\":\"Md Iftakhar\",\"lastName\":\"Parvej\",\"initials\":\"MI\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-4585-0792\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Statistics Noakhali Science and Technology University Noakhali Bangladesh.\"}]}}]},\"authorIdList\":{\"authorId\":[{\"type\":\"ORCID\",\"value\":\"0000-0002-4585-0792\"},{\"type\":\"ORCID\",\"value\":\"0000-0002-6111-826X\"}]},\"journalInfo\":{\"volume\":\"9\",\"journalIssueId\":4186574,\"dateOfPublication\":\"2026
+        May\",\"monthOfPublication\":5,\"yearOfPublication\":2026,\"printPublicationDate\":\"2026-05-01\",\"journal\":{\"title\":\"Health
+        science reports\",\"medlineAbbreviation\":\"Health Sci Rep\",\"essn\":\"2398-8835\",\"issn\":\"2398-8835\",\"isoabbreviation\":\"Health
+        Sci Rep\",\"nlmid\":\"101728855\"}},\"pubYear\":\"2026\",\"pageInfo\":\"e72531\",\"abstractText\":\"<h4>Background
+        and aims</h4>Depression is now a worldwide public health issue among elderly,
+        with particularly high prevalence among those residing in old-age homes. In
+        Bangladesh, limited research has been conducted on this vulnerable population.
+        This study aimed to determine the prevalence of depression and identify associated
+        factors among elderly individuals living in old-age homes in Bangladesh.<h4>Methods</h4>A
+        cross-sectional study was conducted from September 22 to November 15, 2025,
+        among 158 elderly individuals (\u2009\u2265\u200960 years) residing in old-age
+        homes in Gazipur, Chattogram, and Noakhali. Data on sociodemographic, lifestyle,
+        social support, health, and institutional factors were collected, and depression
+        was assessed using the short form of the Geriatric Depression Scale (GDS).
+        Descriptive statistics summarized the data, while Chi-square tests and binary
+        logistic regression were used to identify associations and predictors of geriatric
+        depression.<h4>Results</h4>The study found that 82.3% of the elderly residents
+        were experiencing depression and it increases with advancing age, particularly
+        among those aged 70 years and above. Gender, type of illness, and satisfaction
+        with services in old age homes were identified as significant predictors of
+        depression among elderly residents. Females were considerably more likely
+        to experience depression than males, and individuals with physical illnesses
+        had higher odds of depression compared to those with mental health conditions.
+        Moreover, participants reporting neutral satisfaction with old age home facilities
+        were more prone to depression than those who were very satisfied.<h4>Conclusion</h4>The
+        findings indicate a high prevalence of depression among elderly residents
+        of old-age homes in Bangladesh, with several sociodemographic health-related
+        and institutional factors contributing to its severity. These results highlight
+        the need for targeted mental health interventions and improved care services,
+        which may assist policymakers in developing effective strategies to address
+        geriatric mental health issues in Bangladesh.\",\"affiliation\":\"Department
+        of Statistics Noakhali Science and Technology University Noakhali Bangladesh.\",\"publicationStatus\":\"epublish\",\"language\":\"eng\",\"pubModel\":\"Electronic-eCollection\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"keywordList\":{\"keyword\":[\"Depression\",\"Aged\",\"Bangladesh\",\"Geriatric
+        Depression Scale (Gsd)\",\"Old Age Home (Oah)\"]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1002/hsr2.72531\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13180799\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13180799?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":0,\"hasData\":\"N\",\"hasReferences\":\"N\",\"hasTextMinedTerms\":\"N\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"N\",\"license\":\"cc
+        by\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2026-05-20\",\"dateOfCreation\":\"2026-05-20\",\"firstIndexDate\":\"2026-05-21\",\"fullTextReceivedDate\":\"2026-05-20\",\"dateOfRevision\":\"2026-05-20\",\"electronicPublicationDate\":\"2026-05-17\",\"firstPublicationDate\":\"2026-05-17\"},{\"id\":\"42160062\",\"source\":\"MED\",\"pmid\":\"42160062\",\"pmcid\":\"PMC13191455\",\"fullTextIdList\":{\"fullTextId\":[\"PMC13191455\"]},\"doi\":\"10.1001/jamapsychiatry.2026.1053\",\"title\":\"Interleukin
+        6 as a Treatment Target for Depression: A Proof-of-Concept Randomized Clinical
+        Trial.\",\"authorString\":\"Foley \xC9M, Turner N, Margelyte R, Jones HJ,
+        Kaser M, Lewis G, Jones PB, Khandaker GM.\",\"authorList\":{\"author\":[{\"fullName\":\"Foley
+        \xC9M\",\"firstName\":\"\xC9imear M\",\"lastName\":\"Foley\",\"initials\":\"\xC9M\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"MRC
+        Integrative Epidemiology Unit, Population Health Sciences, Bristol Medical
+        School, University of Bristol, Bristol, United Kingdom.\"},{\"affiliation\":\"Centre
+        for Academic Mental Health, Population Health Sciences, Bristol Medical School,
+        University of Bristol, Bristol, United Kingdom.\"}]}},{\"fullName\":\"Turner
+        N\",\"firstName\":\"Nicholas\",\"lastName\":\"Turner\",\"initials\":\"N\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Bristol
+        Trials Centre, Bristol Medical School, University of Bristol, Bristol, United
+        Kingdom.\"}]}},{\"fullName\":\"Margelyte R\",\"firstName\":\"Ruta\",\"lastName\":\"Margelyte\",\"initials\":\"R\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"MRC
+        Integrative Epidemiology Unit, Population Health Sciences, Bristol Medical
+        School, University of Bristol, Bristol, United Kingdom.\"},{\"affiliation\":\"Centre
+        for Academic Mental Health, Population Health Sciences, Bristol Medical School,
+        University of Bristol, Bristol, United Kingdom.\"}]}},{\"fullName\":\"Jones
+        HJ\",\"firstName\":\"Hannah J\",\"lastName\":\"Jones\",\"initials\":\"HJ\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"MRC
+        Integrative Epidemiology Unit, Population Health Sciences, Bristol Medical
+        School, University of Bristol, Bristol, United Kingdom.\"},{\"affiliation\":\"Centre
+        for Academic Mental Health, Population Health Sciences, Bristol Medical School,
+        University of Bristol, Bristol, United Kingdom.\"},{\"affiliation\":\"NIHR
+        Bristol Biomedical Research Centre, University Hospitals Bristol and Weston
+        NHS Foundation Trust, Bristol, United Kingdom.\"}]}},{\"fullName\":\"Kaser
+        M\",\"firstName\":\"Muzaffer\",\"lastName\":\"Kaser\",\"initials\":\"M\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Psychiatry, University of Cambridge, Cambridge, United Kingdom.\"},{\"affiliation\":\"Cambridgeshire
+        and Peterborough NHS Trust, Cambridge, United Kingdom.\"}]}},{\"fullName\":\"Lewis
+        G\",\"firstName\":\"Glyn\",\"lastName\":\"Lewis\",\"initials\":\"G\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Division
+        of Psychiatry, University College London, London, United Kingdom.\"}]}},{\"fullName\":\"Jones
+        PB\",\"firstName\":\"Peter B\",\"lastName\":\"Jones\",\"initials\":\"PB\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Psychiatry, University of Cambridge, Cambridge, United Kingdom.\"},{\"affiliation\":\"Cambridgeshire
+        and Peterborough NHS Trust, Cambridge, United Kingdom.\"}]}},{\"fullName\":\"Khandaker
+        GM\",\"firstName\":\"Golam M\",\"lastName\":\"Khandaker\",\"initials\":\"GM\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"MRC
+        Integrative Epidemiology Unit, Population Health Sciences, Bristol Medical
+        School, University of Bristol, Bristol, United Kingdom.\"},{\"affiliation\":\"Centre
+        for Academic Mental Health, Population Health Sciences, Bristol Medical School,
+        University of Bristol, Bristol, United Kingdom.\"},{\"affiliation\":\"NIHR
+        Bristol Biomedical Research Centre, University Hospitals Bristol and Weston
+        NHS Foundation Trust, Bristol, United Kingdom.\"},{\"affiliation\":\"Avon
+        and Wiltshire Mental Health Partnership NHS Trust, Bristol, United Kingdom.\"}]}}]},\"dataLinksTagsList\":{\"dataLinkstag\":[\"altmetrics\"]},\"journalInfo\":{\"journalIssueId\":4190661,\"dateOfPublication\":\"2026
+        May\",\"monthOfPublication\":5,\"yearOfPublication\":2026,\"printPublicationDate\":\"2026-05-01\",\"journal\":{\"title\":\"JAMA
+        psychiatry\",\"medlineAbbreviation\":\"JAMA Psychiatry\",\"essn\":\"2168-6238\",\"issn\":\"2168-622X\",\"isoabbreviation\":\"JAMA
+        Psychiatry\",\"nlmid\":\"101589550\"}},\"pubYear\":\"2026\",\"abstractText\":\"<h4>Importance</h4>Interleukin
+        6 (IL-6), a keystone inflammatory cytokine, is a credible mechanistic candidate
+        for causing depression. However, randomized clinical trials testing its treatment
+        potential remain scarce.<h4>Objective</h4>To identify likely treatment-sensitive
+        outcomes and effect size for systemic IL-6 inhibition in patients with difficult-to-treat
+        depression.<h4>Design, setting, and participants</h4>This 4-week, proof-of-concept,
+        double-blind, parallel-arm, placebo-controlled randomized clinical trial recruited
+        adults with moderate-to-severe International Statistical Classification of
+        Diseases and Related Health Problems, Tenth Revision (ICD-10) depression,
+        poor antidepressant response, low-grade systemic inflammation (high-sensitivity
+        C-reactive protein [hs-CRP] level \u22650.3 mg/dL on 2 tests), and depression
+        somatic symptoms (Beck Depression Inventory II somatic symptoms score \u22657)
+        from primary and secondary care and self-referral from 2018 to 2022. Participants
+        were randomized into minimization balanced groups on depression severity and
+        sex. Assessments were conducted at baseline and 7, 14, and 28 days after infusion.
+        Data were analyzed from 2023 to 2025.<h4>Intervention</h4>Single intravenous
+        infusion of IL-6R antagonist tocilizumab (8 mg/kg, maximum 800 mg/patient)
+        or normal saline.<h4>Main outcomes and measures</h4>The primary outcome was
+        depression somatic symptoms at 14 days after infusion. The secondary outcome
+        was total depression severity. Exploratory outcomes included fatigue, anxiety,
+        anhedonia, quality of life, and cognition. Outcomes were assessed using validated
+        scales and interpreted against clinically meaningful thresholds.<h4>Results</h4>A
+        total of 30 participants (mean [SD] age, 41.1 [12.3] years; 24 [80.0%] female)
+        were randomized, including 14 in the tocilizumab group and 16 in the placebo
+        group. Of these, 29 participants received the assigned infusion and completed
+        follow-up. As expected for a small proof-of-concept study, no results reached
+        statistical significance, including little improvement in depression somatic
+        symptoms at day 14 (adjusted mean difference: -0.12; 95% CI, -2.51 to 2.28).
+        However, a pattern of greater stepwise improvement over time was observed
+        with tocilizumab in somatic symptoms, depression severity, fatigue, psychological
+        symptoms, state anxiety, and quality of life, with the largest effects observed
+        at the final follow-up (day 28). Tocilizumab may also improve more individual
+        depressive symptoms. Treatment effects were within ranges considered clinically
+        meaningful for depression severity, fatigue, anxiety, and quality of life.
+        At the final follow-up, remission (7 participants [53.9%] vs 5 participants
+        [31.3%]; number needed to treat [NNT]\u2009=\u20095) and response (6 participants
+        [46.2%] vs 3 participants [18.8%]; NNT\u2009=\u20094) rates favored tocilizumab
+        compared with placebo. Baseline hs-CRP level, but not IL-6 level, tracked
+        depression improvement, suggesting hs-CRP may better predict immunotherapy
+        response in depression than drug-specific biomarkers. Tocilizumab was well
+        tolerated, with no serious adverse events or withdrawals.<h4>Conclusions and
+        relevance</h4>These findings highlight treatment-sensitive outcomes, effect
+        sizes, and patient selection methods for testing systemic IL-6 inhibition
+        in patients with difficult-to-treat depression, and call for a large-scale
+        efficacy trial of anti-IL-6 treatment in depression.<h4>Trial registration</h4>isrctn.org
+        Identifier: ISRCTN16942542.\",\"affiliation\":\"MRC Integrative Epidemiology
+        Unit, Population Health Sciences, Bristol Medical School, University of Bristol,
+        Bristol, United Kingdom.\",\"publicationStatus\":\"aheadofprint\",\"language\":\"eng\",\"pubModel\":\"Print-Electronic\",\"pubTypeList\":{\"pubType\":[\"brief-report\",\"Journal
+        Article\"]},\"subsetList\":{\"subset\":[{\"code\":\"IM\",\"name\":\"Index
+        Medicus\"}]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1001/jamapsychiatry.2026.1053\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13191455\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"N\",\"hasBook\":\"N\",\"hasSuppl\":\"Y\",\"citedByCount\":0,\"hasData\":\"Y\",\"hasReferences\":\"N\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"Y\",\"license\":\"cc
+        by\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCreation\":\"2026-05-20\",\"firstIndexDate\":\"2026-05-21\",\"fullTextReceivedDate\":\"2026-05-22\",\"dateOfRevision\":\"2026-05-23\",\"electronicPublicationDate\":\"2026-05-20\",\"firstPublicationDate\":\"2026-05-20\"}]}}"
+    headers:
+      Access-Control-Allow-Headers:
+      - Content-Type,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Max-Age:
+      - '3600'
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json;charset=UTF-8
+      Date:
+      - Thu, 28 May 2026 15:11:45 GMT
+      Server:
+      - nginx/1.17.7
+      Set-Cookie:
+      - JSESSIONID=CB6596E2A0D39D1568F2C50AEDFC743D; Path=/europepmc/webservices/;
+        HttpOnly
+      Strict-Transport-Security:
+      - max-age=0
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
 version: 1

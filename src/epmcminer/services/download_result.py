@@ -19,9 +19,9 @@ class DownloadResult:
             failed. ``None`` when ``status`` is ``"downloaded"``.
         file_path: Absolute path to the saved PDF file, or ``None`` when
             the paper was not downloaded.
-        active_threads: Number of download threads still running at the
-            moment this result was emitted (not counting the thread that
-            just finished).
+        active_threads: Number of download threads that were running at the
+            moment this result was emitted, including the thread that just
+            finished.
     """
 
     STATUS_DOWNLOADED: ClassVar[str] = "downloaded"

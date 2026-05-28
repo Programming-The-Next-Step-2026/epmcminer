@@ -4,7 +4,10 @@ from pathlib import Path
 
 import pytest
 
-from epmcminer.api.models import DownloadResult, Paper, SearchParams, SearchResult
+from epmcminer.api.paper import Paper
+from epmcminer.api.search_params import SearchParams
+from epmcminer.api.search_result import SearchResult
+from epmcminer.services.models import DownloadResult
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -158,6 +161,26 @@ class TestSearchParams:
             date_to="2024-12-31",
             count=1,
         )  # must not raise
+
+    def test_invalid_date_from_raises_value_error(self) -> None:
+        """A non-ISO date_from raises ValueError."""
+        with pytest.raises(ValueError, match="date_from"):
+            SearchParams(query="test", date_from="not-a-date", date_to="2024-12-31", count=1)
+
+    def test_invalid_date_to_raises_value_error(self) -> None:
+        """A non-ISO date_to raises ValueError."""
+        with pytest.raises(ValueError, match="date_to"):
+            SearchParams(query="test", date_from="2020-01-01", date_to="31/12/2024", count=1)
+
+    def test_date_from_after_date_to_raises_value_error(self) -> None:
+        """date_from later than date_to raises ValueError."""
+        with pytest.raises(ValueError, match="date_from"):
+            SearchParams(query="test", date_from="2025-01-01", date_to="2020-01-01", count=1)
+
+    def test_equal_dates_are_valid(self) -> None:
+        """date_from equal to date_to is a valid single-day range."""
+        params = SearchParams(query="test", date_from="2023-06-15", date_to="2023-06-15", count=1)
+        assert params.date_from == params.date_to
 
 
 # ---------------------------------------------------------------------------
