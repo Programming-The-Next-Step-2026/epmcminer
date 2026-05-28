@@ -33,6 +33,7 @@ dev = [
     "pytest",
     "pytest-cov",
     "pytest-mock",
+    "pytest-recording",  # VCR cassette recording for deterministic integration tests
     "responses",
     "ruff",
 ]

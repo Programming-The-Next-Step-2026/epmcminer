@@ -170,14 +170,41 @@ pip install -e .
 
 Useful commands for testing
 ```
-# run all tests
-pytest
+# run the full test suite (unit + integration, as CI does)
+pytest tests/ --block-network
 
-# only run unit tests
+# run only unit tests (fast, no network, fully mocked)
 pytest -m "not integration"
 
-# only run integration tests
-pytest -m "integration"
+# run only integration tests (replays from cassettes, no network)
+pytest -m integration
+
+# run integration tests against the live API and refresh cassettes
+# (do this after Europe PMC changes its response format)
+pytest -m integration --record-mode=all
+
+# run with coverage report
+pytest --cov=src/epmcminer --cov-report=term-missing
+```
+
+#### How integration tests work
+
+The test suite uses two complementary layers:
+
+**Unit tests** (`tests/test_api/`, `tests/test_services/`, `tests/test_gui/`) mock all HTTP
+calls with the `responses` library. They run in under 10 seconds and never touch the network.
+
+**Integration tests** (`tests/integration/`) verify that the real Europe PMC API contract
+still holds. To avoid non-deterministic CI failures caused by rate limits and network
+timeouts, HTTP conversations are recorded once as *VCR cassettes* (YAML files stored in
+`tests/integration/cassettes/`) using [`pytest-recording`](https://github.com/kiwicom/pytest-recording).
+CI replays these cassettes deterministically — no live API calls are made. The `--block-network`
+flag ensures any accidental live call fails immediately rather than silently timing out.
+
+When the Europe PMC API changes its response format, re-record the cassettes locally
+(requires network access) using:
+```
+pytest -m integration --record-mode=all
 ```
 
 <!-- TOC --><a name="screenshots"></a>
