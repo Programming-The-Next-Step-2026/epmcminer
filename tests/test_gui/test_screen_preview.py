@@ -200,6 +200,15 @@ class TestScreenPreviewLoadingState:
         w._show_loading()
         assert w._error_widget.isHidden()
 
+    def test_loading_card_visible_while_search_in_progress(self, qapp: QApplication) -> None:
+        """loading_card remains visible after load() returns (before results arrive)."""
+        w = ScreenPreview(_make_service())
+        with patch("epmcminer.gui.screens.screen_preview.PreviewWorker") as MockWorker:
+            MockWorker.return_value.isRunning.return_value = False
+            w.load(_make_params())
+        # Worker is mocked — no result emitted yet, so loading card should still be visible.
+        assert not w._loading_card.isHidden()
+
     def test_load_stores_params(self, qapp: QApplication) -> None:
         """load() stores the given params before starting the worker."""
         params = _make_params(query="sleep")

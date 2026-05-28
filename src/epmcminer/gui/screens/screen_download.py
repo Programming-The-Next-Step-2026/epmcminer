@@ -147,6 +147,7 @@ class ScreenDownload(QWidget):
         self._completed: int = 0
         self._total: int = 0
         self._start_time: float = 0.0
+        self._toast: Toast | None = None
         self.setStyleSheet(f"background-color: {theme.APP_BG};")
         self._build_ui()
 
@@ -187,8 +188,8 @@ class ScreenDownload(QWidget):
     def resizeEvent(self, event: QResizeEvent) -> None:
         """Reposition the toast whenever the screen is resized."""
         super().resizeEvent(event)
-        if not self._toast.isHidden():
-            self._toast._reposition()
+        if self._toast is not None and not self._toast.isHidden():
+            self._toast.reposition()
 
     # ------------------------------------------------------------------
     # UI construction

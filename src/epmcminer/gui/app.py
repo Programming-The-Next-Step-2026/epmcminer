@@ -32,6 +32,8 @@ except PackageNotFoundError:
 APP_TITLE = f"epmcminer v{APP_VERSION}"
 MINIMUM_WIDTH = 820
 MINIMUM_HEIGHT = 600
+# Increased from 960×700 to 1000×900 to give expandable list sections (results,
+# log, skipped papers) enough vertical room to be usable at their minimum height.
 DEFAULT_WIDTH = 1000
 DEFAULT_HEIGHT = 900
 

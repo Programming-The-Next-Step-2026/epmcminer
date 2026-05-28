@@ -138,6 +138,8 @@ class TestToastShowError:
         assert toast._hold_timer.interval() == _HOLD_MS_ERROR
 
     def test_hold_durations_are_both_10_seconds(self) -> None:
+        # 10 000 ms (10 s) was chosen to give users enough reading time for long
+        # file-path messages.  Update this test deliberately if the hold time changes.
         assert _HOLD_MS_SUCCESS == 10000
         assert _HOLD_MS_ERROR == 10000
 
@@ -193,9 +195,8 @@ class TestToastRepositioning:
         # y should be above the bottom edge of the parent.
         assert toast.y() < parent_widget.height()
 
-    def test_reposition_noop_without_parent(self, qapp) -> None:
-        """_reposition should not raise when the widget has no parent."""
-        t = QWidget.__new__(Toast)
-        QWidget.__init__(t)
-        # No parent — _reposition must not raise.
-        t._reposition()  # type: ignore[attr-defined]
+    def test_reposition_noop_without_parent(self, parent_widget: QWidget) -> None:
+        """reposition() must not raise when the widget has no parent."""
+        t = Toast(parent_widget)
+        t.setParent(None)  # type: ignore[arg-type]
+        t.reposition()  # must not raise

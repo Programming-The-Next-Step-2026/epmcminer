@@ -165,7 +165,7 @@ class Toast(QWidget):
         self._hold_timer.setInterval(hold_ms)
 
         self.adjustSize()
-        self._reposition()
+        self.reposition()
         self.raise_()
         self.show()
 
@@ -207,7 +207,7 @@ class Toast(QWidget):
         self._msg_lbl.setWordWrap(False)
         layout.addWidget(self._msg_lbl)
 
-    def _reposition(self) -> None:
+    def reposition(self) -> None:
         """Centre the toast horizontally above the bottom margin of its parent."""
         parent = self.parentWidget()
         if parent is None:

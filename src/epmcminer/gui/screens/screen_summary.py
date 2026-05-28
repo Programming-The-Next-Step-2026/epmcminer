@@ -145,6 +145,7 @@ class ScreenSummary(QWidget):
         self._param_query_lbl: QLabel | None = None
         self._param_sort_lbl: QLabel | None = None
         self._param_date_lbl: QLabel | None = None
+        self._toast: Toast | None = None
         self.setStyleSheet(f"background-color: {theme.APP_BG};")
         self._build_ui()
 
@@ -186,8 +187,8 @@ class ScreenSummary(QWidget):
     def resizeEvent(self, event: QResizeEvent) -> None:
         """Reposition the toast whenever the screen is resized."""
         super().resizeEvent(event)
-        if not self._toast.isHidden():
-            self._toast._reposition()
+        if self._toast is not None and not self._toast.isHidden():
+            self._toast.reposition()
 
     def _build_ui(self) -> None:
         root = QVBoxLayout(self)
@@ -577,8 +578,12 @@ class ScreenSummary(QWidget):
         self._worker.start()
 
     def _on_export_done(self, path: str) -> None:
-        """Show a success toast after a successful export."""
-        self._toast.show_message(f"Saved to {path}", success=True)
+        """Show a success toast after a successful export.
+
+        Only the filename (not the full path) is shown so the toast fits
+        without overflowing on long directory paths.
+        """
+        self._toast.show_message(f"Saved to {Path(path).name}", success=True)
 
     def _on_export_error(self, message: str) -> None:
         """Log the error and show a failure toast."""

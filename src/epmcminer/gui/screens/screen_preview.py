@@ -272,7 +272,7 @@ class ScreenPreview(QWidget):
         # Fixed vertical size policy keeps the card at its natural height; the
         # remaining space stays blank below it rather than stretching the card.
         self._progress = ProgressWidget()
-        self._loading_card = self._make_loading_card()
+        self._loading_card = self._make_loading_card(self._progress)
         self._loading_card.setVisible(False)
         self._loading_card.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         layout.addWidget(self._loading_card)
@@ -291,11 +291,18 @@ class ScreenPreview(QWidget):
         root.addWidget(scroll)
         root.addWidget(self._make_action_bar())
 
-    def _make_loading_card(self) -> QWidget:
-        """Build the search-progress card, mirroring the download screen's progress card."""
+    def _make_loading_card(self, progress: ProgressWidget) -> QWidget:
+        """Build the search-progress card, mirroring the download screen's progress card.
+
+        Args:
+            progress: The ProgressWidget to embed in the card.
+
+        Returns:
+            The card QWidget containing the section label and progress widget.
+        """
         card, layout = make_card(padding=26)
         layout.addWidget(make_section_label("Search progress"))
-        layout.addWidget(self._progress)
+        layout.addWidget(progress)
         return card
 
     def _make_error_widget(self) -> QWidget:

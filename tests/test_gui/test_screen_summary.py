@@ -407,11 +407,11 @@ class TestScreenSummaryExport:
         report_svc.export_pdf.assert_called_once()
 
     def test_export_done_shows_success_toast(self, qapp: QApplication) -> None:
-        """_on_export_done shows a success toast with the file path."""
+        """_on_export_done shows a success toast with the filename (not the full path)."""
         w = _make_screen()
         w._on_export_done("/tmp/report.xlsx")
         assert not w._toast.isHidden()
-        assert "/tmp/report.xlsx" in w._toast._msg_lbl.text()
+        assert "report.xlsx" in w._toast._msg_lbl.text()
 
     def test_export_error_shows_error_toast(self, qapp: QApplication) -> None:
         """_on_export_error shows an error toast containing the error message."""

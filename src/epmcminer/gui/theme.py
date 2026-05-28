@@ -90,8 +90,12 @@ SCROLLBAR_STYLE = f"""
     }}
 """
 
-# Minimum height for vertically-expanding list sections (results, log, skipped papers).
-# All three expandable sections share this value so the UI feels consistent.
+# Minimum height for vertically-expanding list sections (results preview on Screen 2,
+# live log on Screen 3, and skipped papers on Screen 4).  All three sections share
+# this constant so resizing behaviour feels consistent across screens.  Raise it if
+# the default window height changes significantly; keep it well below DEFAULT_HEIGHT
+# minus the fixed chrome (action bar 72 px, cards ~200 px) so the section is useful
+# at the minimum window size too.
 EXPANDABLE_MIN_HEIGHT: int = 200
 
 _fusion_style: QStyle | None = None
