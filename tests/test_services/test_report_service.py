@@ -490,3 +490,128 @@ class TestExportPdf:
         assert out.exists()
         assert out.stat().st_size > 0
         assert out.read_bytes().startswith(b"%PDF-")
+
+    def test_pdf_with_all_downloaded(
+        self, service: ReportService, params: SearchParams, tmp_path: Path
+    ) -> None:
+        """All-downloaded results produce a valid PDF (no skipped section)."""
+        results = [
+            make_result(status="downloaded", file_path=Path("/tmp/a.pdf"), pmid=str(i))
+            for i in range(3)
+        ]
+        out = tmp_path / "report.pdf"
+        service.export_pdf(results, params, out)
+        assert out.exists()
+        assert out.read_bytes().startswith(b"%PDF-")
+
+    def test_pdf_with_all_skipped(
+        self, service: ReportService, params: SearchParams, tmp_path: Path
+    ) -> None:
+        """All-skipped results produce a valid PDF with a skipped section."""
+        results = [
+            make_result(
+                status="skipped", reason="PDF unavailable", file_path=None, pmid=str(i)
+            )
+            for i in range(3)
+        ]
+        out = tmp_path / "report.pdf"
+        service.export_pdf(results, params, out)
+        assert out.exists()
+        assert out.read_bytes().startswith(b"%PDF-")
+
+    def test_pdf_with_total_found_nonzero(
+        self, service: ReportService, params: SearchParams, tmp_path: Path
+    ) -> None:
+        """Passing total_found=42 produces a valid PDF."""
+        out = tmp_path / "report.pdf"
+        service.export_pdf([make_result()], params, out, total_found=42)
+        assert out.exists()
+        assert out.read_bytes().startswith(b"%PDF-")
+
+    def test_pdf_with_total_found_zero(
+        self, service: ReportService, params: SearchParams, tmp_path: Path
+    ) -> None:
+        """Default total_found=0 produces a valid PDF."""
+        out = tmp_path / "report.pdf"
+        service.export_pdf([make_result()], params, out, total_found=0)
+        assert out.exists()
+        assert out.read_bytes().startswith(b"%PDF-")
+
+    def test_pdf_mixed_params_filters(
+        self, service: ReportService, tmp_path: Path
+    ) -> None:
+        """Non-empty licenses, publication_types, and author_orcids produce a valid PDF."""
+        params = make_params(
+            licenses=["CC BY", "CC0"],
+            publication_types=["Review", "Research Article"],
+            author_orcids=["0000-0001-2345-6789", "0000-0002-9876-5432"],
+        )
+        out = tmp_path / "report.pdf"
+        service.export_pdf([make_result()], params, out)
+        assert out.exists()
+        assert out.read_bytes().startswith(b"%PDF-")
+
+    def test_pdf_result_with_missing_paper_fields(
+        self, service: ReportService, params: SearchParams, tmp_path: Path
+    ) -> None:
+        """A skipped result whose paper has empty optional fields does not raise."""
+        result = make_result(
+            status="skipped",
+            reason="Server rate limiting",
+            file_path=None,
+            authors="",
+            journal="",
+            year="",
+        )
+        out = tmp_path / "report.pdf"
+        service.export_pdf([result], params, out)
+        assert out.exists()
+        assert out.read_bytes().startswith(b"%PDF-")
+
+    def test_pdf_downloaded_section_included_when_downloads_exist(
+        self, service: ReportService, params: SearchParams, tmp_path: Path
+    ) -> None:
+        """Results with status='downloaded' produce a valid PDF (downloaded section present)."""
+        results = [
+            make_result(status="downloaded", file_path=Path("/tmp/a.pdf"), pmid="1"),
+            make_result(status="downloaded", file_path=Path("/tmp/b.pdf"), pmid="2"),
+        ]
+        out = tmp_path / "report.pdf"
+        service.export_pdf(results, params, out)
+        assert out.exists()
+        assert out.read_bytes().startswith(b"%PDF-")
+
+    def test_pdf_downloaded_section_omitted_when_all_skipped(
+        self, service: ReportService, params: SearchParams, tmp_path: Path
+    ) -> None:
+        """All-skipped results produce a valid PDF (downloaded section absent)."""
+        results = [
+            make_result(status="skipped", reason="PDF unavailable", file_path=None, pmid="1"),
+        ]
+        out = tmp_path / "report.pdf"
+        service.export_pdf(results, params, out)
+        assert out.exists()
+        assert out.read_bytes().startswith(b"%PDF-")
+
+    def test_pdf_both_sections_present_for_mixed_results(
+        self, service: ReportService, params: SearchParams, tmp_path: Path
+    ) -> None:
+        """Mixed results produce a valid PDF containing both downloaded and skipped sections."""
+        results = [
+            make_result(status="downloaded", file_path=Path("/tmp/a.pdf"), pmid="1"),
+            make_result(status="skipped", reason="PDF unavailable", file_path=None, pmid="2"),
+        ]
+        out = tmp_path / "report.pdf"
+        service.export_pdf(results, params, out)
+        assert out.exists()
+        assert out.read_bytes().startswith(b"%PDF-")
+
+    def test_pdf_downloaded_paper_without_file_path_does_not_raise(
+        self, service: ReportService, params: SearchParams, tmp_path: Path
+    ) -> None:
+        """A downloaded result with file_path=None renders without error."""
+        result = make_result(status="downloaded", file_path=None, pmid="1")
+        out = tmp_path / "report.pdf"
+        service.export_pdf([result], params, out)
+        assert out.exists()
+        assert out.read_bytes().startswith(b"%PDF-")

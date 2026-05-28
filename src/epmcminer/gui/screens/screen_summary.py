@@ -141,6 +141,7 @@ class ScreenSummary(QWidget):
         self._report_service = report_service
         self._results: list[DownloadResult] = []
         self._params: SearchParams | None = None
+        self._total_found: int = 0
         self._worker: ExportWorker | None = None
         self._param_query_lbl: QLabel | None = None
         self._param_sort_lbl: QLabel | None = None
@@ -168,6 +169,7 @@ class ScreenSummary(QWidget):
         """
         self._results = results
         self._params = params
+        self._total_found = total_found
 
         downloaded = sum(1 for r in results if r.status == DownloadResult.STATUS_DOWNLOADED)
         not_downloaded = len(results) - downloaded
@@ -559,9 +561,9 @@ class ScreenSummary(QWidget):
         if not path:
             return
         output_path = Path(path)
-        results, params = self._results, self._params
+        results, params, total_found = self._results, self._params, self._total_found
         self._start_export(
-            lambda: self._report_service.export_pdf(results, params, output_path),
+            lambda: self._report_service.export_pdf(results, params, output_path, total_found),
             path,
         )
 
