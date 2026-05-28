@@ -112,9 +112,8 @@ class TestSearch:
         """A non-200, non-429 response raises APIError immediately without retrying."""
         responses.add(responses.GET, SEARCH_URL, body="Internal Server Error", status=500)
 
-        with patch("epmcminer.api.client.time.sleep"):
-            with pytest.raises(APIError) as exc_info:
-                client.search(query="depression", page_size=10)
+        with patch("epmcminer.api.client.time.sleep"), pytest.raises(APIError) as exc_info:
+            client.search(query="depression", page_size=10)
 
         assert exc_info.value.status_code == 500
         assert "500" in str(exc_info.value)
@@ -139,9 +138,8 @@ class TestSearch:
         for _ in range(3):
             responses.add(responses.GET, SEARCH_URL, body="Too Many Requests", status=429)
 
-        with patch("epmcminer.api.client.time.sleep"):
-            with pytest.raises(APIError) as exc_info:
-                client.search(query="depression", page_size=10)
+        with patch("epmcminer.api.client.time.sleep"), pytest.raises(APIError) as exc_info:
+            client.search(query="depression", page_size=10)
 
         assert exc_info.value.status_code == 429
         assert len(responses.calls) == 3
@@ -207,9 +205,8 @@ class TestSearch:
                 body=requests.exceptions.ConnectionError("dropped"),
             )
 
-        with patch("epmcminer.api.client.time.sleep"):
-            with pytest.raises(ConnectionError):
-                client.search(query="depression", page_size=10)
+        with patch("epmcminer.api.client.time.sleep"), pytest.raises(ConnectionError):
+            client.search(query="depression", page_size=10)
 
         assert len(responses.calls) == 3
 
@@ -293,9 +290,8 @@ class TestDownloadPdf:
         for _ in range(3):
             responses.add(responses.GET, self.PDF_URL, body="Server Error", status=500)
 
-        with patch("epmcminer.api.client.time.sleep"):
-            with pytest.raises(APIError) as exc_info:
-                client.download_pdf(url=self.PDF_URL)
+        with patch("epmcminer.api.client.time.sleep"), pytest.raises(APIError) as exc_info:
+            client.download_pdf(url=self.PDF_URL)
 
         assert exc_info.value.status_code == 500
         assert len(responses.calls) == 3
@@ -328,9 +324,8 @@ class TestDownloadPdf:
         for _ in range(3):
             responses.add(responses.GET, self.PDF_URL, body="Server Error", status=500)
 
-        with patch("epmcminer.api.client.time.sleep") as mock_sleep:
-            with pytest.raises(APIError):
-                client.download_pdf(url=self.PDF_URL)
+        with patch("epmcminer.api.client.time.sleep") as mock_sleep, pytest.raises(APIError):
+            client.download_pdf(url=self.PDF_URL)
 
         assert mock_sleep.call_count == 2
         delays = [call.args[0] for call in mock_sleep.call_args_list]
@@ -362,9 +357,8 @@ class TestDownloadPdf:
                 body=requests.exceptions.ConnectionError("dropped"),
             )
 
-        with patch("epmcminer.api.client.time.sleep"):
-            with pytest.raises(ConnectionError):
-                client.download_pdf(url=self.PDF_URL)
+        with patch("epmcminer.api.client.time.sleep"), pytest.raises(ConnectionError):
+            client.download_pdf(url=self.PDF_URL)
 
         assert len(responses.calls) == 3
 
@@ -380,9 +374,8 @@ class TestDownloadPdf:
                 body=requests.exceptions.ConnectionError("dropped"),
             )
 
-        with patch("epmcminer.api.client.time.sleep") as mock_sleep:
-            with pytest.raises(ConnectionError):
-                client.download_pdf(url=self.PDF_URL)
+        with patch("epmcminer.api.client.time.sleep") as mock_sleep, pytest.raises(ConnectionError):
+            client.download_pdf(url=self.PDF_URL)
 
         assert mock_sleep.call_count == 2
         delays = [call.args[0] for call in mock_sleep.call_args_list]
@@ -393,9 +386,8 @@ class TestDownloadPdf:
         """A 4xx HTTP response raises APIError immediately without retrying."""
         responses.add(responses.GET, self.PDF_URL, body="Forbidden", status=403)
 
-        with patch("epmcminer.api.client.time.sleep") as mock_sleep:
-            with pytest.raises(APIError):
-                client.download_pdf(url=self.PDF_URL)
+        with patch("epmcminer.api.client.time.sleep") as mock_sleep, pytest.raises(APIError):
+            client.download_pdf(url=self.PDF_URL)
 
         mock_sleep.assert_not_called()
         assert len(responses.calls) == 1
@@ -422,9 +414,8 @@ class TestDownloadPdf:
                 responses.GET, self.PDF_URL, body=requests.exceptions.Timeout("timed out")
             )
 
-        with patch("epmcminer.api.client.time.sleep"):
-            with pytest.raises(ConnectionError):
-                client.download_pdf(url=self.PDF_URL)
+        with patch("epmcminer.api.client.time.sleep"), pytest.raises(ConnectionError):
+            client.download_pdf(url=self.PDF_URL)
 
         assert len(responses.calls) == 3
 
@@ -455,9 +446,11 @@ class TestDownloadPdf:
             cancel_event.set()
             return True  # True means the event fired (cancelled)
 
-        with patch.object(cancel_event, "wait", side_effect=fake_wait):
-            with pytest.raises(ConnectionError):
-                client.download_pdf(url=self.PDF_URL, cancel_event=cancel_event)
+        with (
+            patch.object(cancel_event, "wait", side_effect=fake_wait),
+            pytest.raises(ConnectionError),
+        ):
+            client.download_pdf(url=self.PDF_URL, cancel_event=cancel_event)
 
         # Only one HTTP attempt — cancelled during the sleep after the first failure.
         assert len(responses.calls) == 1
@@ -505,9 +498,8 @@ class TestDownloadPdf:
         for _ in range(3):
             responses.add(responses.GET, self.PDF_URL, body="Too Many Requests", status=429)
 
-        with patch("epmcminer.api.client.time.sleep") as mock_sleep:
-            with pytest.raises(APIError):
-                client.download_pdf(url=self.PDF_URL)
+        with patch("epmcminer.api.client.time.sleep") as mock_sleep, pytest.raises(APIError):
+            client.download_pdf(url=self.PDF_URL)
 
         delays = [call.args[0] for call in mock_sleep.call_args_list]
         assert delays == [1, 2]
@@ -518,9 +510,8 @@ class TestDownloadPdf:
         for _ in range(3):
             responses.add(responses.GET, self.PDF_URL, body="Too Many Requests", status=429)
 
-        with patch("epmcminer.api.client.time.sleep"):
-            with pytest.raises(APIError) as exc_info:
-                client.download_pdf(url=self.PDF_URL)
+        with patch("epmcminer.api.client.time.sleep"), pytest.raises(APIError) as exc_info:
+            client.download_pdf(url=self.PDF_URL)
 
         assert exc_info.value.status_code == 429
         assert len(responses.calls) == 3
@@ -535,9 +526,11 @@ class TestDownloadPdf:
             cancel_event.set()
             return True  # event fired — cancelled
 
-        with patch.object(cancel_event, "wait", side_effect=fake_wait):
-            with pytest.raises(ConnectionError):
-                client.download_pdf(url=self.PDF_URL, cancel_event=cancel_event)
+        with (
+            patch.object(cancel_event, "wait", side_effect=fake_wait),
+            pytest.raises(ConnectionError),
+        ):
+            client.download_pdf(url=self.PDF_URL, cancel_event=cancel_event)
 
         # One HTTP attempt — cancelled during the sleep after the first 5xx response.
         assert len(responses.calls) == 1
@@ -552,8 +545,10 @@ class TestDownloadPdf:
             cancel_event.set()
             return True  # event fired — cancelled
 
-        with patch.object(cancel_event, "wait", side_effect=fake_wait):
-            with pytest.raises(ConnectionError):
-                client.download_pdf(url=self.PDF_URL, cancel_event=cancel_event)
+        with (
+            patch.object(cancel_event, "wait", side_effect=fake_wait),
+            pytest.raises(ConnectionError),
+        ):
+            client.download_pdf(url=self.PDF_URL, cancel_event=cancel_event)
 
         assert len(responses.calls) == 1

@@ -187,7 +187,7 @@ class _TitleBar(QWidget):
         Args:
             active: Zero-based index of the currently active step (0–3).
         """
-        for i, (circle, text) in enumerate(zip(self._circles, self._step_texts)):
+        for i, (circle, text) in enumerate(zip(self._circles, self._step_texts, strict=False)):
             if i < active:
                 circle.setText("✓")
                 circle.setStyleSheet(

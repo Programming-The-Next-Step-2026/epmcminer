@@ -7,6 +7,7 @@ from pathlib import Path
 from PyQt6.QtCore import QPoint, Qt, QThread, pyqtSignal
 from PyQt6.QtWidgets import (
     QFileDialog,
+    QFrame,
     QHBoxLayout,
     QLabel,
     QLineEdit,
@@ -24,6 +25,9 @@ from epmcminer.gui.widgets.card import make_card, make_section_label
 from epmcminer.gui.widgets.progress_widget import ProgressWidget
 from epmcminer.services.models import Paper, SearchParams, SearchResult
 from epmcminer.services.search_service import SORT_ORDER_MAP, SearchService
+from epmcminer.utils.logger import get_logger
+
+_logger = get_logger(__name__)
 
 # ---------------------------------------------------------------------------
 # Screen-local constants
@@ -169,6 +173,7 @@ class PreviewWorker(QThread):
             result = self._service.preview(self._params)
             self.result_ready.emit(result)
         except Exception as exc:  # noqa: BLE001
+            _logger.exception("PreviewWorker failed: %s", exc)
             self.error_occurred.emit(str(exc))
 
 
@@ -444,8 +449,6 @@ class ScreenPreview(QWidget):
         return card
 
     def _make_paper_row(self, paper: Paper) -> QWidget:
-        from PyQt6.QtWidgets import QFrame
-
         row = QWidget()
         row.setStyleSheet(f"background-color: {theme.CARD_BG};")
         layout = QVBoxLayout(row)

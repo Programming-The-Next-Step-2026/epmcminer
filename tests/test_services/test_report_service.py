@@ -375,7 +375,7 @@ class TestExportExcel:
         wb = openpyxl.load_workbook(out)
         ws = wb.active
         headers = [cell.value for cell in ws[1]]
-        data_row = dict(zip(headers, [cell.value for cell in ws[2]]))
+        data_row = dict(zip(headers, [cell.value for cell in ws[2]], strict=False))
         assert data_row["title"] == result.paper.title
         assert data_row["doi"] == result.paper.doi
 
@@ -389,7 +389,7 @@ class TestExportExcel:
         wb = openpyxl.load_workbook(out)
         ws = wb.active
         headers = [cell.value for cell in ws[1]]
-        data_row = dict(zip(headers, [cell.value for cell in ws[2]]))
+        data_row = dict(zip(headers, [cell.value for cell in ws[2]], strict=False))
         assert data_row["query"] == "anxiety"
         assert data_row["sort_order"] == "date"
 
@@ -425,7 +425,7 @@ class TestExportExcel:
         wb = openpyxl.load_workbook(out)
         ws = wb.active
         headers = [cell.value for cell in ws[1]]
-        data_row = dict(zip(headers, [cell.value for cell in ws[2]]))
+        data_row = dict(zip(headers, [cell.value for cell in ws[2]], strict=False))
         assert data_row["file_path"] is None
 
 

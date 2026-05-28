@@ -12,8 +12,8 @@ from epmcminer.api.client import (
     InvalidPdfContentError,
 )
 from epmcminer.api.download_result import DownloadResult
-from epmcminer.api.models import Paper, SearchParams
-from epmcminer.services.search_service import SORT_ORDER_MAP, SearchService, pdf_url_from_raw
+from epmcminer.api.models import SearchParams
+from epmcminer.services.search_service import SORT_ORDER_MAP, SearchService, paper_from_raw
 from epmcminer.utils.file_utils import build_pdf_filename
 from epmcminer.utils.logger import get_logger, setup_logger
 
@@ -163,19 +163,8 @@ class DownloadService:
         def run_one(raw: dict) -> DownloadResult:
             nonlocal active
             if cancel_event.is_set():
-                pmid = raw.get("pmid") or raw.get("id", "")
-                paper = Paper(
-                    pmid=pmid,
-                    doi=raw.get("doi", ""),
-                    title=raw.get("title", ""),
-                    authors=raw.get("authorString", ""),
-                    journal=raw.get("journalTitle", ""),
-                    year=raw.get("pubYear", ""),
-                    abstract=raw.get("abstractText", ""),
-                    pdf_url=None,
-                )
                 return DownloadResult(
-                    paper=paper,
+                    paper=paper_from_raw(raw),
                     status=DownloadResult.STATUS_SKIPPED,
                     reason="Cancelled",
                     file_path=None,
@@ -215,23 +204,11 @@ class DownloadService:
         Returns:
             A DownloadResult describing the outcome.
         """
-        pmid = raw.get("pmid") or raw.get("id", "")
-        pdf_url = pdf_url_from_raw(raw)
-        paper = Paper(
-            pmid=pmid,
-            doi=raw.get("doi", ""),
-            title=raw.get("title", ""),
-            authors=raw.get("authorString", ""),
-            journal=raw.get("journalTitle", ""),
-            year=raw.get("pubYear", ""),
-            abstract=raw.get("abstractText", ""),
-            pdf_url=pdf_url,
-        )
+        paper = paper_from_raw(raw)
+        _logger.info("Processing paper: %s", paper.pmid)
 
-        _logger.info("Processing paper: %s", pmid)
-
-        if pdf_url is None:
-            _logger.info("Skipping %s: PDF unavailable", pmid)
+        if paper.pdf_url is None:
+            _logger.info("Skipping %s: PDF unavailable", paper.pmid)
             return DownloadResult(
                 paper=paper,
                 status=DownloadResult.STATUS_SKIPPED,
@@ -242,7 +219,7 @@ class DownloadService:
         file_path = pdfs_dir / build_pdf_filename(paper.doi, paper.title)
 
         if file_path.exists():
-            _logger.info("Skipping %s: already downloaded at %s", pmid, file_path)
+            _logger.info("Skipping %s: already downloaded at %s", paper.pmid, file_path)
             return DownloadResult(
                 paper=paper,
                 status=DownloadResult.STATUS_SKIPPED,
@@ -251,9 +228,9 @@ class DownloadService:
             )
 
         try:
-            pdf_bytes = self._client.download_pdf(pdf_url, cancel_event=cancel_event)
+            pdf_bytes = self._client.download_pdf(paper.pdf_url, cancel_event=cancel_event)
         except InvalidPdfContentError as exc:
-            _logger.warning("Skipping %s: %s", pmid, exc)
+            _logger.warning("Skipping %s: %s", paper.pmid, exc)
             return DownloadResult(
                 paper=paper,
                 status=DownloadResult.STATUS_SKIPPED,
@@ -261,7 +238,7 @@ class DownloadService:
                 file_path=None,
             )
         except APIError as exc:
-            _logger.warning("Failed to download %s: HTTP %s", pmid, exc.status_code)
+            _logger.warning("Failed to download %s: HTTP %s", paper.pmid, exc.status_code)
             reason = (
                 _REASON_RATE_LIMITED if exc.status_code == 429 else str(exc.status_code)
             )
@@ -273,14 +250,14 @@ class DownloadService:
             )
         except ConnectionError as exc:
             if cancel_event is not None and cancel_event.is_set():
-                _logger.info("Download of %s cancelled during retry", pmid)
+                _logger.info("Download of %s cancelled during retry", paper.pmid)
                 return DownloadResult(
                     paper=paper,
                     status=DownloadResult.STATUS_SKIPPED,
                     reason="Cancelled",
                     file_path=None,
                 )
-            _logger.warning("Connection error downloading %s: %s", pmid, exc)
+            _logger.warning("Connection error downloading %s: %s", paper.pmid, exc)
             return DownloadResult(
                 paper=paper,
                 status=DownloadResult.STATUS_FAILED,
@@ -298,7 +275,7 @@ class DownloadService:
                 reason="Write error",
                 file_path=None,
             )
-        _logger.info("Downloaded %s to %s", pmid, file_path)
+        _logger.info("Downloaded %s to %s", paper.pmid, file_path)
         return DownloadResult(
             paper=paper, status=DownloadResult.STATUS_DOWNLOADED, reason=None, file_path=file_path
         )

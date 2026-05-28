@@ -30,11 +30,6 @@ _logger = get_logger(__name__)
 # ---------------------------------------------------------------------------
 # Screen-local constants
 # ---------------------------------------------------------------------------
-_SUCCESS_BG = "#1a3d1a"
-_SUCCESS = "#4ade80"
-_DANGER_BG = "#3a1a1a"
-_DANGER = "#f87171"
-_SKIPPED_BG = "rgba(255, 122, 61, 20)"
 _DIVIDER = theme.BORDER_FAINT
 
 _LOG_MIN_HEIGHT = theme.EXPANDABLE_MIN_HEIGHT
@@ -104,6 +99,7 @@ class DownloadWorker(QThread):
             )
             self.download_finished.emit(results)
         except Exception as exc:  # noqa: BLE001
+            _logger.exception("DownloadWorker failed: %s", exc)
             self.error_occurred.emit(str(exc))
 
 
@@ -287,11 +283,11 @@ class ScreenDownload(QWidget):
     def _make_status_dot(self, status: str) -> QLabel:
         """Return a circular status indicator for a download row."""
         if status == DownloadResult.STATUS_DOWNLOADED:
-            bg, fg, symbol = _SUCCESS_BG, _SUCCESS, "✓"
+            bg, fg, symbol = theme.SUCCESS_BG, theme.SUCCESS, "✓"
         elif status == DownloadResult.STATUS_FAILED:
-            bg, fg, symbol = _DANGER_BG, _DANGER, "✗"
+            bg, fg, symbol = theme.DANGER_BG, theme.DANGER, "✗"
         else:
-            bg, fg, symbol = _SKIPPED_BG, theme.ACCENT, "–"
+            bg, fg, symbol = theme.SKIPPED_BG, theme.ACCENT, "–"
 
         dot = QLabel(symbol)
         dot.setFixedSize(_DOT_SIZE, _DOT_SIZE)
@@ -323,7 +319,7 @@ class ScreenDownload(QWidget):
                 size_str = ""
             return f"Saved · {size_str}".rstrip(" ·"), theme.TEXT_MUTED
         if result.status == DownloadResult.STATUS_FAILED:
-            return result.reason or "Download failed", _DANGER
+            return result.reason or "Download failed", theme.DANGER
         return result.reason or "Skipped", theme.TEXT_MUTED
 
     def _make_log_row(self, result: DownloadResult) -> QWidget:
@@ -422,11 +418,12 @@ class ScreenDownload(QWidget):
         self._progress.set_progress(downloaded, max(self._total, 1), processed=self._completed)
         if self._params is not None:
             output_folder = self._params.output_folder
-            assert output_folder is not None, "output_folder must be set before download()"
+            if output_folder is None:
+                raise ValueError("output_folder must be set before download()")
             try:
                 self._report_service.save_csv(results, self._params, output_folder)
-            except Exception:  # noqa: BLE001
-                _logger.exception("Failed to save report.csv")
+            except Exception as exc:  # noqa: BLE001
+                _logger.exception("Failed to save report.csv: %s", exc)
                 self._toast.show_message("Could not save report.csv", success=False)
         self.download_complete.emit(results)
 

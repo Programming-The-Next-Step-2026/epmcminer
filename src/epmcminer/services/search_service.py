@@ -3,7 +3,6 @@
 import re
 
 from epmcminer.api.client import (
-    FREE_FULL_TEXT_FILTER,
     PDF_DOCUMENT_STYLE,
     SORT_BY_CITATIONS,
     SORT_BY_DATE,
@@ -68,6 +67,31 @@ def pdf_url_from_raw(raw: dict) -> str | None:
     return None
 
 
+def paper_from_raw(raw: dict) -> Paper:
+    """Build a Paper dataclass from a single raw Europe PMC result dict.
+
+    Handles both MED (PubMed) records that carry a ``pmid`` field and
+    non-MED records (e.g. preprints) that only carry the generic ``id`` field.
+
+    Args:
+        raw: A single result dict from the Europe PMC core search response.
+
+    Returns:
+        A fully populated Paper instance.
+    """
+    pmid = raw.get("pmid") or raw.get("id", "")
+    return Paper(
+        pmid=pmid,
+        doi=raw.get("doi", ""),
+        title=raw.get("title", ""),
+        authors=raw.get("authorString", ""),
+        journal=raw.get("journalTitle", ""),
+        year=raw.get("pubYear", ""),
+        abstract=raw.get("abstractText", ""),
+        pdf_url=pdf_url_from_raw(raw),
+    )
+
+
 class SearchService:
     """Orchestrates paper search operations against the Europe PMC API.
 
@@ -87,14 +111,15 @@ class SearchService:
         """Build a Europe PMC query string from SearchParams.
 
         Handles AND/OR keyword logic, date range, publication types,
-        licenses, and author ORCIDs. The free-full-text availability
-        filter is always appended and is not derived from params.
+        licenses, and author ORCIDs.  The free-full-text availability
+        filter is **not** included here; the HTTP client appends it to
+        every request as an invariant policy.
 
         Args:
             params: A SearchParams instance containing all search filters.
 
         Returns:
-            A complete Europe PMC query string ready to pass to the API.
+            A Europe PMC query string ready to pass to the API client.
 
         Examples:
             Keyword-only query with a date range:
@@ -105,8 +130,8 @@ class SearchService:
             >>> params = SearchParams(
             ...     query="depression", date_from="2020-01-01", date_to="2024-12-31"
             ... )
-            >>> service.build_query(params)  # doctest: +ELLIPSIS
-            'depression AND (FIRST_PDATE:[2020-01-01 TO 2024-12-31]) AND ...'
+            >>> service.build_query(params)
+            'depression AND (FIRST_PDATE:[2020-01-01 TO 2024-12-31])'
 
             With publication type and license filters added:
 
@@ -148,8 +173,6 @@ class SearchService:
             clause = " OR ".join(f"AUTHORID:{oid}" for oid in params.author_orcids)
             parts.append(f"({clause})")
 
-        parts.append(f"({FREE_FULL_TEXT_FILTER})")
-
         return " AND ".join(parts)
 
     def preview(self, params: SearchParams) -> SearchResult:
@@ -174,22 +197,10 @@ class SearchService:
         sort = SORT_ORDER_MAP.get(params.sort_order)
         data = self._client.search(query=query, page_size=PREVIEW_PAGE_SIZE, sort=sort)
 
-        papers: list[Paper] = []
-        for raw in data.get("resultList", {}).get("result", []):
-            pmid = raw.get("pmid") or raw.get("id", "")
-            pdf_url = pdf_url_from_raw(raw)
-            papers.append(
-                Paper(
-                    pmid=pmid,
-                    doi=raw.get("doi", ""),
-                    title=raw.get("title", ""),
-                    authors=raw.get("authorString", ""),
-                    journal=raw.get("journalTitle", ""),
-                    year=raw.get("pubYear", ""),
-                    abstract=raw.get("abstractText", ""),
-                    pdf_url=pdf_url,
-                )
-            )
+        papers: list[Paper] = [
+            paper_from_raw(raw)
+            for raw in data.get("resultList", {}).get("result", [])
+        ]
 
         estimated_downloadable = sum(1 for p in papers if p.pdf_url is not None)
 

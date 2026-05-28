@@ -29,8 +29,6 @@ _logger = get_logger(__name__)
 # ---------------------------------------------------------------------------
 # Screen-local constants
 # ---------------------------------------------------------------------------
-_DANGER = "#f87171"
-_DANGER_BG = "#3a1a1a"
 _DIVIDER = theme.BORDER_FAINT
 
 _SKIPPED_LIST_MIN_HEIGHT = theme.EXPANDABLE_MIN_HEIGHT
@@ -105,6 +103,7 @@ class ExportWorker(QThread):
             self._fn()
             self.export_done.emit(self._path)
         except Exception as exc:  # noqa: BLE001
+            _logger.exception("ExportWorker failed: %s", exc)
             self.export_error.emit(str(exc))
 
 
@@ -255,7 +254,7 @@ class ScreenSummary(QWidget):
             "Downloaded", "—", "of 0 processed", theme.ACCENT
         )
         card_sk, self._stat_skipped_lbl, _ = self._make_stat_card(
-            "Skipped", "—", "see reasons below", _DANGER
+            "Skipped", "—", "see reasons below", theme.DANGER
         )
         card_tot, self._stat_total_lbl, _ = self._make_stat_card(
             "Total results", "—", "found in Europe PMC", theme.ACCENT
@@ -484,7 +483,7 @@ class ScreenSummary(QWidget):
         dot.setFixedSize(_DOT_SIZE, _DOT_SIZE)
         dot.setAlignment(Qt.AlignmentFlag.AlignCenter)
         dot.setStyleSheet(
-            f"background-color: {_DANGER_BG}; color: {_DANGER};"
+            f"background-color: {theme.DANGER_BG}; color: {theme.DANGER};"
             f" border-radius: {_DOT_RADIUS}px; font-size: 12px;"
             f" font-weight: 700; border: none;"
         )
@@ -512,7 +511,7 @@ class ScreenSummary(QWidget):
 
         reason_lbl = QLabel(result.reason or "Unknown reason")
         reason_lbl.setStyleSheet(
-            f"color: {_DANGER}; font-size: 14px; font-weight: 500;"
+            f"color: {theme.DANGER}; font-size: 14px; font-weight: 500;"
         )
         text_layout.addWidget(reason_lbl)
 

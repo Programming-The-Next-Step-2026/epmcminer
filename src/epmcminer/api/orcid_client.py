@@ -45,8 +45,8 @@ class OrcidClient:
             ``False`` otherwise (HTTP 404 or any other non-200 status).
 
         Raises:
-            ConnectionError: If a network-level failure prevents the request
-                from completing (e.g. no internet connection, DNS failure).
+            ConnectionError: If a network-level failure (connection error or
+                timeout) prevents the request from completing.
         """
         url = f"{ORCID_API_BASE}/{orcid}"
         try:
@@ -55,6 +55,6 @@ class OrcidClient:
                 headers={"Accept": _ACCEPT_HEADER},
                 timeout=_REQUEST_TIMEOUT,
             )
-        except requests.exceptions.ConnectionError as exc:
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:
             raise ConnectionError(str(exc)) from exc
         return response.status_code == 200

@@ -383,7 +383,7 @@ class _InputSlot(QWidget):
             self._input.setFocus()
 
     def _confirm(self) -> None:
-        text = self._input.text() if self._input is not None else ""
+        text = self._input.text().strip() if self._input is not None else ""
         if self._input is not None:
             self._input.clear()
         self._add_btn.setVisible(True)
@@ -392,7 +392,8 @@ class _InputSlot(QWidget):
         if self._confirm_btn is not None:
             self._confirm_btn.setVisible(False)
         self._relayout()
-        self.tag_confirmed.emit(text)
+        if text:
+            self.tag_confirmed.emit(text)
 
     def _relayout(self) -> None:
         """Resize to new sizeHint and force parent flow layout to reposition."""

@@ -230,9 +230,9 @@ class TestBuildQuery:
         assert "depression NOT anxiety" in result
         assert "depression AND NOT" not in result
 
-    def test_free_full_text_filter_always_present(self, service: SearchService) -> None:
-        """HAS_FT:Y OR HAS_FREE_FULLTEXT:Y is always appended."""
-        assert "HAS_FT:Y OR HAS_FREE_FULLTEXT:Y" in service.build_query(make_params())
+    def test_free_full_text_filter_not_in_build_query(self, service: SearchService) -> None:
+        """build_query does not include the free-full-text filter; the HTTP client enforces it."""
+        assert "HAS_FT:Y OR HAS_FREE_FULLTEXT:Y" not in service.build_query(make_params())
 
     def test_all_filters_combined(self, service: SearchService) -> None:
         """All active filters appear in the final query string."""
@@ -250,7 +250,6 @@ class TestBuildQuery:
         assert 'PUB_TYPE:("review")' in result
         assert 'LICENSE:"CC-BY"' in result
         assert "AUTHORID:0000-0001-2345-6789" in result
-        assert "HAS_FT:Y OR HAS_FREE_FULLTEXT:Y" in result
 
 
 # ---------------------------------------------------------------------------

@@ -98,6 +98,13 @@ SCROLLBAR_STYLE = f"""
 # at the minimum window size too.
 EXPANDABLE_MIN_HEIGHT: int = 200
 
+# Status colours — shared across screens (download log, summary, PDF export).
+SUCCESS = "#4ade80"
+SUCCESS_BG = "#1a3d1a"
+DANGER = "#f87171"
+DANGER_BG = "#3a1a1a"
+SKIPPED_BG = "rgba(255, 122, 61, 20)"
+
 _fusion_style: QStyle | None = None
 
 
