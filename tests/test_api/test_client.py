@@ -162,6 +162,24 @@ class TestSearch:
         mock_sleep.assert_called_once_with(7.0)
 
     @responses.activate
+    def test_search_429_non_numeric_retry_after_falls_back_to_backoff(
+        self, client: EuropePMCClient
+    ) -> None:
+        """A non-numeric Retry-After header (e.g. HTTP-date) falls back to backoff delay."""
+        responses.add(
+            responses.GET, SEARCH_URL,
+            body="Too Many Requests", status=429,
+            headers={"Retry-After": "Wed, 21 Oct 2015 07:28:00 GMT"},
+        )
+        responses.add(responses.GET, SEARCH_URL, json=SEARCH_RESPONSE, status=200)
+
+        with patch("epmcminer.api.client.time.sleep") as mock_sleep:
+            client.search(query="depression", page_size=10)
+
+        # Backoff for attempt 0: _RETRY_BACKOFF_BASE * (2**0) = 1
+        mock_sleep.assert_called_once_with(1)
+
+    @responses.activate
     def test_search_connection_error_is_retried_and_succeeds(
         self, client: EuropePMCClient
     ) -> None:
@@ -506,6 +524,23 @@ class TestDownloadPdf:
 
         assert exc_info.value.status_code == 429
         assert len(responses.calls) == 3
+
+    @responses.activate
+    def test_5xx_cancel_during_backoff_aborts_retries(self, client: EuropePMCClient) -> None:
+        """Setting cancel_event during a 5xx backoff sleep aborts further retry attempts."""
+        cancel_event = threading.Event()
+        responses.add(responses.GET, self.PDF_URL, body="Service Unavailable", status=503)
+
+        def fake_wait(timeout: float) -> bool:
+            cancel_event.set()
+            return True  # event fired — cancelled
+
+        with patch.object(cancel_event, "wait", side_effect=fake_wait):
+            with pytest.raises(ConnectionError):
+                client.download_pdf(url=self.PDF_URL, cancel_event=cancel_event)
+
+        # One HTTP attempt — cancelled during the sleep after the first 5xx response.
+        assert len(responses.calls) == 1
 
     @responses.activate
     def test_429_is_interruptible_via_cancel_event(self, client: EuropePMCClient) -> None:
