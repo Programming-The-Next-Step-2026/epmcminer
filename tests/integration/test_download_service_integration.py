@@ -1,14 +1,10 @@
-"""Integration tests for DownloadService — hits the real Europe PMC API.
+"""Integration tests for DownloadService.
 
-This directory sits outside the unit-test tree defined in CLAUDE.md so that
-integration tests can be excluded from CI with ``-m "not integration"`` without
-touching the mirrored unit-test structure under tests/test_services/.
+HTTP interactions are recorded as VCR cassettes in tests/integration/cassettes/
+and replayed deterministically in CI — no live network access required.
 
-Run with:
-    pytest -m integration
-
-Skip during normal development/CI with:
-    pytest -m "not integration"
+Re-record cassettes when the API changes:
+    pytest -m integration --vcr-record=all
 """
 
 import threading
@@ -21,6 +17,8 @@ from epmcminer.api.download_result import DownloadResult
 from epmcminer.api.models import SearchParams
 from epmcminer.services.download_service import DownloadService
 from epmcminer.services.search_service import SearchService
+
+pytestmark = [pytest.mark.vcr, pytest.mark.integration]
 
 COMMON_QUERY = "depression"
 DATE_FROM = "2020-01-01"
@@ -64,7 +62,6 @@ def service(client: EuropePMCClient, search_service: SearchService) -> DownloadS
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.integration
 class TestDownloadIntegration:
     """Integration tests for DownloadService.download."""
 

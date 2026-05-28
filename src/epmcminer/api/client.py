@@ -1,5 +1,6 @@
 """Europe PMC API HTTP client — raw HTTP calls only, no business logic."""
 
+import threading
 import time
 
 import requests
@@ -21,6 +22,38 @@ REQUEST_TIMEOUT = 30
 
 _PDF_MAX_RETRIES = 3
 _PDF_RETRY_BACKOFF_BASE = 1
+_HTTP_429_TOO_MANY_REQUESTS = 429
+_SEARCH_MAX_RETRIES = 3
+_SEARCH_RETRY_BACKOFF_BASE = 1
+
+
+def _parse_retry_after(response: requests.Response) -> float | None:
+    """Return the Retry-After delay in seconds, or None if the header is absent or invalid.
+
+    Args:
+        response: The HTTP response that included a Retry-After header.
+
+    Returns:
+        The number of seconds to wait as a float, or None.
+    """
+    header = response.headers.get("Retry-After")
+    if header is None:
+        return None
+    try:
+        return float(header)
+    except ValueError:
+        return None
+
+
+_PDF_MAGIC_BYTES = b"%PDF"
+
+
+class InvalidPdfContentError(Exception):
+    """Raised when a 200 response body does not contain valid PDF bytes.
+
+    This typically occurs when the server returns an HTML challenge or error page
+    instead of the PDF file (e.g. a bot-detection Proof-of-Work page).
+    """
 
 
 class APIError(Exception):
@@ -81,8 +114,9 @@ class EuropePMCClient:
             The raw JSON response from the API as a dict.
 
         Raises:
-            APIError: If the API returns a non-200 HTTP status code.
-            ConnectionError: If the HTTP request cannot be completed.
+            APIError: If the API returns a non-200, non-retryable HTTP status code, or if
+                a 429 persists after all retry attempts.
+            ConnectionError: If the HTTP request cannot be completed after all retries.
         """
         full_query = f"({query}) AND ({FREE_FULL_TEXT_FILTER})"
         params: dict = {
@@ -94,49 +128,135 @@ class EuropePMCClient:
         }
         if sort is not None:
             params["sort"] = sort
-        response = self._session.get(SEARCH_URL, params=params, timeout=REQUEST_TIMEOUT)
-        if response.status_code != 200:
-            raise APIError(response.status_code, response.text)
-        return response.json()
 
-    def download_pdf(self, url: str) -> bytes:
-        """Download a PDF from a direct URL.
-
-        Retries up to ``_PDF_MAX_RETRIES`` times on connection errors and HTTP
-        5xx responses with exponential backoff. HTTP 4xx errors are not retried
-        as they indicate a client-side problem unlikely to resolve on retry.
-
-        Args:
-            url: The direct URL to the open-access PDF file.
-
-        Returns:
-            The raw bytes of the PDF file.
-
-        Raises:
-            APIError: If the server returns a non-retryable HTTP status code,
-                or if a 5xx error persists after all retry attempts.
-            ConnectionError: If the connection fails on all retry attempts.
-        """
         last_exc: Exception | None = None
-        for attempt in range(_PDF_MAX_RETRIES):
+        for attempt in range(_SEARCH_MAX_RETRIES):
             try:
-                response = self._session.get(url, timeout=REQUEST_TIMEOUT)
-            except requests.exceptions.ConnectionError as exc:
+                response = self._session.get(SEARCH_URL, params=params, timeout=REQUEST_TIMEOUT)
+            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:
                 last_exc = exc
-                if attempt < _PDF_MAX_RETRIES - 1:
-                    delay = _PDF_RETRY_BACKOFF_BASE * (2 ** attempt)
+                if attempt < _SEARCH_MAX_RETRIES - 1:
+                    delay = _SEARCH_RETRY_BACKOFF_BASE * (2 ** attempt)
                     _logger.warning(
-                        "download_pdf connection error (attempt %d/%d), retrying in %ds: %s",
+                        "search transient error (attempt %d/%d), retrying in %ds: %s",
                         attempt + 1,
-                        _PDF_MAX_RETRIES,
+                        _SEARCH_MAX_RETRIES,
                         delay,
                         exc,
                     )
                     time.sleep(delay)
                 continue
+            if response.status_code == 200:
+                return response.json()
+            if response.status_code == _HTTP_429_TOO_MANY_REQUESTS:
+                delay = _parse_retry_after(response) or (
+                    _SEARCH_RETRY_BACKOFF_BASE * (2 ** attempt)
+                )
+                last_exc = APIError(response.status_code, response.text)
+                if attempt < _SEARCH_MAX_RETRIES - 1:
+                    _logger.warning(
+                        "search HTTP 429 (attempt %d/%d), retrying in %.1fs",
+                        attempt + 1,
+                        _SEARCH_MAX_RETRIES,
+                        delay,
+                    )
+                    time.sleep(delay)
+                continue
+            raise APIError(response.status_code, response.text)
+
+        # All retries exhausted.
+        if isinstance(
+            last_exc,
+            (requests.exceptions.ConnectionError, requests.exceptions.Timeout),
+        ):
+            raise ConnectionError(str(last_exc)) from last_exc
+        raise last_exc if last_exc is not None else APIError(0, "unknown")
+
+    def download_pdf(
+        self,
+        url: str,
+        cancel_event: threading.Event | None = None,
+    ) -> bytes:
+        """Download a PDF from a direct URL.
+
+        Retries up to ``_PDF_MAX_RETRIES`` times on connection errors, timeouts,
+        HTTP 5xx responses, and HTTP 429 (Too Many Requests) using exponential
+        backoff (1 s, 2 s).  HTTP 429 retries honour the ``Retry-After`` response
+        header when present, falling back to the same exponential schedule.
+        Other HTTP 4xx errors are not retried as they indicate a client-side problem.
+
+        Backoff sleeps are interruptible: when ``cancel_event`` is provided,
+        ``Event.wait`` is used instead of ``time.sleep`` so that setting the
+        event wakes the sleeping thread immediately.
+
+        Args:
+            url: The direct URL to the open-access PDF file.
+            cancel_event: Optional cancellation signal.  When set, the retry
+                loop exits as soon as the current backoff sleep finishes (or
+                immediately if set before the next attempt) and raises
+                ``ConnectionError``.
+
+        Returns:
+            The raw bytes of the PDF file.
+
+        Raises:
+            APIError: If the server returns a non-retryable HTTP 4xx status code,
+                or if a 5xx or 429 error persists after all retry attempts.
+            ConnectionError: If the connection fails on all retry attempts, if a
+                timeout persists after all retry attempts, or if ``cancel_event``
+                is set.
+        """
+        last_exc: Exception | None = None
+        for attempt in range(_PDF_MAX_RETRIES):
+            if cancel_event is not None and cancel_event.is_set():
+                break
+            try:
+                response = self._session.get(url, timeout=REQUEST_TIMEOUT)
+            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:
+                last_exc = exc
+                if attempt < _PDF_MAX_RETRIES - 1:
+                    delay = _PDF_RETRY_BACKOFF_BASE * (2 ** attempt)
+                    _logger.warning(
+                        "download_pdf transient error (attempt %d/%d), retrying in %ds: %s",
+                        attempt + 1,
+                        _PDF_MAX_RETRIES,
+                        delay,
+                        exc,
+                    )
+                    if cancel_event is not None:
+                        if cancel_event.wait(timeout=delay):
+                            break  # cancelled during sleep — exit immediately
+                    else:
+                        time.sleep(delay)
+                continue
             else:
                 if response.status_code == 200:
+                    if not response.content.startswith(_PDF_MAGIC_BYTES):
+                        raise InvalidPdfContentError(
+                            f"Response from {url!r} is not a valid PDF "
+                            f"(got {response.content[:16]!r})"
+                        )
                     return response.content
+                if response.status_code == _HTTP_429_TOO_MANY_REQUESTS:
+                    # Rate-limited: honour the Retry-After hint; fall back to
+                    # the same exponential schedule used for 5xx errors.
+                    delay = _parse_retry_after(response) or (
+                        _PDF_RETRY_BACKOFF_BASE * (2 ** attempt)
+                    )
+                    last_exc = APIError(response.status_code, response.text)
+                    if attempt < _PDF_MAX_RETRIES - 1:
+                        _logger.warning(
+                            "download_pdf HTTP 429 (attempt %d/%d), retrying in %.1fs",
+                            attempt + 1,
+                            _PDF_MAX_RETRIES,
+                            delay,
+                        )
+                        if cancel_event is not None:
+                            if cancel_event.wait(timeout=delay):
+                                break  # cancelled during sleep — exit immediately
+                        else:
+                            time.sleep(delay)
+                    continue
                 if 400 <= response.status_code < 500:
                     raise APIError(response.status_code, response.text)
                 # 5xx: treat as transient and retry
@@ -150,7 +270,16 @@ class EuropePMCClient:
                         _PDF_MAX_RETRIES,
                         delay,
                     )
-                    time.sleep(delay)
-        if isinstance(last_exc, requests.exceptions.ConnectionError):
+                    if cancel_event is not None:
+                        if cancel_event.wait(timeout=delay):
+                            break  # cancelled during sleep — exit immediately
+                    else:
+                        time.sleep(delay)
+        if cancel_event is not None and cancel_event.is_set():
+            raise ConnectionError("Download cancelled")
+        if isinstance(
+            last_exc,
+            (requests.exceptions.ConnectionError, requests.exceptions.Timeout),
+        ):
             raise ConnectionError(str(last_exc)) from last_exc
         raise last_exc if last_exc is not None else APIError(0, "unknown")

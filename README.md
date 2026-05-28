@@ -82,6 +82,17 @@ python -m epmcminer
 epmcminer
 ```
 
+### Tutorial notebook
+
+A step-by-step walkthrough of all four screens — with a worked example and sample output — is available as an interactive Jupyter notebook:
+
+```bash
+pip install jupyter
+jupyter lab docs/vignette.ipynb
+```
+
+The notebook also renders statically on GitHub (including the Mermaid flowchart) if you'd rather read it without launching Jupyter.
+
 <!-- TOC --><a name="python-api"></a>
 ## Python API
 
@@ -98,7 +109,8 @@ epmcminer can be used as a library without launching the GUI. All public classes
 | `SearchService` | Searches Europe PMC and returns `SearchResult` |
 | `DownloadService` | Downloads PDFs in parallel and returns `list[DownloadResult]` |
 | `ReportService` | Saves `report.csv`, Excel, or PDF exports from results |
-| `create_application_services` | Factory that wires up all three services in one call |
+| `OrcidValidationService` | Validates ORCID format (checksum) and registry existence |
+| `create_application_services` | Factory that wires up all four services in one call |
 
 ### Example: search and preview results
 
@@ -107,7 +119,7 @@ import threading
 from pathlib import Path
 import epmcminer
 
-search, download, report = epmcminer.create_application_services()
+search, download, report, orcid = epmcminer.create_application_services()
 
 params = epmcminer.SearchParams(
     query="depression AND therapy",
@@ -158,14 +170,41 @@ pip install -e .
 
 Useful commands for testing
 ```
-# run all tests
-pytest
+# run the full test suite (unit + integration, as CI does)
+pytest tests/ --block-network
 
-# only run unit tests
+# run only unit tests (fast, no network, fully mocked)
 pytest -m "not integration"
 
-# only run integration tests
-pytest -m "integration"
+# run only integration tests (replays from cassettes, no network)
+pytest -m integration
+
+# run integration tests against the live API and refresh cassettes
+# (do this after Europe PMC changes its response format)
+pytest -m integration --record-mode=all
+
+# run with coverage report
+pytest --cov=src/epmcminer --cov-report=term-missing
+```
+
+#### How integration tests work
+
+The test suite uses two complementary layers:
+
+**Unit tests** (`tests/test_api/`, `tests/test_services/`, `tests/test_gui/`) mock all HTTP
+calls with the `responses` library. They run in under 10 seconds and never touch the network.
+
+**Integration tests** (`tests/integration/`) verify that the real Europe PMC API contract
+still holds. To avoid non-deterministic CI failures caused by rate limits and network
+timeouts, HTTP conversations are recorded once as *VCR cassettes* (YAML files stored in
+`tests/integration/cassettes/`) using [`pytest-recording`](https://github.com/kiwicom/pytest-recording).
+CI replays these cassettes deterministically — no live API calls are made. The `--block-network`
+flag ensures any accidental live call fails immediately rather than silently timing out.
+
+When the Europe PMC API changes its response format, re-record the cassettes locally
+(requires network access) using:
+```
+pytest -m integration --record-mode=all
 ```
 
 <!-- TOC --><a name="screenshots"></a>
@@ -196,7 +235,7 @@ TODO: update with actual screenshots from the app once the UI is implemented and
 <!-- TOC --><a name="f1-keyword-search-input"></a>
 ### F1: Keyword search input
 
-Users can enter a search query using free text. If no boolean operators are specified, AND logic is assumed between words. Users can explicitly use AND or OR operators (case-insensitive) to control query logic.
+Users can enter a search query using free text. If no boolean operators are specified, AND logic is assumed between words. Users can explicitly use AND or OR operators (case-insensitive) to control query logic. The query field accepts up to 500 characters.
 
 ---
 
@@ -206,7 +245,7 @@ Users can enter a search query using free text. If no boolean operators are spec
 The following filters are available on the search screen.
 
 **Date range**
-Two date pickers for start and end date. Default: start = 5 years ago, end = today. The end date is capped at today.
+Two date pickers for start and end date. Default: start = 5 years ago, end = today. The start date can be set as far back as 1 January 1900. The end date is capped at today.
 
 **Publication type**
 A tag-style input field pre-loaded with the following default types: Review, Meta analysis, Clinical trial, Systematic review, Comparative study, Observational study, Randomized controlled trial, Twin study, Validation study, Case reports, Dataset, Corrected and republished article, Clinical study, Evaluation study, Multicenter study, Observational study (veterinary), Randomized controlled trial (veterinary), Books. The user can remove any tag or add new ones from a dropdown of all types available in the Europe PMC API. At least one type must be selected.
@@ -215,7 +254,14 @@ A tag-style input field pre-loaded with the following default types: Review, Met
 A tag-style input field. Default: CC-BY. Options match those available on the Europe PMC website. At least one license must be selected.
 
 **Author (ORCID)**
-A tag-style input field. The user can add one or more ORCID identifiers. Multiple ORCIDs use OR logic. The field can be left empty to search across all authors.
+A tag-style input field. The user can add one or more ORCID identifiers (bare format `0000-0000-0000-0000` or with the `https://orcid.org/` prefix — the prefix is stripped automatically). Multiple ORCIDs use OR logic. The field can be left empty to search across all authors.
+
+Each ORCID is validated in two steps as soon as it is added:
+
+1. **Format check** (synchronous) — verifies the four-group pattern and the ISO 7064 MOD 11-2 checksum digit. Invalid ORCIDs are shown as a red pill immediately.
+2. **Registry check** (asynchronous) — queries the ORCID public API (`pub.orcid.org`) to confirm the identifier exists. While the check is in flight the pill is shown in grey ("pending"). On success it turns orange; on failure it turns red. If the network is unreachable the pill stays grey so the user can still proceed (fail-open).
+
+Red pills (invalid format or not found in the registry) are **excluded** from the search query. Pending (grey) ORCIDs — where the registry was unreachable — are still included so the user can proceed without network access. The validation is informational and does not block submission.
 
 **Full-text availability**
 Not a user-facing filter — hardcoded requirement that all results must have a freely available full text (`HAS_FT:Y OR HAS_FREE_FULLTEXT:Y`). This is communicated to the user via a lock icon in the action bar.
@@ -232,8 +278,10 @@ When the user clicks "Continue to preview", a progress animation is displayed wh
 - A list of the first 10 results showing: title, authors, journal, year, DOI
 - A sort order selector (see F4) in the preview list header
 - A "Back" button to return to Screen 1 and adjust filters
-- Download settings (count and output folder) below the preview list
-- A "Start download" button, disabled until both count and output folder are filled in
+- Download settings (number of papers and output folder) below the preview list
+- A "Start download" button, disabled until the count is ≥ 1, an output folder is set, and the folder is writable
+
+When either button ("Continue to preview" or "Start download") is disabled, an inline hint in the action bar explains which field still needs attention.
 
 ---
 
@@ -254,9 +302,9 @@ A sort order selector is shown in the results preview header on Screen 2. Option
 
 These settings are configured on Screen 2 (the preview screen) after the user has seen what results are available.
 
-**Count**: an integer input specifying the number of successfully downloaded papers desired. The tool keeps retrieving results until count papers are downloaded or the API returns no more results.
+**Number of papers**: an integer input specifying the number of successfully downloaded papers desired. The tool keeps retrieving results until that many papers are downloaded or the API returns no more results. Skipped papers do not count toward this total.
 
-**Output folder**: the user selects a local folder via a folder picker dialog.
+**Output folder**: the user selects a local folder via a folder picker dialog. The folder must be writable; if a non-writable directory is selected the "Start download" button remains disabled and a hint explains the reason.
 
 ---
 

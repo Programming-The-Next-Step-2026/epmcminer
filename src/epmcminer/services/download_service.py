@@ -9,6 +9,7 @@ from epmcminer.api.client import (
     DEFAULT_CURSOR_MARK,
     APIError,
     EuropePMCClient,
+    InvalidPdfContentError,
 )
 from epmcminer.api.download_result import DownloadResult
 from epmcminer.api.models import Paper, SearchParams
@@ -22,6 +23,7 @@ DOWNLOAD_PAGE_SIZE = 10
 
 _REASON_NO_PDF = "PDF unavailable"
 _REASON_ALREADY_DOWNLOADED = "Already downloaded"
+_REASON_RATE_LIMITED = "Server rate limiting"
 
 
 class DownloadService:
@@ -32,7 +34,7 @@ class DownloadService:
     the operation.
     """
 
-    MAX_WORKERS = 4
+    MAX_WORKERS = 2  # reduced from 4 to limit concurrent request rate and avoid HTTP 429
 
     def __init__(self, client: EuropePMCClient, search_service: SearchService) -> None:
         """Initialise DownloadService with injected API client and search service.
@@ -71,9 +73,15 @@ class DownloadService:
             A list of DownloadResult objects, one per paper processed.
 
         Raises:
+            ValueError: If ``params.output_folder`` is ``None``.
             APIError: If the Europe PMC search API returns a non-200 response.
             ConnectionError: If an HTTP request cannot be completed.
         """
+        if params.output_folder is None:
+            raise ValueError(
+                "SearchParams.output_folder must be set before calling download()."
+            )
+
         setup_logger(params.output_folder)
 
         pdfs_dir = params.output_folder / "pdfs"
@@ -104,13 +112,15 @@ class DownloadService:
                 break
 
             if page_size == DOWNLOAD_PAGE_SIZE:
-                page_results = self._download_page(raw_results, pdfs_dir, progress_callback)
+                page_results = self._download_page(
+                    raw_results, pdfs_dir, progress_callback, cancel_event
+                )
                 for result in page_results:
                     all_results.append(result)
                     if result.status == DownloadResult.STATUS_DOWNLOADED:
                         success_count += 1
             else:
-                result = self._download_one(raw_results[0], pdfs_dir)
+                result = self._download_one(raw_results[0], pdfs_dir, cancel_event)
                 progress_callback(result)
                 all_results.append(result)
                 if result.status == DownloadResult.STATUS_DOWNLOADED:
@@ -128,36 +138,79 @@ class DownloadService:
         raw_results: list[dict],
         pdfs_dir: Path,
         progress_callback: Callable[[DownloadResult], None],
+        cancel_event: threading.Event,
     ) -> list[DownloadResult]:
         """Download papers from one API page in parallel, calling progress_callback
         immediately as each individual download completes.
+
+        Respects cancel_event: tasks that have not yet started HTTP work are
+        short-circuited immediately; in-flight requests complete naturally.
 
         Args:
             raw_results: List of raw result dicts from the API.
             pdfs_dir: Directory where PDFs are saved.
             progress_callback: Called once per completed download.
+            cancel_event: When set, queued tasks are skipped and no new
+                HTTP requests are started.
 
         Returns:
             A list of DownloadResult objects in completion order.
         """
         results: list[DownloadResult] = []
+        active = 0
+        lock = threading.Lock()
+
+        def run_one(raw: dict) -> DownloadResult:
+            nonlocal active
+            if cancel_event.is_set():
+                pmid = raw.get("pmid") or raw.get("id", "")
+                paper = Paper(
+                    pmid=pmid,
+                    doi=raw.get("doi", ""),
+                    title=raw.get("title", ""),
+                    authors=raw.get("authorString", ""),
+                    journal=raw.get("journalTitle", ""),
+                    year=raw.get("pubYear", ""),
+                    abstract=raw.get("abstractText", ""),
+                    pdf_url=None,
+                )
+                return DownloadResult(
+                    paper=paper,
+                    status=DownloadResult.STATUS_SKIPPED,
+                    reason="Cancelled",
+                    file_path=None,
+                )
+            with lock:
+                active += 1
+            result = self._download_one(raw, pdfs_dir, cancel_event)
+            with lock:
+                active -= 1
+                result.active_threads = active
+            return result
+
         with ThreadPoolExecutor(max_workers=self.MAX_WORKERS) as executor:
-            futures = {
-                executor.submit(self._download_one, raw, pdfs_dir): raw
-                for raw in raw_results
-            }
+            futures = {executor.submit(run_one, raw): raw for raw in raw_results}
             for future in as_completed(futures):
                 result = future.result()
                 results.append(result)
                 progress_callback(result)
         return results
 
-    def _download_one(self, raw: dict, pdfs_dir: Path) -> DownloadResult:
+    def _download_one(
+        self,
+        raw: dict,
+        pdfs_dir: Path,
+        cancel_event: threading.Event | None = None,
+    ) -> DownloadResult:
         """Attempt to download a single paper's PDF.
 
         Args:
             raw: A single result dict from the Europe PMC core search response.
             pdfs_dir: Directory where the PDF should be saved.
+            cancel_event: Optional cancellation signal forwarded to the HTTP
+                client so that backoff sleeps are interruptible.  When set
+                during a retry, the result will have status ``STATUS_SKIPPED``
+                with reason ``"Cancelled"`` rather than ``STATUS_FAILED``.
 
         Returns:
             A DownloadResult describing the outcome.
@@ -198,16 +251,35 @@ class DownloadService:
             )
 
         try:
-            pdf_bytes = self._client.download_pdf(pdf_url)
+            pdf_bytes = self._client.download_pdf(pdf_url, cancel_event=cancel_event)
+        except InvalidPdfContentError as exc:
+            _logger.warning("Skipping %s: %s", pmid, exc)
+            return DownloadResult(
+                paper=paper,
+                status=DownloadResult.STATUS_SKIPPED,
+                reason="Not a valid PDF",
+                file_path=None,
+            )
         except APIError as exc:
             _logger.warning("Failed to download %s: HTTP %s", pmid, exc.status_code)
+            reason = (
+                _REASON_RATE_LIMITED if exc.status_code == 429 else str(exc.status_code)
+            )
             return DownloadResult(
                 paper=paper,
                 status=DownloadResult.STATUS_FAILED,
-                reason=str(exc.status_code),
+                reason=reason,
                 file_path=None,
             )
         except ConnectionError as exc:
+            if cancel_event is not None and cancel_event.is_set():
+                _logger.info("Download of %s cancelled during retry", pmid)
+                return DownloadResult(
+                    paper=paper,
+                    status=DownloadResult.STATUS_SKIPPED,
+                    reason="Cancelled",
+                    file_path=None,
+                )
             _logger.warning("Connection error downloading %s: %s", pmid, exc)
             return DownloadResult(
                 paper=paper,

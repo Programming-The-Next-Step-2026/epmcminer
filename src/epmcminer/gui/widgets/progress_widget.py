@@ -40,17 +40,10 @@ _ETA_SUB_STYLE = "color: #8a8a8d; font-size: 13px;"
 _DOT_BRIGHT = "background-color: #ff7a3d; border-radius: 3px;"
 _DOT_DIM = "background-color: rgba(255, 122, 61, 46); border-radius: 3px;"
 
-# Thread dot styles: static decreasing opacity (0.85, 0.67, 0.49, 0.31 × 255).
-_THREAD_DOT_STYLES = [
-    "background-color: rgba(255, 122, 61, 217); border-radius: 3px;",
-    "background-color: rgba(255, 122, 61, 171); border-radius: 3px;",
-    "background-color: rgba(255, 122, 61, 125); border-radius: 3px;",
-    "background-color: rgba(255, 122, 61, 79);  border-radius: 3px;",
-]
-
 _DOT_SIZE = 6
 _LOADING_DOT_COUNT = 3
-_MAX_THREAD_DOTS = len(_THREAD_DOT_STYLES)
+_THREAD_DOT_COUNT = 3
+_MAX_THREAD_DOTS = 4
 _ANIM_INTERVAL_MS = 500
 
 
@@ -75,7 +68,7 @@ class ProgressWidget(QWidget):
         self._build_ui()
         self._anim_timer = QTimer(self)
         self._anim_timer.setInterval(_ANIM_INTERVAL_MS)
-        self._anim_timer.timeout.connect(self._tick_loading_dots)
+        self._anim_timer.timeout.connect(self._tick_dots)
         self.reset()
 
     # ------------------------------------------------------------------
@@ -107,28 +100,41 @@ class ProgressWidget(QWidget):
         total: int,
         eta_seconds: int | None = None,
         thread_count: int | None = None,
+        processed: int | None = None,
+        cancelling: bool = False,
     ) -> None:
         """Show a determinate progress bar with download statistics.
 
         Args:
             current: Number of papers successfully downloaded so far.
-            total: Total number of papers requested.
+            total: Total number of papers requested (used for percentage).
             eta_seconds: Estimated seconds remaining, or ``None`` to hide
                 the ETA display.
             thread_count: Number of active download threads, or ``None``
                 to hide the thread dot indicators.
+            processed: Total papers processed (attempted) so far, or
+                ``None`` to omit the processed count from the label.
+            cancelling: When ``True``, the thread label reads
+                "cancelling, waiting for N thread(s)" instead of
+                "N thread(s) running".
         """
-        self._anim_timer.stop()
+        if not self._anim_timer.isActive():
+            self._anim_timer.start()
         self._bar.setRange(0, max(total, 1))
         self._bar.setValue(current)
         self._bar.setVisible(True)
 
         pct = round(100 * current / total) if total > 0 else 0
         self._pct_label.setText(f"{pct}%")
-        self._count_label.setText(f"{current} downloaded out of {total} processed papers")
+        if processed is not None:
+            self._count_label.setText(
+                f"downloaded {current} out of {total}  –  processed {processed} results"
+            )
+        else:
+            self._count_label.setText(f"downloaded {current} out of {total}")
 
         self._update_eta(eta_seconds)
-        self._update_thread_dots(thread_count)
+        self._update_thread_dots(thread_count, cancelling)
 
         self._loading_row.setVisible(False)
         self._stats_row.setVisible(True)
@@ -249,10 +255,10 @@ class ProgressWidget(QWidget):
         dot_layout.setSpacing(5)
 
         dots: list[QFrame] = []
-        for style in _THREAD_DOT_STYLES:
+        for _ in range(_THREAD_DOT_COUNT):
             dot = QFrame()
             dot.setFixedSize(_DOT_SIZE, _DOT_SIZE)
-            dot.setStyleSheet(style)
+            dot.setStyleSheet(_DOT_DIM)
             dot_layout.addWidget(dot)
             dots.append(dot)
 
@@ -296,21 +302,29 @@ class ProgressWidget(QWidget):
         else:
             self._eta_value.setText(f"~{eta_seconds}s")
 
-    def _update_thread_dots(self, thread_count: int | None) -> None:
+    def _update_thread_dots(self, thread_count: int | None, cancelling: bool = False) -> None:
         if thread_count is None:
             self._thread_row.setVisible(False)
             return
+        if not self._thread_row.isVisible():
+            self._dot_phase = 0
         self._thread_row.setVisible(True)
-        n = min(thread_count, _MAX_THREAD_DOTS)
-        for i, dot in enumerate(self._thread_dots):
-            dot.setVisible(i < n)
-        self._thread_label.setText(
-            "1 thread running" if thread_count == 1 else f"{thread_count} threads running"
-        )
+        if cancelling:
+            noun = "thread" if thread_count == 1 else "threads"
+            self._thread_label.setText(f"cancelling, waiting for {thread_count} {noun}")
+        else:
+            self._thread_label.setText(
+                "1 thread running" if thread_count == 1 else f"{thread_count} threads running"
+            )
 
-    def _tick_loading_dots(self) -> None:
-        self._dot_phase = (self._dot_phase + 1) % _LOADING_DOT_COUNT
-        self._update_loading_dots()
+    def _tick_dots(self) -> None:
+        if self._loading_row.isVisible():
+            self._dot_phase = (self._dot_phase + 1) % _LOADING_DOT_COUNT
+            self._update_loading_dots()
+        elif self._thread_row.isVisible():
+            self._dot_phase = (self._dot_phase + 1) % _THREAD_DOT_COUNT
+            for i, dot in enumerate(self._thread_dots):
+                dot.setStyleSheet(_DOT_BRIGHT if i == self._dot_phase else _DOT_DIM)
 
     def _update_loading_dots(self) -> None:
         for i, dot in enumerate(self._loading_dot_frames):

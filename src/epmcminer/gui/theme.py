@@ -36,6 +36,68 @@ CARD_STYLE = f"""
     }}
 """
 
+# ACCENT rgb components for use in rgba() expressions (ACCENT = #ff7a3d = 255, 122, 61).
+_A_R, _A_G, _A_B = 255, 122, 61
+
+SCROLLBAR_STYLE = f"""
+    QScrollBar:vertical {{
+        background: transparent;
+        width: 8px;
+        margin: 2px 2px 2px 0px;
+    }}
+    QScrollBar::handle:vertical {{
+        background: rgba({_A_R}, {_A_G}, {_A_B}, 70);
+        border-radius: 4px;
+        min-height: 28px;
+    }}
+    QScrollBar::handle:vertical:hover {{
+        background: rgba({_A_R}, {_A_G}, {_A_B}, 150);
+    }}
+    QScrollBar::handle:vertical:pressed {{
+        background: rgba({_A_R}, {_A_G}, {_A_B}, 210);
+    }}
+    QScrollBar::add-line:vertical,
+    QScrollBar::sub-line:vertical {{
+        height: 0px;
+    }}
+    QScrollBar::add-page:vertical,
+    QScrollBar::sub-page:vertical {{
+        background: transparent;
+    }}
+    QScrollBar:horizontal {{
+        background: transparent;
+        height: 8px;
+        margin: 0px 2px 2px 2px;
+    }}
+    QScrollBar::handle:horizontal {{
+        background: rgba({_A_R}, {_A_G}, {_A_B}, 70);
+        border-radius: 4px;
+        min-width: 28px;
+    }}
+    QScrollBar::handle:horizontal:hover {{
+        background: rgba({_A_R}, {_A_G}, {_A_B}, 150);
+    }}
+    QScrollBar::handle:horizontal:pressed {{
+        background: rgba({_A_R}, {_A_G}, {_A_B}, 210);
+    }}
+    QScrollBar::add-line:horizontal,
+    QScrollBar::sub-line:horizontal {{
+        width: 0px;
+    }}
+    QScrollBar::add-page:horizontal,
+    QScrollBar::sub-page:horizontal {{
+        background: transparent;
+    }}
+"""
+
+# Minimum height for vertically-expanding list sections (results preview on Screen 2,
+# live log on Screen 3, and skipped papers on Screen 4).  All three sections share
+# this constant so resizing behaviour feels consistent across screens.  Raise it if
+# the default window height changes significantly; keep it well below DEFAULT_HEIGHT
+# minus the fixed chrome (action bar 72 px, cards ~200 px) so the section is useful
+# at the minimum window size too.
+EXPANDABLE_MIN_HEIGHT: int = 200
+
 _fusion_style: QStyle | None = None
 
 

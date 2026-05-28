@@ -1,6 +1,7 @@
 """Screen 2 — results preview and download settings."""
 
 import dataclasses
+import os
 from pathlib import Path
 
 from PyQt6.QtCore import QPoint, Qt, QThread, pyqtSignal
@@ -32,7 +33,7 @@ _SORT_LABELS: dict[str, str] = {"relevance": "Relevance", "date": "Date", "citat
 _DEFAULT_COUNT = 50
 _COUNT_MIN = 1
 _COUNT_MAX = 10_000
-_PAPER_LIST_HEIGHT = 380
+_PAPER_LIST_MIN_HEIGHT = theme.EXPANDABLE_MIN_HEIGHT
 _DIVIDER = theme.BORDER_FAINT
 
 _ACTION_BTN_STYLE = f"""
@@ -132,6 +133,8 @@ _BROWSE_BTN_STYLE = f"""
     }}
 """
 
+_HINT_STYLE = f"color: {theme.TEXT_MUTED}; font-size: 13px;"
+
 
 # ---------------------------------------------------------------------------
 # Worker
@@ -206,6 +209,8 @@ class ScreenPreview(QWidget):
         self._params: SearchParams | None = None
         self._worker: PreviewWorker | None = None
         self._sort_index: int = 0
+        # True while the selected output folder is writable (or no folder is set yet).
+        self._folder_writable: bool = True
         self.setStyleSheet(f"background-color: {theme.APP_BG};")
         self._build_ui()
         self._connect_signals()
@@ -230,9 +235,6 @@ class ScreenPreview(QWidget):
         )
         self._sort_index = sort_idx
         self._sort_btn.setText(_SORT_LABELS[_SORT_OPTIONS[sort_idx]] + "  ▾")
-
-        if params.output_folder.is_absolute():
-            self._folder_edit.setText(str(params.output_folder))
 
         self._show_loading()
 
@@ -266,23 +268,42 @@ class ScreenPreview(QWidget):
         layout.setContentsMargins(22, 22, 22, 22)
         layout.setSpacing(18)
 
+        # Loading card — identical structure to the progress card on Screen 3.
+        # Fixed vertical size policy keeps the card at its natural height; the
+        # remaining space stays blank below it rather than stretching the card.
         self._progress = ProgressWidget()
-        self._progress.setVisible(False)
-        layout.addWidget(self._progress)
+        self._loading_card = self._make_loading_card(self._progress)
+        self._loading_card.setVisible(False)
+        self._loading_card.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        layout.addWidget(self._loading_card)
 
         self._error_widget = self._make_error_widget()
         self._error_widget.setVisible(False)
-        layout.addWidget(self._error_widget)
+        self._error_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        layout.addWidget(self._error_widget, 1)
 
         self._content = self._make_content()
         self._content.setVisible(False)
-        layout.addWidget(self._content)
-
-        layout.addStretch()
+        self._content.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        layout.addWidget(self._content, 1)
 
         scroll.setWidget(content_widget)
         root.addWidget(scroll)
         root.addWidget(self._make_action_bar())
+
+    def _make_loading_card(self, progress: ProgressWidget) -> QWidget:
+        """Build the search-progress card, mirroring the download screen's progress card.
+
+        Args:
+            progress: The ProgressWidget to embed in the card.
+
+        Returns:
+            The card QWidget containing the section label and progress widget.
+        """
+        card, layout = make_card(padding=26)
+        layout.addWidget(make_section_label("Search progress"))
+        layout.addWidget(progress)
+        return card
 
     def _make_error_widget(self) -> QWidget:
         widget = QWidget()
@@ -315,8 +336,10 @@ class ScreenPreview(QWidget):
         layout.setSpacing(18)
 
         layout.addWidget(self._make_stat_row())
-        layout.addWidget(self._make_results_card())
         layout.addWidget(self._make_download_settings_card())
+        results_card = self._make_results_card()
+        results_card.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        layout.addWidget(results_card, 1)
 
         return widget
 
@@ -351,7 +374,7 @@ class ScreenPreview(QWidget):
             "Total results", "matching your query"
         )
         tile_pdf, self._stat_pdf_value = self._make_stat_tile(
-            "PDF available", "open-access full text"
+            "PDF available", "of previewed results"
         )
         tile_prev, self._stat_previewing_value = self._make_stat_tile(
             "Previewing", "top results shown below"
@@ -401,7 +424,8 @@ class ScreenPreview(QWidget):
 
         paper_scroll = QScrollArea()
         paper_scroll.setWidgetResizable(True)
-        paper_scroll.setFixedHeight(_PAPER_LIST_HEIGHT)
+        paper_scroll.setMinimumHeight(_PAPER_LIST_MIN_HEIGHT)
+        paper_scroll.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         paper_scroll.setStyleSheet(
             f"QScrollArea {{ background-color: {theme.CARD_BG}; border: none; }}"
             f"QScrollArea > QWidget > QWidget {{ background-color: {theme.CARD_BG}; }}"
@@ -467,7 +491,7 @@ class ScreenPreview(QWidget):
         count_layout = QVBoxLayout(count_col)
         count_layout.setContentsMargins(0, 0, 0, 0)
         count_layout.setSpacing(8)
-        count_lbl = QLabel("Count")
+        count_lbl = QLabel("Number of papers")
         count_lbl.setStyleSheet(f"color: {theme.TEXT_BODY}; font-size: 14px; font-weight: 500;")
         count_layout.addWidget(count_lbl)
         self._count_spin = QSpinBox()
@@ -527,6 +551,12 @@ class ScreenPreview(QWidget):
 
         bar_layout.addStretch()
 
+        self._hint_lbl = QLabel()
+        self._hint_lbl.setStyleSheet(_HINT_STYLE)
+        self._hint_lbl.setVisible(False)
+        bar_layout.addWidget(self._hint_lbl)
+        bar_layout.addSpacing(16)
+
         self._start_btn = QPushButton("Start download  →")
         self._start_btn.setStyle(theme.get_fusion_style())
         self._start_btn.setStyleSheet(_ACTION_BTN_STYLE)
@@ -546,7 +576,7 @@ class ScreenPreview(QWidget):
 
     def _show_loading(self) -> None:
         self._progress.set_loading("Searching…")
-        self._progress.setVisible(True)
+        self._loading_card.setVisible(True)
         self._error_widget.setVisible(False)
         self._content.setVisible(False)
 
@@ -555,17 +585,34 @@ class ScreenPreview(QWidget):
     # ------------------------------------------------------------------
 
     def _validate(self) -> None:
-        """Enable Start download when count >= 1 and folder is non-empty."""
-        ok = self._count_spin.value() >= 1 and bool(self._folder_edit.text().strip())
+        """Enable Start download when count >= 1, folder is set, and folder is writable."""
+        has_count = self._count_spin.value() >= 1
+        has_folder = bool(self._folder_edit.text().strip())
+        ok = has_count and has_folder and self._folder_writable
         self._start_btn.setEnabled(ok)
+
+        if not ok:
+            parts: list[str] = []
+            if not has_folder:
+                parts.append("Select an output folder")
+            elif not self._folder_writable:
+                parts.append("Selected folder is not writable")
+            if not has_count:
+                parts.append("Set a download count")
+            self._hint_lbl.setText("  ·  ".join(parts))
+            self._hint_lbl.setVisible(True)
+        else:
+            self._hint_lbl.setVisible(False)
 
     def _on_result(self, result: SearchResult) -> None:
         """Handle a successful preview result from the worker."""
+        n_previewed = len(result.papers)
+        pdf_pct = round(100 * result.estimated_downloadable / n_previewed) if n_previewed else 0
         self._stat_total_value.setText(f"{result.total_found:,}")
-        self._stat_pdf_value.setText(f"{result.estimated_downloadable:,}")
-        self._stat_previewing_value.setText(str(len(result.papers)))
+        self._stat_pdf_value.setText(f"~{pdf_pct}%")
+        self._stat_previewing_value.setText(str(n_previewed))
         self._populate_paper_list(result.papers)
-        self._progress.setVisible(False)
+        self._loading_card.setVisible(False)
         self._error_widget.setVisible(False)
         self._content.setVisible(True)
         self.result_loaded.emit(result.total_found)
@@ -573,7 +620,7 @@ class ScreenPreview(QWidget):
     def _on_error(self, message: str) -> None:
         """Handle an error emitted by the worker."""
         self._error_label.setText(message)
-        self._progress.setVisible(False)
+        self._loading_card.setVisible(False)
         self._content.setVisible(False)
         self._error_widget.setVisible(True)
 
@@ -610,8 +657,14 @@ class ScreenPreview(QWidget):
         self.download_requested.emit(params)
 
     def _browse_folder(self) -> None:
+        """Open a folder picker dialog and update the output folder field.
+
+        Also checks whether the selected folder is writable, storing the result
+        in :attr:`_folder_writable` so :meth:`_validate` can gate the button.
+        """
         folder = QFileDialog.getExistingDirectory(self, "Select output folder")
         if folder:
+            self._folder_writable = os.access(folder, os.W_OK)
             self._folder_edit.setText(folder)
 
     def _populate_paper_list(self, papers: list[Paper]) -> None:

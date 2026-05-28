@@ -152,9 +152,9 @@ class TestScreenPreviewDefaults:
         assert hasattr(ScreenPreview, "download_requested")
 
     def test_progress_hidden_initially(self, qapp: QApplication) -> None:
-        """Progress widget is hidden before load() is called."""
+        """Loading wrapper is hidden before load() is called."""
         w = ScreenPreview(_make_service())
-        assert w._progress.isHidden()
+        assert w._loading_card.isHidden()
 
     def test_error_widget_hidden_initially(self, qapp: QApplication) -> None:
         """Error widget is hidden before load() is called."""
@@ -200,6 +200,15 @@ class TestScreenPreviewLoadingState:
         w._show_loading()
         assert w._error_widget.isHidden()
 
+    def test_loading_card_visible_while_search_in_progress(self, qapp: QApplication) -> None:
+        """loading_card remains visible after load() returns (before results arrive)."""
+        w = ScreenPreview(_make_service())
+        with patch("epmcminer.gui.screens.screen_preview.PreviewWorker") as MockWorker:
+            MockWorker.return_value.isRunning.return_value = False
+            w.load(_make_params())
+        # Worker is mocked — no result emitted yet, so loading card should still be visible.
+        assert not w._loading_card.isHidden()
+
     def test_load_stores_params(self, qapp: QApplication) -> None:
         """load() stores the given params before starting the worker."""
         params = _make_params(query="sleep")
@@ -224,10 +233,10 @@ class TestScreenPreviewResultsState:
         assert not w._content.isHidden()
 
     def test_on_result_hides_progress(self, qapp: QApplication) -> None:
-        """_on_result() hides the progress widget."""
+        """_on_result() hides the loading wrapper."""
         w = ScreenPreview(_make_service())
         w._on_result(_make_result())
-        assert w._progress.isHidden()
+        assert w._loading_card.isHidden()
 
     def test_on_result_hides_error_widget(self, qapp: QApplication) -> None:
         """_on_result() hides the error widget."""
@@ -243,10 +252,10 @@ class TestScreenPreviewResultsState:
         assert w._stat_total_value.text() == "1,247"
 
     def test_on_result_stat_pdf_available(self, qapp: QApplication) -> None:
-        """Stat tile shows estimated_downloadable."""
+        """Stat tile shows PDF availability as percentage of previewed papers."""
         w = ScreenPreview(_make_service())
-        w._on_result(_make_result(pdf_count=892))
-        assert w._stat_pdf_value.text() == "892"
+        w._on_result(_make_result(n_papers=5, pdf_count=4))
+        assert w._stat_pdf_value.text() == "~80%"
 
     def test_on_result_stat_previewing(self, qapp: QApplication) -> None:
         """Stat tile shows number of papers in the preview list."""
@@ -298,10 +307,10 @@ class TestScreenPreviewErrorState:
         assert not w._error_widget.isHidden()
 
     def test_on_error_hides_progress(self, qapp: QApplication) -> None:
-        """_on_error() hides the progress widget."""
+        """_on_error() hides the loading wrapper."""
         w = ScreenPreview(_make_service())
         w._on_error("API unavailable")
-        assert w._progress.isHidden()
+        assert w._loading_card.isHidden()
 
     def test_on_error_hides_content(self, qapp: QApplication) -> None:
         """_on_error() hides the content area."""
@@ -361,6 +370,63 @@ class TestScreenPreviewValidation:
         """Count spinbox defaults to 50."""
         w = ScreenPreview(_make_service())
         assert w._count_spin.value() == 50
+
+    def test_start_disabled_when_folder_not_writable(self, qapp: QApplication) -> None:
+        """Button is disabled when a folder is selected but is not writable."""
+        w = ScreenPreview(_make_service())
+        w._count_spin.setValue(10)
+        # Simulate non-writable folder by setting internal flag directly
+        w._folder_edit.setText("/tmp/papers")
+        w._folder_writable = False
+        w._validate()
+        assert not w._start_btn.isEnabled()
+
+    def test_start_enabled_when_folder_writable(self, qapp: QApplication) -> None:
+        """Button is enabled when folder is set and writable."""
+        w = ScreenPreview(_make_service())
+        w._count_spin.setValue(10)
+        w._folder_edit.setText("/tmp/papers")
+        w._folder_writable = True
+        w._validate()
+        assert w._start_btn.isEnabled()
+
+    def test_browse_folder_sets_not_writable_on_unwritable_path(
+        self, qapp: QApplication
+    ) -> None:
+        """Selecting a non-writable folder via Browse sets _folder_writable to False."""
+
+        w = ScreenPreview(_make_service())
+        with (
+            patch(
+                "epmcminer.gui.screens.screen_preview.QFileDialog.getExistingDirectory",
+                return_value="/unwritable/path",
+            ),
+            patch("os.access", return_value=False),
+        ):
+            w._browse_folder()
+        assert w._folder_writable is False
+
+    def test_browse_folder_sets_writable_on_writable_path(self, qapp: QApplication) -> None:
+        """Selecting a writable folder via Browse sets _folder_writable to True."""
+        w = ScreenPreview(_make_service())
+        with (
+            patch(
+                "epmcminer.gui.screens.screen_preview.QFileDialog.getExistingDirectory",
+                return_value="/tmp/papers",
+            ),
+            patch("os.access", return_value=True),
+        ):
+            w._browse_folder()
+        assert w._folder_writable is True
+
+    def test_count_label_text(self, qapp: QApplication) -> None:
+        """The count field label reads 'Number of papers'."""
+        from PyQt6.QtWidgets import QLabel
+
+        w = ScreenPreview(_make_service())
+        labels = w.findChildren(QLabel)
+        texts = [lbl.text() for lbl in labels]
+        assert any("number of papers" in t.lower() for t in texts)
 
 
 # ---------------------------------------------------------------------------
@@ -465,24 +531,6 @@ class TestScreenPreviewSortChange:
         """Sort defaults to index 0 (relevance)."""
         w = ScreenPreview(_make_service())
         assert w._sort_index == 0
-
-    def test_load_prefills_folder_from_absolute_params(self, qapp: QApplication) -> None:
-        """load() pre-populates the folder field when params.output_folder is absolute."""
-        w = ScreenPreview(_make_service())
-        with patch("epmcminer.gui.screens.screen_preview.PreviewWorker") as MockWorker:
-            MockWorker.return_value.isRunning.return_value = False
-            w.load(_make_params(output_folder=Path("/tmp/papers")))
-        assert w._folder_edit.text() == "/tmp/papers"
-
-    def test_load_does_not_prefill_folder_from_relative_params(
-        self, qapp: QApplication
-    ) -> None:
-        """load() leaves the folder field blank when params.output_folder is relative."""
-        w = ScreenPreview(_make_service())
-        with patch("epmcminer.gui.screens.screen_preview.PreviewWorker") as MockWorker:
-            MockWorker.return_value.isRunning.return_value = False
-            w.load(_make_params(output_folder=Path()))  # Path() = Path('.')
-        assert w._folder_edit.text() == ""
 
     def test_sort_synced_on_load(self, qapp: QApplication) -> None:
         """load() syncs _sort_index to params.sort_order without triggering a second load."""

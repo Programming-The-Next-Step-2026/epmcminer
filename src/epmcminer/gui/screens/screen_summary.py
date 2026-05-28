@@ -4,20 +4,22 @@ from collections.abc import Callable
 from pathlib import Path
 
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6.QtGui import QResizeEvent
 from PyQt6.QtWidgets import (
     QFileDialog,
     QFrame,
     QHBoxLayout,
     QLabel,
-    QMessageBox,
     QPushButton,
     QScrollArea,
+    QSizePolicy,
     QVBoxLayout,
     QWidget,
 )
 
 import epmcminer.gui.theme as theme
 from epmcminer.gui.widgets.card import make_card, make_section_label
+from epmcminer.gui.widgets.toast import Toast
 from epmcminer.services.models import DownloadResult, SearchParams
 from epmcminer.services.report_service import ReportService
 from epmcminer.utils.logger import get_logger
@@ -31,9 +33,12 @@ _DANGER = "#f87171"
 _DANGER_BG = "#3a1a1a"
 _DIVIDER = theme.BORDER_FAINT
 
-_SKIPPED_LIST_HEIGHT = 220
+_SKIPPED_LIST_MIN_HEIGHT = theme.EXPANDABLE_MIN_HEIGHT
 _DOT_SIZE = 26
 _DOT_RADIUS = _DOT_SIZE // 2
+# License strings up to this many characters are placed inline on row 1;
+# longer strings (many licenses selected) fall back to their own wrapping row.
+_LICENSE_INLINE_MAX_CHARS = 40
 
 _GHOST_BTN_STYLE = f"""
     QPushButton {{
@@ -140,6 +145,7 @@ class ScreenSummary(QWidget):
         self._param_query_lbl: QLabel | None = None
         self._param_sort_lbl: QLabel | None = None
         self._param_date_lbl: QLabel | None = None
+        self._toast: Toast | None = None
         self.setStyleSheet(f"background-color: {theme.APP_BG};")
         self._build_ui()
 
@@ -178,6 +184,12 @@ class ScreenSummary(QWidget):
     # UI construction
     # ------------------------------------------------------------------
 
+    def resizeEvent(self, event: QResizeEvent) -> None:
+        """Reposition the toast whenever the screen is resized."""
+        super().resizeEvent(event)
+        if self._toast is not None and not self._toast.isHidden():
+            self._toast.reposition()
+
     def _build_ui(self) -> None:
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
@@ -198,13 +210,15 @@ class ScreenSummary(QWidget):
         layout.addLayout(self._make_stat_row())
         layout.addWidget(self._make_params_card())
         self._skipped_card = self._make_skipped_card()
-        layout.addWidget(self._skipped_card)
+        self._skipped_card.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        layout.addWidget(self._skipped_card, 1)
         self._skipped_card.setVisible(False)
-        layout.addStretch()
 
         scroll.setWidget(content_widget)
         root.addWidget(scroll)
         root.addWidget(self._make_action_bar())
+
+        self._toast = Toast(self)
 
     def _make_stat_card(
         self,
@@ -269,7 +283,8 @@ class ScreenSummary(QWidget):
 
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        scroll.setFixedHeight(_SKIPPED_LIST_HEIGHT)
+        scroll.setMinimumHeight(_SKIPPED_LIST_MIN_HEIGHT)
+        scroll.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         scroll.setStyleSheet(
             f"QScrollArea {{ background-color: {theme.CARD_BG}; border: none; }}"
             f"QScrollArea > QWidget > QWidget {{ background-color: {theme.CARD_BG}; }}"
@@ -347,6 +362,39 @@ class ScreenSummary(QWidget):
         h.addWidget(value_lbl)
         return widget, value_lbl
 
+    def _make_param_line(self, label: str, value: str) -> QWidget:
+        """Build a full-width label–value row where the value wraps across lines.
+
+        The value label receives stretch factor 1 so it always fills the
+        available card width, giving Qt the layout information it needs to
+        reflow text as the window is resized.
+
+        Args:
+            label: The parameter name displayed in muted colour on the left.
+            value: The parameter value; wraps to additional lines when needed.
+
+        Returns:
+            The containing row widget.
+        """
+        widget = QWidget()
+        widget.setStyleSheet(f"background-color: {theme.CARD_BG};")
+        h = QHBoxLayout(widget)
+        h.setContentsMargins(0, 0, 0, 0)
+        h.setSpacing(8)
+        h.setAlignment(Qt.AlignmentFlag.AlignTop)
+
+        label_lbl = QLabel(label)
+        label_lbl.setStyleSheet(f"color: {theme.TEXT_MUTED}; font-size: 15px;")
+        h.addWidget(label_lbl)
+
+        value_lbl = QLabel(value)
+        value_lbl.setStyleSheet(
+            f"color: {theme.TEXT_PRIMARY}; font-size: 15px; font-weight: 600;"
+        )
+        value_lbl.setWordWrap(True)
+        h.addWidget(value_lbl, 1)
+        return widget
+
     def _make_param_row(self, pairs: list[tuple[str, str]]) -> tuple[QWidget, list[QLabel]]:
         """Build a horizontal row of inline label–value pairs.
 
@@ -378,26 +426,36 @@ class ScreenSummary(QWidget):
 
         date_str = f"{params.date_from} → {params.date_to}"
 
-        row1, (self._param_query_lbl, self._param_sort_lbl, self._param_date_lbl) = (
-            self._make_param_row([
-                ("Query", params.query),
-                ("Sort", params.sort_order.capitalize()),
-                ("Date", date_str),
-            ])
-        )
+        # Build row 1: Query, Sort, Date are always inline; License joins them
+        # when its text is short enough to fit comfortably.
+        license_str = ", ".join(params.licenses) if params.licenses else ""
+        license_inline = bool(license_str) and len(license_str) <= _LICENSE_INLINE_MAX_CHARS
+        row1_pairs: list[tuple[str, str]] = [
+            ("Query", params.query),
+            ("Sort", params.sort_order.capitalize()),
+            ("Date", date_str),
+        ]
+        if license_inline:
+            row1_pairs.append(("License", license_str))
+
+        row1, row1_lbls = self._make_param_row(row1_pairs)
+        self._param_query_lbl = row1_lbls[0]
+        self._param_sort_lbl = row1_lbls[1]
+        self._param_date_lbl = row1_lbls[2]
         self._param_pairs_layout.addWidget(row1)
 
-        optional = []
-        if params.licenses:
-            optional.append(("License", ", ".join(params.licenses)))
+        if license_str and not license_inline:
+            self._param_pairs_layout.addWidget(
+                self._make_param_line("License", license_str)
+            )
         if params.publication_types:
-            optional.append(("Publication types", ", ".join(params.publication_types)))
+            self._param_pairs_layout.addWidget(
+                self._make_param_line("Publication types", ", ".join(params.publication_types))
+            )
         if params.author_orcids:
-            optional.append(("Authors", f"{len(params.author_orcids)} ORCIDs"))
-
-        if optional:
-            row2, _ = self._make_param_row(optional)
-            self._param_pairs_layout.addWidget(row2)
+            self._param_pairs_layout.addWidget(
+                self._make_param_line("Authors", f"{len(params.author_orcids)} ORCIDs")
+            )
 
     def _populate_skipped(self, results: list[DownloadResult]) -> None:
         not_downloaded = [r for r in results if r.status != DownloadResult.STATUS_DOWNLOADED]
@@ -480,7 +538,7 @@ class ScreenSummary(QWidget):
         if self._params is None:
             return
         path, _ = QFileDialog.getSaveFileName(
-            self, "Export Excel", "", "Excel Files (*.xlsx)"
+            self, "Export Excel", "results.xlsx", "Excel Files (*.xlsx)"
         )
         if not path:
             return
@@ -496,7 +554,7 @@ class ScreenSummary(QWidget):
         if self._params is None:
             return
         path, _ = QFileDialog.getSaveFileName(
-            self, "Export PDF", "", "PDF Files (*.pdf)"
+            self, "Export PDF", "results.pdf", "PDF Files (*.pdf)"
         )
         if not path:
             return
@@ -520,10 +578,14 @@ class ScreenSummary(QWidget):
         self._worker.start()
 
     def _on_export_done(self, path: str) -> None:
-        """Show a success dialog after a successful export."""
-        QMessageBox.information(self, "Export complete", f"Saved to:\n{path}")
+        """Show a success toast after a successful export.
+
+        Only the filename (not the full path) is shown so the toast fits
+        without overflowing on long directory paths.
+        """
+        self._toast.show_message(f"Saved to {Path(path).name}", success=True)
 
     def _on_export_error(self, message: str) -> None:
-        """Log and show a warning dialog when an export fails."""
+        """Log the error and show a failure toast."""
         _logger.error("Export failed: %s", message)
-        QMessageBox.warning(self, "Export failed", message)
+        self._toast.show_message(f"Export failed: {message}", success=False)

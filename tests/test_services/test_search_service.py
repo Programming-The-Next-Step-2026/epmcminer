@@ -162,20 +162,30 @@ class TestBuildQuery:
         assert "FIRST_PDATE:[2020-01-01 TO 2024-12-31]" in result
 
     def test_single_publication_type(self, service: SearchService) -> None:
-        """A single publication type produces a PUB_TYPE clause."""
+        """A single pub type produces a clause with the catch-all and lowercased value."""
         result = service.build_query(make_params(publication_types=["Review"]))
-        assert 'PUB_TYPE:("Review")' in result
+        assert 'PUB_TYPE:("review")' in result
+        assert "HAS_BOOK:Y" in result
+        assert "SRC:(MED OR PMC OR AGR OR CBA) NOT PUB_TYPE:(Review)" in result
 
     def test_multiple_publication_types_joined_with_or(self, service: SearchService) -> None:
-        """Multiple publication types are joined with OR."""
+        """Multiple publication types are lowercased and joined with OR."""
         result = service.build_query(make_params(publication_types=["Review", "Meta analysis"]))
-        assert 'PUB_TYPE:("Review")' in result
-        assert 'PUB_TYPE:("Meta analysis")' in result
+        assert 'PUB_TYPE:("review")' in result
+        assert 'PUB_TYPE:("meta analysis")' in result
         assert " OR " in result
 
     def test_no_publication_types_omits_clause(self, service: SearchService) -> None:
         """An empty publication_types list produces no PUB_TYPE clause."""
         assert "PUB_TYPE" not in service.build_query(make_params(publication_types=[]))
+
+    def test_veterinary_pub_type_uses_comma_spelling(self, service: SearchService) -> None:
+        """'Observational study (veterinary)' maps to the comma-separated API spelling."""
+        result = service.build_query(
+            make_params(publication_types=["Observational study (veterinary)"])
+        )
+        assert 'PUB_TYPE:("observational study, veterinary")' in result
+        assert 'PUB_TYPE:("observational study (veterinary)")' not in result
 
     def test_single_license(self, service: SearchService) -> None:
         """A single license produces a LICENSE clause."""
@@ -193,17 +203,17 @@ class TestBuildQuery:
         assert "LICENSE" not in service.build_query(make_params(licenses=[]))
 
     def test_single_author_orcid(self, service: SearchService) -> None:
-        """A single ORCID produces an AUTHORID clause."""
+        """A single ORCID produces a bare AUTHORID:value clause (no quotes, no prefix)."""
         result = service.build_query(make_params(author_orcids=["0000-0001-2345-6789"]))
-        assert 'AUTHORID:"0000-0001-2345-6789"' in result
+        assert "AUTHORID:0000-0001-2345-6789" in result
 
     def test_multiple_author_orcids_joined_with_or(self, service: SearchService) -> None:
-        """Multiple ORCIDs are joined with OR."""
+        """Multiple ORCIDs are joined with OR, each as a bare AUTHORID:value."""
         result = service.build_query(
             make_params(author_orcids=["0000-0001-2345-6789", "0000-0009-8765-4321"])
         )
-        assert 'AUTHORID:"0000-0001-2345-6789"' in result
-        assert 'AUTHORID:"0000-0009-8765-4321"' in result
+        assert "AUTHORID:0000-0001-2345-6789" in result
+        assert "AUTHORID:0000-0009-8765-4321" in result
 
     def test_empty_author_orcids_omits_clause(self, service: SearchService) -> None:
         """An empty author_orcids list produces no AUTHORID clause."""
@@ -237,9 +247,9 @@ class TestBuildQuery:
         result = service.build_query(params)
         assert "depression AND therapy" in result
         assert "FIRST_PDATE:[2020-01-01 TO 2024-12-31]" in result
-        assert 'PUB_TYPE:("Review")' in result
+        assert 'PUB_TYPE:("review")' in result
         assert 'LICENSE:"CC-BY"' in result
-        assert 'AUTHORID:"0000-0001-2345-6789"' in result
+        assert "AUTHORID:0000-0001-2345-6789" in result
         assert "HAS_FT:Y OR HAS_FREE_FULLTEXT:Y" in result
 
 

@@ -19,6 +19,34 @@ SORT_ORDER_MAP: dict[str, str | None] = {
     "citations": SORT_BY_CITATIONS,
 }
 
+# Europe PMC pub-type API values differ from the human-readable display names in
+# two ways: (1) they are always lowercase; (2) a handful have different spellings.
+# All names not listed here are simply lowercased at query-build time.
+_PUB_TYPE_API_EXCEPTIONS: dict[str, str] = {
+    "Observational study (veterinary)": "observational study, veterinary",
+    "Randomized controlled trial (veterinary)": "randomized controlled trial, veterinary",
+}
+
+# Prepended to every pub-type clause so that regular journal articles
+# (stored as "research-article" / "Journal Article" in Europe PMC) are included
+# alongside the explicitly named review/study types.  This mirrors the query
+# the Europe PMC website itself generates.
+_PUB_TYPE_CATCH_ALL = (
+    "HAS_BOOK:Y OR (SRC:(MED OR PMC OR AGR OR CBA) NOT PUB_TYPE:(Review))"
+)
+
+
+def _pub_type_to_api(display_name: str) -> str:
+    """Convert a publication-type display name to its Europe PMC API value.
+
+    Args:
+        display_name: The human-readable pub type string used in the UI.
+
+    Returns:
+        The lowercase API value accepted by the Europe PMC search endpoint.
+    """
+    return _PUB_TYPE_API_EXCEPTIONS.get(display_name, display_name.lower())
+
 
 def pdf_url_from_raw(raw: dict) -> str | None:
     """Extract the PDF URL from a raw core search result.
@@ -102,15 +130,22 @@ class SearchService:
         parts.append(f"(FIRST_PDATE:[{params.date_from} TO {params.date_to}])")
 
         if params.publication_types:
-            clause = " OR ".join(f'PUB_TYPE:("{pt}")' for pt in params.publication_types)
-            parts.append(f"({clause})")
+            # The catch-all captures regular journal articles (stored as
+            # "research-article" / "Journal Article" in Europe PMC) that would
+            # otherwise be missed by the explicit type list alone.
+            explicit = " OR ".join(
+                f'PUB_TYPE:("{_pub_type_to_api(pt)}")' for pt in params.publication_types
+            )
+            parts.append(f"({_PUB_TYPE_CATCH_ALL} OR {explicit})")
 
         if params.licenses:
             clause = " OR ".join(f'LICENSE:"{lic}"' for lic in params.licenses)
             parts.append(f"({clause})")
 
         if params.author_orcids:
-            clause = " OR ".join(f'AUTHORID:"{oid}"' for oid in params.author_orcids)
+            # Europe PMC AUTHORID field syntax: no quotes, no prefix.
+            # e.g. AUTHORID:0000-0001-5109-3700
+            clause = " OR ".join(f"AUTHORID:{oid}" for oid in params.author_orcids)
             parts.append(f"({clause})")
 
         parts.append(f"({FREE_FULL_TEXT_FILTER})")

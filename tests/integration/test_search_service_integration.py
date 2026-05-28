@@ -1,14 +1,10 @@
-"""Integration tests for SearchService — hits the real Europe PMC API.
+"""Integration tests for SearchService.
 
-This directory sits outside the unit-test tree defined in CLAUDE.md so that
-integration tests can be excluded from CI with ``-m "not integration"`` without
-touching the mirrored unit-test structure under tests/test_services/.
+HTTP interactions are recorded as VCR cassettes in tests/integration/cassettes/
+and replayed deterministically in CI — no live network access required.
 
-Run with:
-    pytest -m integration
-
-Skip during normal development/CI with:
-    pytest -m "not integration"
+Re-record cassettes when the API changes:
+    pytest -m integration --vcr-record=all
 """
 
 from pathlib import Path
@@ -18,6 +14,8 @@ import pytest
 from epmcminer.api.client import EuropePMCClient
 from epmcminer.api.models import SearchParams, SearchResult
 from epmcminer.services.search_service import SearchService
+
+pytestmark = [pytest.mark.vcr, pytest.mark.integration]
 
 COMMON_QUERY = "depression"
 DATE_FROM = "2020-01-01"
@@ -52,7 +50,6 @@ def service() -> SearchService:
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.integration
 class TestBuildQueryIntegration:
     """Integration tests verifying build_query output produces valid API results."""
 
@@ -82,7 +79,6 @@ class TestBuildQueryIntegration:
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.integration
 class TestPreviewIntegration:
     """Integration tests for SearchService.preview."""
 

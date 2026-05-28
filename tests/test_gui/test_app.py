@@ -68,7 +68,7 @@ class TestMainWindowInit:
     """Verify the initial state of a freshly created MainWindow."""
 
     def test_window_title(self, qapp: QApplication) -> None:
-        """Window title is 'epmcminer'."""
+        """Window title matches the APP_TITLE constant (includes version)."""
         w = MainWindow()
         assert w.windowTitle() == APP_TITLE
 
