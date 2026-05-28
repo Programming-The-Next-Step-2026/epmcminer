@@ -9,6 +9,7 @@ from epmcminer.api.client import (
     DEFAULT_CURSOR_MARK,
     APIError,
     EuropePMCClient,
+    InvalidPdfContentError,
 )
 from epmcminer.api.download_result import DownloadResult
 from epmcminer.api.models import Paper, SearchParams
@@ -22,6 +23,7 @@ DOWNLOAD_PAGE_SIZE = 10
 
 _REASON_NO_PDF = "PDF unavailable"
 _REASON_ALREADY_DOWNLOADED = "Already downloaded"
+_REASON_RATE_LIMITED = "Server rate limiting"
 
 
 class DownloadService:
@@ -32,7 +34,7 @@ class DownloadService:
     the operation.
     """
 
-    MAX_WORKERS = 4
+    MAX_WORKERS = 2  # reduced from 4 to limit concurrent request rate and avoid HTTP 429
 
     def __init__(self, client: EuropePMCClient, search_service: SearchService) -> None:
         """Initialise DownloadService with injected API client and search service.
@@ -250,12 +252,23 @@ class DownloadService:
 
         try:
             pdf_bytes = self._client.download_pdf(pdf_url, cancel_event=cancel_event)
+        except InvalidPdfContentError as exc:
+            _logger.warning("Skipping %s: %s", pmid, exc)
+            return DownloadResult(
+                paper=paper,
+                status=DownloadResult.STATUS_SKIPPED,
+                reason="Not a valid PDF",
+                file_path=None,
+            )
         except APIError as exc:
             _logger.warning("Failed to download %s: HTTP %s", pmid, exc.status_code)
+            reason = (
+                _REASON_RATE_LIMITED if exc.status_code == 429 else str(exc.status_code)
+            )
             return DownloadResult(
                 paper=paper,
                 status=DownloadResult.STATUS_FAILED,
-                reason=str(exc.status_code),
+                reason=reason,
                 file_path=None,
             )
         except ConnectionError as exc:

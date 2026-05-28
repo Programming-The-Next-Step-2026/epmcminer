@@ -14,6 +14,7 @@ from epmcminer.api.client import (
     SORT_BY_DATE,
     APIError,
     EuropePMCClient,
+    InvalidPdfContentError,
 )
 
 # ---------------------------------------------------------------------------
@@ -108,14 +109,91 @@ class TestSearch:
 
     @responses.activate
     def test_search_api_error_raises_api_error(self, client: EuropePMCClient) -> None:
-        """A non-200 response raises APIError with status code and body."""
+        """A non-200, non-429 response raises APIError immediately without retrying."""
         responses.add(responses.GET, SEARCH_URL, body="Internal Server Error", status=500)
 
-        with pytest.raises(APIError) as exc_info:
-            client.search(query="depression", page_size=10)
+        with patch("epmcminer.api.client.time.sleep"):
+            with pytest.raises(APIError) as exc_info:
+                client.search(query="depression", page_size=10)
 
         assert exc_info.value.status_code == 500
         assert "500" in str(exc_info.value)
+        assert len(responses.calls) == 1
+
+    @responses.activate
+    def test_search_429_is_retried_and_succeeds(self, client: EuropePMCClient) -> None:
+        """A 429 response is retried and succeeds on the next attempt."""
+        responses.add(responses.GET, SEARCH_URL, body="Too Many Requests", status=429)
+        responses.add(responses.GET, SEARCH_URL, json=SEARCH_RESPONSE, status=200)
+
+        with patch("epmcminer.api.client.time.sleep") as mock_sleep:
+            result = client.search(query="depression", page_size=10)
+
+        assert result["hitCount"] == 2
+        assert len(responses.calls) == 2
+        mock_sleep.assert_called_once()
+
+    @responses.activate
+    def test_search_429_exhausted_raises_api_error(self, client: EuropePMCClient) -> None:
+        """A persistent 429 raises APIError after exhausting all retries."""
+        for _ in range(3):
+            responses.add(responses.GET, SEARCH_URL, body="Too Many Requests", status=429)
+
+        with patch("epmcminer.api.client.time.sleep"):
+            with pytest.raises(APIError) as exc_info:
+                client.search(query="depression", page_size=10)
+
+        assert exc_info.value.status_code == 429
+        assert len(responses.calls) == 3
+
+    @responses.activate
+    def test_search_429_uses_retry_after_header(self, client: EuropePMCClient) -> None:
+        """search() uses the Retry-After header value as the sleep delay on 429."""
+        responses.add(
+            responses.GET, SEARCH_URL,
+            body="Too Many Requests", status=429,
+            headers={"Retry-After": "7"},
+        )
+        responses.add(responses.GET, SEARCH_URL, json=SEARCH_RESPONSE, status=200)
+
+        with patch("epmcminer.api.client.time.sleep") as mock_sleep:
+            client.search(query="depression", page_size=10)
+
+        mock_sleep.assert_called_once_with(7.0)
+
+    @responses.activate
+    def test_search_connection_error_is_retried_and_succeeds(
+        self, client: EuropePMCClient
+    ) -> None:
+        """A transient ConnectionError on search is retried and succeeds."""
+        responses.add(
+            responses.GET, SEARCH_URL,
+            body=requests.exceptions.ConnectionError("dropped"),
+        )
+        responses.add(responses.GET, SEARCH_URL, json=SEARCH_RESPONSE, status=200)
+
+        with patch("epmcminer.api.client.time.sleep"):
+            result = client.search(query="depression", page_size=10)
+
+        assert result["hitCount"] == 2
+        assert len(responses.calls) == 2
+
+    @responses.activate
+    def test_search_persistent_connection_error_raises_connection_error(
+        self, client: EuropePMCClient
+    ) -> None:
+        """Persistent ConnectionError on search raises ConnectionError after all retries."""
+        for _ in range(3):
+            responses.add(
+                responses.GET, SEARCH_URL,
+                body=requests.exceptions.ConnectionError("dropped"),
+            )
+
+        with patch("epmcminer.api.client.time.sleep"):
+            with pytest.raises(ConnectionError):
+                client.search(query="depression", page_size=10)
+
+        assert len(responses.calls) == 3
 
     @responses.activate
     def test_search_empty_results(self, client: EuropePMCClient) -> None:
@@ -159,6 +237,27 @@ class TestDownloadPdf:
         result = client.download_pdf(url=self.PDF_URL)
 
         assert result == self.PDF_BYTES
+
+    @responses.activate
+    def test_html_response_raises_invalid_pdf_content_error(
+        self, client: EuropePMCClient
+    ) -> None:
+        """A 200 response whose body is not PDF bytes raises InvalidPdfContentError."""
+        html_body = b"<html><head><title>Preparing to download...</title></head></html>"
+        responses.add(responses.GET, self.PDF_URL, body=html_body, status=200)
+
+        with pytest.raises(InvalidPdfContentError):
+            client.download_pdf(url=self.PDF_URL)
+
+    @responses.activate
+    def test_non_pdf_bytes_raise_invalid_pdf_content_error(
+        self, client: EuropePMCClient
+    ) -> None:
+        """Any 200 response body not starting with %PDF raises InvalidPdfContentError."""
+        responses.add(responses.GET, self.PDF_URL, body=b"not a pdf", status=200)
+
+        with pytest.raises(InvalidPdfContentError):
+            client.download_pdf(url=self.PDF_URL)
 
     @responses.activate
     def test_non_200_raises_api_error(self, client: EuropePMCClient) -> None:
@@ -360,3 +459,66 @@ class TestDownloadPdf:
         assert result == self.PDF_BYTES
         # cancel_event was not set, so time.sleep was NOT used (cancel_event.wait was used)
         mock_sleep.assert_not_called()
+
+    @responses.activate
+    def test_429_is_retried_and_succeeds_with_retry_after_header(
+        self, client: EuropePMCClient
+    ) -> None:
+        """A 429 with a Retry-After header is retried using the header value as delay."""
+        responses.add(
+            responses.GET, self.PDF_URL,
+            body="Too Many Requests", status=429,
+            headers={"Retry-After": "3"},
+        )
+        responses.add(responses.GET, self.PDF_URL, body=self.PDF_BYTES, status=200)
+
+        with patch("epmcminer.api.client.time.sleep") as mock_sleep:
+            result = client.download_pdf(url=self.PDF_URL)
+
+        assert result == self.PDF_BYTES
+        assert len(responses.calls) == 2
+        mock_sleep.assert_called_once_with(3.0)
+
+    @responses.activate
+    def test_429_uses_exponential_backoff_when_no_retry_after_header(
+        self, client: EuropePMCClient
+    ) -> None:
+        """A 429 without Retry-After falls back to exponential backoff (1 s, 2 s)."""
+        for _ in range(3):
+            responses.add(responses.GET, self.PDF_URL, body="Too Many Requests", status=429)
+
+        with patch("epmcminer.api.client.time.sleep") as mock_sleep:
+            with pytest.raises(APIError):
+                client.download_pdf(url=self.PDF_URL)
+
+        delays = [call.args[0] for call in mock_sleep.call_args_list]
+        assert delays == [1, 2]
+
+    @responses.activate
+    def test_429_exhausted_raises_api_error(self, client: EuropePMCClient) -> None:
+        """A persistent 429 raises APIError(429) after all retries are exhausted."""
+        for _ in range(3):
+            responses.add(responses.GET, self.PDF_URL, body="Too Many Requests", status=429)
+
+        with patch("epmcminer.api.client.time.sleep"):
+            with pytest.raises(APIError) as exc_info:
+                client.download_pdf(url=self.PDF_URL)
+
+        assert exc_info.value.status_code == 429
+        assert len(responses.calls) == 3
+
+    @responses.activate
+    def test_429_is_interruptible_via_cancel_event(self, client: EuropePMCClient) -> None:
+        """A 429 retry delay is interruptible via cancel_event.wait."""
+        cancel_event = threading.Event()
+        responses.add(responses.GET, self.PDF_URL, body="Too Many Requests", status=429)
+
+        def fake_wait(timeout: float) -> bool:
+            cancel_event.set()
+            return True  # event fired — cancelled
+
+        with patch.object(cancel_event, "wait", side_effect=fake_wait):
+            with pytest.raises(ConnectionError):
+                client.download_pdf(url=self.PDF_URL, cancel_event=cancel_event)
+
+        assert len(responses.calls) == 1

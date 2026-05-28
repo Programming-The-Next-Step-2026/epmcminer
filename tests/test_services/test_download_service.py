@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from epmcminer.api.client import APIError, EuropePMCClient
+from epmcminer.api.client import APIError, EuropePMCClient, InvalidPdfContentError
 from epmcminer.api.download_result import DownloadResult
 from epmcminer.api.models import SearchParams
 from epmcminer.services.download_service import DOWNLOAD_PAGE_SIZE, DownloadService
@@ -212,7 +212,7 @@ class TestDownload:
     def test_failed_download_on_http_error(
         self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
     ) -> None:
-        """An HTTP error during download returns status='failed' with the status code."""
+        """A non-429 HTTP error returns status='failed' with the numeric status code."""
         mock_client.search.return_value = make_search_response(
             [make_raw_paper()], next_cursor="*"
         )
@@ -227,6 +227,26 @@ class TestDownload:
         assert len(results) == 1
         assert results[0].status == "failed"
         assert results[0].reason == "503"
+        assert results[0].file_path is None
+
+    def test_429_error_reported_as_server_rate_limiting(
+        self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
+    ) -> None:
+        """An exhausted 429 returns status='failed' with reason 'Server rate limiting'."""
+        mock_client.search.return_value = make_search_response(
+            [make_raw_paper()], next_cursor="*"
+        )
+        mock_client.download_pdf.side_effect = APIError(429, "Too Many Requests")
+
+        results = service.download(
+            make_params(tmp_path, count=1),
+            progress_callback=lambda r: None,
+            cancel_event=threading.Event(),
+        )
+
+        assert len(results) == 1
+        assert results[0].status == DownloadResult.STATUS_FAILED
+        assert results[0].reason == "Server rate limiting"
         assert results[0].file_path is None
 
     def test_failed_download_on_connection_error(
@@ -247,6 +267,28 @@ class TestDownload:
         assert len(results) == 1
         assert results[0].status == "failed"
         assert results[0].reason == "Connection error"
+        assert results[0].file_path is None
+
+    def test_non_pdf_response_results_in_skipped(
+        self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
+    ) -> None:
+        """InvalidPdfContentError from the client returns status='skipped' with a clear reason."""
+        mock_client.search.return_value = make_search_response(
+            [make_raw_paper()], next_cursor="*"
+        )
+        mock_client.download_pdf.side_effect = InvalidPdfContentError(
+            "Response is not a valid PDF"
+        )
+
+        results = service.download(
+            make_params(tmp_path, count=1),
+            progress_callback=lambda r: None,
+            cancel_event=threading.Event(),
+        )
+
+        assert len(results) == 1
+        assert results[0].status == DownloadResult.STATUS_SKIPPED
+        assert results[0].reason == "Not a valid PDF"
         assert results[0].file_path is None
 
     def test_cancel_event_set_before_download_returns_empty(
