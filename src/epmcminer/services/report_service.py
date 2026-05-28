@@ -101,6 +101,12 @@ class ReportService:
 
         Raises:
             OSError: If the file cannot be written.
+
+        Examples:
+            >>> from pathlib import Path
+            >>> report_path = service.save_csv(results, params, Path("/tmp/my_run"))
+            >>> print(report_path.name)
+            report.csv
         """
         output_folder.mkdir(parents=True, exist_ok=True)
         path = output_folder / _CSV_FILENAME
@@ -123,6 +129,10 @@ class ReportService:
 
         Raises:
             OSError: If the file cannot be written.
+
+        Examples:
+            >>> from pathlib import Path
+            >>> service.export_excel(results, params, Path("/tmp/my_run/report.xlsx"))
         """
         output_path.parent.mkdir(parents=True, exist_ok=True)
         self._build_dataframe(results, params).to_excel(output_path, index=False, engine="openpyxl")
@@ -150,6 +160,11 @@ class ReportService:
 
         Raises:
             OSError: If the file cannot be written.
+
+        Examples:
+            >>> from pathlib import Path
+            >>> out = Path("/tmp/my_run/report.pdf")
+            >>> service.export_pdf(results, params, out, total_found=1024)
         """
         output_path.parent.mkdir(parents=True, exist_ok=True)
         doc = SimpleDocTemplate(

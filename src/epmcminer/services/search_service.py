@@ -194,6 +194,14 @@ class SearchService:
         Raises:
             APIError: If the Europe PMC API returns a non-200 response.
             ConnectionError: If the HTTP request cannot be completed.
+
+        Examples:
+            >>> params = SearchParams(query="sleep", date_from="2020-01-01", date_to="2024-12-31")
+            >>> result = service.preview(params)
+            >>> print(result.total_found)
+            142
+            >>> print(len(result.papers))
+            10
         """
         query = self.build_query(params)
         sort = SORT_ORDER_MAP.get(params.sort_order)

@@ -116,6 +116,14 @@ class EuropePMCClient:
             APIError: If the API returns a non-200, non-retryable HTTP status code, or if
                 a 429 persists after all retry attempts.
             ConnectionError: If the HTTP request cannot be completed after all retries.
+
+        Examples:
+            >>> client = EuropePMCClient()
+            >>> data = client.search("depression AND therapy", page_size=10)
+            >>> print(data["hitCount"])
+            4231
+            >>> print(data["resultList"]["result"][0]["title"])
+            'Cognitive behavioural therapy for depression: a meta-analysis'
         """
         full_query = f"({query}) AND ({FREE_FULL_TEXT_FILTER})"
         params: dict = {
@@ -204,6 +212,18 @@ class EuropePMCClient:
             ConnectionError: If the connection fails on all retry attempts, if a
                 timeout persists after all retry attempts, or if ``cancel_event``
                 is set.
+
+        Examples:
+            >>> client = EuropePMCClient()
+            >>> pdf_bytes = client.download_pdf("https://europepmc.org/articles/PMC1234567?pdf=render")
+            >>> pdf_bytes[:4]
+            b'%PDF'
+
+            With cancellation support:
+
+            >>> import threading
+            >>> cancel = threading.Event()
+            >>> pdf_bytes = client.download_pdf(url, cancel_event=cancel)
         """
         last_exc: Exception | None = None
         for attempt in range(_MAX_RETRIES):

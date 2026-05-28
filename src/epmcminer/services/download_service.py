@@ -76,6 +76,22 @@ class DownloadService:
             ValueError: If ``params.output_folder`` is ``None``.
             APIError: If the Europe PMC search API returns a non-200 response.
             ConnectionError: If an HTTP request cannot be completed.
+
+        Examples:
+            >>> import threading
+            >>> from pathlib import Path
+            >>> from epmcminer.api.search_params import SearchParams
+            >>> params = SearchParams(
+            ...     query="memory AND sleep",
+            ...     date_from="2022-01-01",
+            ...     date_to="2024-12-31",
+            ...     count=5,
+            ...     output_folder=Path("/tmp/my_run"),
+            ... )
+            >>> cancel = threading.Event()
+            >>> results = service.download(params, progress_callback=print, cancel_event=cancel)
+            >>> print(sum(1 for r in results if r.status == "downloaded"))
+            5
         """
         if params.output_folder is None:
             raise ValueError(
