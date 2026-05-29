@@ -196,6 +196,7 @@ class ScreenSummary(QWidget):
             self._toast.reposition()
 
     def _build_ui(self) -> None:
+        """Construct the screen layout: scrollable stat and params cards, plus action bar."""
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
@@ -232,6 +233,18 @@ class ScreenSummary(QWidget):
         sub_text: str,
         value_color: str,
     ) -> tuple[QWidget, QLabel, QLabel]:
+        """Build a single stat card with a label, large value, and sub-text.
+
+        Args:
+            label: The card's descriptive heading shown at the top.
+            initial_value: The placeholder value displayed before data is loaded.
+            sub_text: A short explanatory line shown below the value.
+            value_color: CSS colour string applied to the value label.
+
+        Returns:
+            Tuple of (the card widget, the value QLabel, the sub-text QLabel).
+
+        """
         card, layout = make_card()
 
         label_lbl = QLabel(label)
@@ -251,6 +264,12 @@ class ScreenSummary(QWidget):
         return card, value_lbl, sub_lbl
 
     def _make_stat_row(self) -> QHBoxLayout:
+        """Build the horizontal layout of three stat cards (downloaded, skipped, total found).
+
+        Returns:
+            A QHBoxLayout containing the three stat card widgets.
+
+        """
         row = QHBoxLayout()
         row.setSpacing(16)
 
@@ -270,6 +289,12 @@ class ScreenSummary(QWidget):
         return row
 
     def _make_params_card(self) -> QWidget:
+        """Build the search parameters card with a container for populated param rows.
+
+        Returns:
+            The card QWidget whose interior is populated by _populate_params.
+
+        """
         card, layout = make_card()
         layout.addWidget(make_section_label("Search parameters"))
 
@@ -283,6 +308,13 @@ class ScreenSummary(QWidget):
         return card
 
     def _make_skipped_card(self) -> QWidget:
+        """Build the skipped papers card with a scrollable list container.
+
+        Returns:
+            The card QWidget whose list is populated by _populate_skipped. Hidden when
+            there are no skipped papers.
+
+        """
         card, layout = make_card()
         layout.addWidget(make_section_label("Skipped papers"))
 
@@ -306,6 +338,12 @@ class ScreenSummary(QWidget):
         return card
 
     def _make_action_bar(self) -> QWidget:
+        """Build the fixed-height action bar with New search, Export Excel, and Export PDF buttons.
+
+        Returns:
+            A QWidget containing the three action buttons.
+
+        """
         bar = QWidget()
         bar.setFixedHeight(72)
         bar.setStyleSheet(
@@ -427,6 +465,12 @@ class ScreenSummary(QWidget):
         return row, value_lbls
 
     def _populate_params(self, params: SearchParams) -> None:
+        """Clear and repopulate the params card with rows built from the given SearchParams.
+
+        Args:
+            params: The SearchParams whose fields are rendered as label–value rows.
+
+        """
         while self._param_pairs_layout.count():
             item = self._param_pairs_layout.takeAt(0)
             if item.widget():  # type: ignore[union-attr]
@@ -466,6 +510,14 @@ class ScreenSummary(QWidget):
             )
 
     def _populate_skipped(self, results: list[DownloadResult]) -> None:
+        """Clear and repopulate the skipped papers card from the given results.
+
+        Shows the card when there are skipped or failed papers; hides it otherwise.
+
+        Args:
+            results: The full list of DownloadResult objects from the download phase.
+
+        """
         not_downloaded = [r for r in results if r.status != DownloadResult.STATUS_DOWNLOADED]
         self._skipped_card.setVisible(bool(not_downloaded))
 
@@ -479,6 +531,16 @@ class ScreenSummary(QWidget):
             self._skipped_list_layout.addWidget(self._make_skipped_row(result, last=last))
 
     def _make_skipped_row(self, result: DownloadResult, *, last: bool) -> QWidget:
+        """Build a single row widget for a skipped or failed paper.
+
+        Args:
+            result: The DownloadResult to render (non-downloaded status expected).
+            last: When True, the bottom separator is omitted to avoid a double border.
+
+        Returns:
+            A QWidget showing the paper title, metadata, and skip reason.
+
+        """
         row = QWidget()
         row.setStyleSheet(f"background-color: {theme.CARD_BG};")
         row_layout = QHBoxLayout(row)

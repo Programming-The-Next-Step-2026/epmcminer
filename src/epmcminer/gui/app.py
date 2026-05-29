@@ -3,8 +3,8 @@
 from importlib.metadata import PackageNotFoundError
 from importlib.metadata import version as _pkg_version
 
-from PyQt6.QtCore import QPoint, Qt
-from PyQt6.QtGui import QMouseEvent
+from PyQt6.QtCore import QPoint, QRectF, Qt
+from PyQt6.QtGui import QColor, QMouseEvent, QPaintEvent, QPainter, QPainterPath, QRegion, QResizeEvent
 from PyQt6.QtWidgets import (
     QFrame,
     QHBoxLayout,
@@ -45,6 +45,8 @@ _STEP_COUNT = len(_STEP_LABELS)
 _STEP_FONT_SIZE = 11
 _STEP_TOP_MARGIN = 20  # vertical padding above circles inside each step widget
 
+_CORNER_RADIUS = 14.0
+
 _TITLE_BAR_HEIGHT = 74
 _CIRCLE_SIZE = 26
 _CIRCLE_RADIUS = _CIRCLE_SIZE // 2
@@ -60,6 +62,35 @@ _TRAFFIC_LIGHT_SIZE = 12
 _TRAFFIC_LIGHT_RADIUS = _TRAFFIC_LIGHT_SIZE // 2
 _TRAFFIC_LIGHT_SPACING = 8
 _TRAFFIC_LIGHTS_LEFT_MARGIN = 16
+
+
+# ---------------------------------------------------------------------------
+# Rounded window background
+# ---------------------------------------------------------------------------
+
+
+class _RoundedCentralWidget(QWidget):
+    """Central widget that clips itself and all children to a rounded rectangle.
+
+    Works together with ``WA_TranslucentBackground`` on the parent window:
+    the corners outside the rounded path are fully transparent (the OS renders
+    a native drop shadow into that space on macOS).
+    """
+
+    def paintEvent(self, event: QPaintEvent | None) -> None:
+        """Fill the rounded rect with the app background colour."""
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        path = QPainterPath()
+        path.addRoundedRect(QRectF(self.rect()), _CORNER_RADIUS, _CORNER_RADIUS)
+        painter.fillPath(path, QColor(theme.APP_BG))
+
+    def resizeEvent(self, event: QResizeEvent | None) -> None:
+        """Re-apply the rounded mask whenever the window is resized."""
+        super().resizeEvent(event)
+        path = QPainterPath()
+        path.addRoundedRect(QRectF(self.rect()), _CORNER_RADIUS, _CORNER_RADIUS)
+        self.setMask(QRegion(path.toFillPolygon().toPolygon()))
 
 
 # ---------------------------------------------------------------------------
@@ -98,6 +129,12 @@ class _TitleBar(QWidget):
         layout.addLayout(self._make_app_title())
 
     def _make_app_title(self) -> QHBoxLayout:
+        """Build and return the version label layout placed at the right of the title bar.
+
+        Returns:
+            A QHBoxLayout containing the version label.
+
+        """
         lay = QHBoxLayout()
         lay.setContentsMargins(0, 0, _TRAFFIC_LIGHTS_LEFT_MARGIN, 0)
         lay.setSpacing(0)
@@ -109,6 +146,12 @@ class _TitleBar(QWidget):
         return lay
 
     def _make_traffic_lights(self) -> QHBoxLayout:
+        """Build and return the macOS-style traffic-light button layout.
+
+        Returns:
+            A QHBoxLayout containing the close, minimise, and zoom buttons.
+
+        """
         btn_layout = QHBoxLayout()
         btn_layout.setContentsMargins(0, 0, 0, 0)
         btn_layout.setSpacing(_TRAFFIC_LIGHT_SPACING)
@@ -137,6 +180,13 @@ class _TitleBar(QWidget):
         return btn_layout
 
     def _make_steps(self) -> QHBoxLayout:
+        """Build and return the step-indicator layout with numbered circles and connectors.
+
+        Returns:
+            A QHBoxLayout containing one step widget per wizard step, joined by
+            horizontal connector lines.
+
+        """
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
@@ -270,6 +320,7 @@ class MainWindow(QMainWindow):
         self.setMinimumSize(MINIMUM_WIDTH, MINIMUM_HEIGHT)
         self.resize(DEFAULT_WIDTH, DEFAULT_HEIGHT)
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.Window)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
         # Services — created once and injected; never re-created on navigation
         search_service, download_service, report_service, orcid_service = (
@@ -303,22 +354,13 @@ class MainWindow(QMainWindow):
         self._stack.setCurrentIndex(screen_index)
         self._title_bar.update_steps(screen_index)
 
-    def update_step_indicator(self, active_step: int) -> None:
-        """Update only the step indicator without switching screens.
-
-        Args:
-            active_step: Zero-based index of the currently active step (0–3).
-
-        """
-        self._title_bar.update_steps(active_step)
-
     # ------------------------------------------------------------------
     # UI construction
-    # ------------------------------------------------------------------
+    # ----------------------------------------------------------------
 
     def _build_ui(self) -> None:
-        central = QWidget()
-        central.setStyleSheet(f"background-color: {theme.APP_BG};")
+        """Construct the main window layout: rounded central widget, title bar, and screen stack."""
+        central = _RoundedCentralWidget()
         self.setCentralWidget(central)
 
         root = QVBoxLayout(central)
@@ -338,6 +380,7 @@ class MainWindow(QMainWindow):
         self._title_bar.update_steps(0)
 
     def _connect_signals(self) -> None:
+        """Connect all inter-screen signals to their corresponding navigation slots."""
         self._screen_search.search_requested.connect(self._on_search_requested)
         self._screen_preview.back_requested.connect(self._on_back_requested)
         self._screen_preview.download_requested.connect(self._on_download_requested)
@@ -350,24 +393,50 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------------------------
 
     def _on_search_requested(self, params: SearchParams) -> None:
+        """Load the preview screen with the given params and navigate to it.
+
+        Args:
+            params: The search parameters collected on Screen 1.
+
+        """
         self._screen_preview.load(params)
         self.navigate_to(1)
 
     def _on_back_requested(self) -> None:
+        """Navigate back to Screen 1 when the preview screen emits back_requested."""
         self.navigate_to(0)
 
     def _on_download_requested(self, params: SearchParams) -> None:
+        """Start the download with the given params and navigate to Screen 3.
+
+        Args:
+            params: The fully populated SearchParams including output_folder and count.
+
+        """
         self._last_params = params
         self._screen_download.start(params)
         self.navigate_to(2)
 
     def _on_result_loaded(self, total_found: int) -> None:
+        """Store the total API result count for use on the summary screen.
+
+        Args:
+            total_found: Total number of papers found by the Europe PMC search.
+
+        """
         self._total_found = total_found
 
     def _on_download_complete(self, results: list[DownloadResult]) -> None:
+        """Populate and navigate to the summary screen when the download finishes.
+
+        Args:
+            results: The full list of DownloadResult objects from the download phase.
+
+        """
         if self._last_params is not None:
             self._screen_summary.load(results, self._last_params, self._total_found)
             self.navigate_to(3)
 
     def _on_new_search_requested(self) -> None:
+        """Navigate back to Screen 1 when the summary screen requests a new search."""
         self.navigate_to(0)

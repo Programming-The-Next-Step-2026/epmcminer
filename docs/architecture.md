@@ -121,6 +121,67 @@ Every blocking operation (API calls, file I/O) runs in a `QThread` worker subcla
 
 ---
 
+## Qt signals and slots
+
+### The core idea
+
+A **signal** is a typed announcement that an object can fire. A **slot** is any callable that is registered to receive it. The connection is declared once; after that, emitting the signal automatically calls every connected slot — the emitter never needs to know who is listening.
+
+```python
+# Declaration (on the class, not an instance)
+class MyWorker(QThread):
+    result_ready = pyqtSignal(str)      # will carry one str argument
+
+# Connection (in the caller)
+worker.result_ready.connect(self._on_result)
+
+# Emission (inside the worker)
+self.result_ready.emit("hello")         # _on_result("hello") is called
+```
+
+Think of it as a strongly-typed callback system built into Qt — but with one critical extra property: **cross-thread safety**.
+
+### Why signals exist
+
+GUI frameworks require that all UI updates happen on the **main thread** (the thread that owns the event loop). Worker threads do blocking I/O and must not touch widgets directly. Signals solve this:
+
+- When a signal is emitted from a **background thread**, Qt queues the call as an event in the main thread's event loop.
+- The main thread picks it up between user interactions and runs the slot safely.
+- No mutexes, no `QMetaObject.invokeMethod` boilerplate — the framework handles it.
+
+### How this project uses signals
+
+**Screen → MainWindow navigation.** A screen never imports `MainWindow` or navigates itself. Instead it declares a signal and emits it. `MainWindow` connects it to `navigate_to()`:
+
+```
+ScreenSearch.search_requested  ──connect──►  MainWindow._on_search_requested
+                                             (calls navigate_to(1) + starts preview)
+```
+
+This keeps screens decoupled: `ScreenSearch` has no idea what happens next.
+
+**Worker → GUI progress updates.** Every `QThread` worker owns its own signals. `DownloadWorker` emits three:
+
+| Signal | Argument | Connected slot |
+|---|---|---|
+| `progress_updated` | `DownloadResult` | `ScreenDownload._on_progress` |
+| `download_finished` | `list[DownloadResult]` | `ScreenDownload._on_finished` |
+| `error_occurred` | `str` | `ScreenDownload._on_error` |
+
+The worker thread calls `self.progress_updated.emit(result)` for each paper. Qt marshals this into the main thread's event loop; `_on_progress` then updates the progress bar and appends a log row — both safe UI operations.
+
+### Signal type safety in PyQt6
+
+`pyqtSignal(DownloadResult)` pins the argument type at class definition time. Emitting the wrong type raises at runtime, and mypy catches mismatches statically. The `list` in `download_finished = pyqtSignal(list)` is unparameterised because PyQt6's C++ bridge cannot represent generic types; the slot manually annotates the argument as `list[DownloadResult]`.
+
+### What signals are not
+
+- They are **not async/await**. Emission is synchronous in the emitting thread; delivery happens when the receiving thread's event loop next runs.
+- They are **not a message bus**. Each connection is point-to-point, declared explicitly, and visible in the code.
+- They do **not replace return values**. A worker emits results via a signal because it runs on a different thread; two objects on the same thread that need to exchange data just call methods normally.
+
+---
+
 ## Testing
 
 **618 tests** across unit and integration suites.

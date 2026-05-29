@@ -195,6 +195,7 @@ class Toast(QWidget):
         self.style().drawPrimitive(QStyle.PrimitiveElement.PE_Widget, opt, painter, self)  # type: ignore[union-attr]
 
     def _build_ui(self) -> None:
+        """Create the icon badge and message label laid out horizontally."""
         layout = QHBoxLayout(self)
         layout.setContentsMargins(16, 12, 16, 12)
         layout.setSpacing(12)

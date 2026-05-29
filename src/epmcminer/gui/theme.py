@@ -111,6 +111,10 @@ _fusion_style: QStyle | None = None
 def get_fusion_style() -> QStyle | None:
     """Return the Fusion QStyle instance, creating it lazily on first call.
 
+    This is needed to enure consistent widget appearance across platforms,
+    since the default style on some platforms (e.g. Windows) doesn't support
+    the full range of QSS features we use.
+
     The style is created on demand so this module is safe to import before
     a QApplication instance exists (e.g. in non-GUI tests or at module load
     time).

@@ -196,6 +196,7 @@ class ScreenDownload(QWidget):
     # ------------------------------------------------------------------
 
     def _build_ui(self) -> None:
+        """Construct the screen layout: scrollable progress and log cards, plus action bar."""
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
@@ -224,6 +225,12 @@ class ScreenDownload(QWidget):
         self._toast = Toast(self)
 
     def _make_progress_card(self) -> QWidget:
+        """Build the download progress card containing the ProgressWidget.
+
+        Returns:
+            The card QWidget containing the progress widget.
+
+        """
         card, layout = make_card(padding=26)
         layout.addWidget(make_section_label("Download progress"))
         self._progress = ProgressWidget()
@@ -231,6 +238,12 @@ class ScreenDownload(QWidget):
         return card
 
     def _make_log_card(self) -> QWidget:
+        """Build the live status card with a scrollable, auto-scrolling log area.
+
+        Returns:
+            The card QWidget containing the log scroll area.
+
+        """
         card, layout = make_card()
         layout.addWidget(make_section_label("Live status"))
 
@@ -258,6 +271,12 @@ class ScreenDownload(QWidget):
         return card
 
     def _make_action_bar(self) -> QWidget:
+        """Build the fixed-height action bar with the output path label and Cancel button.
+
+        Returns:
+            A QWidget containing the folder label and cancel button.
+
+        """
         bar = QWidget()
         bar.setFixedHeight(72)
         bar.setStyleSheet(
@@ -394,7 +413,7 @@ class ScreenDownload(QWidget):
         elapsed = time.time() - self._start_time
         avg = elapsed / downloaded
         remaining = max(0, self._total - downloaded)
-        return round(avg * remaining) if remaining > 0 else None
+        return round(avg * remaining)
 
     # ------------------------------------------------------------------
     # Slots

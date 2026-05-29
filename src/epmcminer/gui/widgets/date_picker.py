@@ -318,6 +318,7 @@ class DatePicker(QWidget):
     # ------------------------------------------------------------------
 
     def _build_ui(self) -> None:
+        """Create the display button and attach the calendar popup."""
         self.setStyleSheet("background-color: transparent;")
 
         layout = QVBoxLayout(self)
@@ -340,6 +341,7 @@ class DatePicker(QWidget):
     # ------------------------------------------------------------------
 
     def _toggle_popup(self) -> None:
+        """Show the calendar popup below the display button, or hide it if already visible."""
         if self._popup.isVisible():
             self._popup.hide()
         else:
@@ -348,7 +350,14 @@ class DatePicker(QWidget):
             self._popup.show()
 
     def _on_date_selected(self, date: QDate) -> None:
+        """Handle a date click in the calendar popup by forwarding to setDate.
+
+        Args:
+            date: The QDate clicked in the calendar.
+
+        """
         self.setDate(date)
 
     def _update_display(self) -> None:
+        """Refresh the display button text to show the current selected date."""
         self._display.setText(self._date.toString("d MMM yyyy"))

@@ -208,6 +208,7 @@ class ScreenSearch(QWidget):
     # ------------------------------------------------------------------
 
     def _build_ui(self) -> None:
+        """Construct the screen layout: scrollable form cards and fixed action bar."""
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
@@ -249,6 +250,12 @@ class ScreenSearch(QWidget):
         self._license.tags_changed.connect(self._validate)
 
     def _make_query_card(self) -> QWidget:
+        """Build the search query card with a text input and a usage hint.
+
+        Returns:
+            The card QWidget containing the query input.
+
+        """
         card, layout = make_card()
         layout.addWidget(make_section_label("Search query"))
 
@@ -259,12 +266,18 @@ class ScreenSearch(QWidget):
         self._query_edit.setMaxLength(500)
         layout.addWidget(self._query_edit)
 
-        hint = QLabel("Defaults to AND if no operator specified")
+        hint = QLabel("Use AND / OR to combine keywords. Defaults to AND if no operator is specified")
         hint.setStyleSheet(_HINT_STYLE)
         layout.addWidget(hint)
         return card
 
     def _make_orcids_card(self) -> QWidget:
+        """Build the Author ORCIDs card with a tag input and a format hint.
+
+        Returns:
+            The card QWidget containing the ORCID tag input.
+
+        """
         card, layout = make_card()
         layout.addWidget(make_section_label("Author ORCIDs"))
 
@@ -278,6 +291,12 @@ class ScreenSearch(QWidget):
         return card
 
     def _make_pub_types_card(self) -> QWidget:
+        """Build the publication types card pre-populated with all default types.
+
+        Returns:
+            The card QWidget containing the publication type tag input.
+
+        """
         card, layout = make_card()
         layout.addWidget(make_section_label("Publication types"))
 
@@ -289,6 +308,12 @@ class ScreenSearch(QWidget):
         return card
 
     def _make_two_col_row(self) -> QWidget:
+        """Build a two-column row containing the license and date range cards side by side.
+
+        Returns:
+            A QWidget laying out the license card and date card horizontally.
+
+        """
         row = QWidget()
         row.setStyleSheet(f"background-color: {theme.APP_BG}; border: none;")
         layout = QHBoxLayout(row)
@@ -299,8 +324,14 @@ class ScreenSearch(QWidget):
         return row
 
     def _make_license_card(self) -> QWidget:
+        """Build the license card pre-populated with CC-BY.
+
+        Returns:
+            The card QWidget containing the license tag input.
+
+        """
         card, layout = make_card()
-        layout.addWidget(make_section_label("License"))
+        layout.addWidget(make_section_label("Licenses"))
 
         self._license = TagInput(available_options=_AVAILABLE_LICENSES, add_label="+ Add")
         self._license.set_tags(["CC-BY"])
@@ -308,6 +339,12 @@ class ScreenSearch(QWidget):
         return card
 
     def _make_date_card(self) -> QWidget:
+        """Build the date range card with from/to DatePicker widgets.
+
+        Returns:
+            The card QWidget containing the date range pickers.
+
+        """
         card, layout = make_card()
         layout.addWidget(make_section_label("Date range"))
 
@@ -342,6 +379,12 @@ class ScreenSearch(QWidget):
         return card
 
     def _make_action_bar(self) -> QWidget:
+        """Build the fixed-height action bar with the open-access label and Continue button.
+
+        Returns:
+            A QWidget containing the status label, hint label, and continue button.
+
+        """
         bar = QWidget()
         bar.setFixedHeight(72)
         bar.setStyleSheet(
@@ -384,9 +427,9 @@ class ScreenSearch(QWidget):
             parts: list[str] = []
             if not has_query:
                 parts.append("Enter a search keyword")
-            if not has_pub_types:
+            elif not has_pub_types:
                 parts.append("Select a publication type")
-            if not has_license:
+            elif not has_license:
                 parts.append("Select a license")
             self._hint_lbl.setText("  ·  ".join(parts))
             self._hint_lbl.setVisible(True)
@@ -404,6 +447,7 @@ class ScreenSearch(QWidget):
         self._date_from.setMaximumDate(new_to)
 
     def _on_continue(self) -> None:
+        """Emit search_requested with the current form values when Continue is clicked."""
         self.search_requested.emit(self.get_params())
 
     def _on_orcid_tags_changed(self, tags: list[str]) -> None:

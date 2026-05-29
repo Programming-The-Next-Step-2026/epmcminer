@@ -273,6 +273,7 @@ class ScreenPreview(QWidget):
     # ------------------------------------------------------------------
 
     def _build_ui(self) -> None:
+        """Construct the screen layout: scrollable content area and fixed action bar."""
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
@@ -328,6 +329,12 @@ class ScreenPreview(QWidget):
         return card
 
     def _make_error_widget(self) -> QWidget:
+        """Build the error state widget with a message label and a retry button.
+
+        Returns:
+            A QWidget shown in place of the results when the API call fails.
+
+        """
         widget = QWidget()
         widget.setStyleSheet(f"background-color: {theme.APP_BG};")
         layout = QVBoxLayout(widget)
@@ -351,6 +358,12 @@ class ScreenPreview(QWidget):
         return widget
 
     def _make_content(self) -> QWidget:
+        """Build the main results container holding stat tiles, settings, and paper list.
+
+        Returns:
+            A QWidget that is shown once a successful API result arrives.
+
+        """
         widget = QWidget()
         widget.setStyleSheet(f"background-color: {theme.APP_BG};")
         layout = QVBoxLayout(widget)
@@ -386,6 +399,12 @@ class ScreenPreview(QWidget):
         return card, value_lbl
 
     def _make_stat_row(self) -> QWidget:
+        """Build the horizontal row of three stat tiles (total, PDF %, previewing).
+
+        Returns:
+            A QWidget containing the three stat tiles laid out side by side.
+
+        """
         row = QWidget()
         row.setStyleSheet(f"background-color: {theme.APP_BG}; border: none;")
         layout = QHBoxLayout(row)
@@ -408,6 +427,12 @@ class ScreenPreview(QWidget):
         return row
 
     def _make_results_card(self) -> QWidget:
+        """Build the results preview card with a sort control and a scrollable paper list.
+
+        Returns:
+            The card QWidget containing the header, sort button, and paper list scroll area.
+
+        """
         card, layout = make_card()
 
         header_row = QWidget()
@@ -466,6 +491,15 @@ class ScreenPreview(QWidget):
         return card
 
     def _make_paper_row(self, paper: Paper) -> QWidget:
+        """Build a single row widget displaying title, authors, and metadata for a paper.
+
+        Args:
+            paper: The Paper dataclass whose fields are rendered in the row.
+
+        Returns:
+            A QWidget containing the paper's title, authors, and meta labels.
+
+        """
         row = QWidget()
         row.setStyleSheet(f"background-color: {theme.CARD_BG};")
         layout = QVBoxLayout(row)
@@ -499,6 +533,12 @@ class ScreenPreview(QWidget):
         return row
 
     def _make_download_settings_card(self) -> QWidget:
+        """Build the download settings card with count spinbox and folder picker.
+
+        Returns:
+            The card QWidget containing the paper count, output folder, and browse controls.
+
+        """
         card, layout = make_card()
         layout.addWidget(make_section_label("Download settings"))
 
@@ -539,7 +579,7 @@ class ScreenPreview(QWidget):
         folder_layout.addWidget(self._folder_edit)
         fields_layout.addWidget(folder_col, 1)
 
-        browse_btn = QPushButton("Browse")
+        browse_btn = QPushButton("Select")
         browse_btn.setStyle(theme.get_fusion_style())
         browse_btn.setStyleSheet(_BROWSE_BTN_STYLE)
         browse_btn.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
@@ -555,6 +595,12 @@ class ScreenPreview(QWidget):
         return card
 
     def _make_action_bar(self) -> QWidget:
+        """Build the fixed-height action bar with Back, hint label, and Start download buttons.
+
+        Returns:
+            A QWidget containing the action buttons pinned to the bottom of the screen.
+
+        """
         bar = QWidget()
         bar.setFixedHeight(72)
         bar.setStyleSheet(
@@ -595,6 +641,7 @@ class ScreenPreview(QWidget):
     # ------------------------------------------------------------------
 
     def _show_loading(self) -> None:
+        """Switch the screen to the loading state, hiding content and error widgets."""
         self._progress.set_loading("Searching…")
         self._loading_card.setVisible(True)
         self._error_widget.setVisible(False)
@@ -617,7 +664,7 @@ class ScreenPreview(QWidget):
                 parts.append("Select an output folder")
             elif not self._folder_writable:
                 parts.append("Selected folder is not writable")
-            if not has_count:
+            elif not has_count:
                 parts.append("Set a download count")
             self._hint_lbl.setText("  ·  ".join(parts))
             self._hint_lbl.setVisible(True)
@@ -688,6 +735,12 @@ class ScreenPreview(QWidget):
             self._folder_edit.setText(folder)
 
     def _populate_paper_list(self, papers: list[Paper]) -> None:
+        """Replace the paper list contents with rows built from the given papers.
+
+        Args:
+            papers: The list of Paper objects to render in the results card.
+
+        """
         # Remove all items including the trailing stretch
         while self._paper_list_layout.count():
             item = self._paper_list_layout.takeAt(0)

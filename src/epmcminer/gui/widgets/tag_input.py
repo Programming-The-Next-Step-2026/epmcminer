@@ -188,6 +188,16 @@ class _FlowLayout(QLayout):
         return size + QSize(m.left() + m.right(), m.top() + m.bottom())
 
     def _do_layout(self, rect: QRect, *, test_only: bool) -> int:
+        """Place child items in wrapping rows and return the total height used.
+
+        Args:
+            rect: The bounding rectangle available for layout.
+            test_only: When True, geometry is calculated but not applied to items.
+
+        Returns:
+            The total height in pixels occupied by all rows.
+
+        """
         m = self.contentsMargins()
         x = rect.x() + m.left()
         y = rect.y() + m.top()
@@ -368,6 +378,7 @@ class _InputSlot(QWidget):
                 )
 
     def _show_menu(self) -> None:
+        """Rebuild and display the options menu below the add button."""
         self._populate_menu()
         pos = self._add_btn.mapToGlobal(QPoint(0, self._add_btn.height() + 4))
         self._menu.exec(pos)  # type: ignore[union-attr]
@@ -377,6 +388,7 @@ class _InputSlot(QWidget):
     # ------------------------------------------------------------------
 
     def _show_input(self) -> None:
+        """Hide the add button and reveal the inline text input and confirm button."""
         self._add_btn.setVisible(False)
         if self._input is not None:
             self._input.setVisible(True)
@@ -387,6 +399,7 @@ class _InputSlot(QWidget):
             self._input.setFocus()
 
     def _confirm(self) -> None:
+        """Read the input text, reset to idle state, and emit tag_confirmed if non-blank."""
         text = self._input.text().strip() if self._input is not None else ""
         if self._input is not None:
             self._input.clear()
@@ -556,6 +569,7 @@ class TagInput(QWidget):
     # ------------------------------------------------------------------
 
     def _build_ui(self) -> None:
+        """Set up the flow layout and add the input slot as the first child."""
         self._flow = _FlowLayout(self)
         self._flow.setContentsMargins(0, 0, 0, 0)
 
@@ -564,6 +578,7 @@ class TagInput(QWidget):
         self._flow.addWidget(self._slot)
 
     def _rebuild_pills(self) -> None:
+        """Rebuild all pill widgets in the flow layout to reflect the current tag list."""
         # Remove all items except _slot; hide before deparenting so that Qt
         # does not promote visible widgets to top-level windows.
         while self._flow.count() > 0:
