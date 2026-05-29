@@ -499,7 +499,7 @@ class ScreenSearch(QWidget):
 
             # Step 3: existence check (async, HTTP).
             self._orcids.set_tag_status(tag, "pending")
-            worker = OrcidExistenceWorker(tag, self._orcid_service, parent=self)
+            worker = OrcidExistenceWorker(tag, self._orcid_service)
             worker.validation_done.connect(self._on_orcid_existence_checked)
             worker.network_error.connect(self._on_orcid_network_error)
             # deleteLater schedules C++ cleanup via the event loop once the

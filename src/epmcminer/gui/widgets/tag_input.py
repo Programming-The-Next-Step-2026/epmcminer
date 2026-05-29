@@ -1,6 +1,6 @@
 """Reusable tag input widget used on all filter fields."""
 
-from PyQt6.QtCore import QPoint, QRect, QSize, Qt, pyqtSignal
+from PyQt6.QtCore import QPoint, QRect, QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtWidgets import (
     QHBoxLayout,
     QLayout,
@@ -579,14 +579,20 @@ class TagInput(QWidget):
 
     def _rebuild_pills(self) -> None:
         """Rebuild all pill widgets in the flow layout to reflect the current tag list."""
-        # Remove all items except _slot; hide before deparenting so that Qt
-        # does not promote visible widgets to top-level windows.
+        # Remove all items except _slot. setParent(None) removes each pill from
+        # TagInput's Qt children tree (so findChildren / rendering ignore it
+        # immediately), but we keep Python references alive in to_delete and
+        # release them via a zero-delay timer.  This lets Qt flush any queued
+        # geometry or paint events for the old pills before their C++ objects
+        # are destroyed, preventing a segfault when those events fire.
+        to_delete: list[QWidget] = []
         while self._flow.count() > 0:
             item = self._flow.takeAt(0)
             widget = item.widget() if item else None
             if widget and widget is not self._slot:
                 widget.hide()
                 widget.setParent(None)
+                to_delete.append(widget)
         # Re-add pills in order, then the input slot.
         for tag in self._tags:
             status = self._tag_statuses.get(tag, "valid")
@@ -595,3 +601,5 @@ class TagInput(QWidget):
             self._flow.addWidget(pill)
         self._flow.addWidget(self._slot)
         self.updateGeometry()
+        if to_delete:
+            QTimer.singleShot(0, to_delete.clear)
