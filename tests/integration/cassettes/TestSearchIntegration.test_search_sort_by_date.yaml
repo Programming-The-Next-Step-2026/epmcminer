@@ -2442,4 +2442,388 @@ interactions:
     status:
       code: 200
       message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - JSESSIONID=E54CEF4DAB04B8F0B40A3728991AB5CF
+      User-Agent:
+      - python-requests/2.32.5
+    method: GET
+    uri: https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%28depression%29+AND+%28HAS_FT%3AY+OR+HAS_FREE_FULLTEXT%3AY%29&format=json&resultType=core&pageSize=5&cursorMark=%2A&sort=P_PDATE_D+desc
+  response:
+    body:
+      string: "{\"version\":\"6.9\",\"hitCount\":1173887,\"nextCursorMark\":\"AoJwgNa5l6IDKDU1NjAzNTYz\",\"nextPageUrl\":\"https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=(depression)
+        AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)&cursorMark=AoJwgNa5l6IDKDU1NjAzNTYz&resultType=core&pageSize=5&sort=P_PDATE_D
+        desc&format=json\",\"request\":{\"queryString\":\"(depression) AND (HAS_FT:Y
+        OR HAS_FREE_FULLTEXT:Y)\",\"resultType\":\"core\",\"cursorMark\":\"%2A\",\"pageSize\":5,\"sort\":\"P_PDATE_D
+        desc\",\"synonym\":false},\"resultList\":{\"result\":[{\"id\":\"42184272\",\"source\":\"MED\",\"pmid\":\"42184272\",\"pmcid\":\"PMC13202683\",\"fullTextIdList\":{\"fullTextId\":[\"PMC13202683\"]},\"doi\":\"10.1080/15502783.2026.2670564\",\"title\":\"The
+        effect of probiotic and synbiotic supplementation on sleep parameters in exercised
+        population: a systematic review and synthesis without meta-analysis (SWiM)
+        of randomized controlled trials.\",\"authorString\":\"Salehi Asl M, Ahmadi
+        F, Ershadmanesh M, Mortezapour E, Torki F, Danandeh A, Dehghani E, Danandeh
+        K.\",\"authorList\":{\"author\":[{\"fullName\":\"Salehi Asl M\",\"firstName\":\"Mina\",\"lastName\":\"Salehi
+        Asl\",\"initials\":\"M\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-8703-5462\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"School
+        of Medicine, Shahid Beheshti University of Medical Sciences, Tehran, Iran.\"}]}},{\"fullName\":\"Ahmadi
+        F\",\"firstName\":\"Fatemeh\",\"lastName\":\"Ahmadi\",\"initials\":\"F\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0009-0002-3854-6706\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Sports
+        Medicine Research Center (SMRC), Neuroscience Institute, Tehran University
+        of Medical Sciences (TUMS), Tehran, Iran.\"}]}},{\"fullName\":\"Ershadmanesh
+        M\",\"firstName\":\"Mohamadjavad\",\"lastName\":\"Ershadmanesh\",\"initials\":\"M\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0009-0000-9638-8043\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"School
+        of Medicine, Shahid Beheshti University of Medical Sciences, Tehran, Iran.\"}]}},{\"fullName\":\"Mortezapour
+        E\",\"firstName\":\"Erfan\",\"lastName\":\"Mortezapour\",\"initials\":\"E\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0009-0000-0739-5584\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Sports
+        Medicine Research Center (SMRC), Neuroscience Institute, Tehran University
+        of Medical Sciences (TUMS), Tehran, Iran.\"}]}},{\"fullName\":\"Torki F\",\"firstName\":\"Fereshteh\",\"lastName\":\"Torki\",\"initials\":\"F\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0009-0007-4855-5661\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Sports
+        Medicine Research Center (SMRC), Neuroscience Institute, Tehran University
+        of Medical Sciences (TUMS), Tehran, Iran.\"}]}},{\"fullName\":\"Danandeh A\",\"firstName\":\"Arshiya\",\"lastName\":\"Danandeh\",\"initials\":\"A\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0009-0001-5304-2656\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Faculty
+        of Mechanics, Electrical Power and Computer, Islamic Azad University, Science
+        and Research Branch, Tehran, Iran.\"}]}},{\"fullName\":\"Dehghani E\",\"firstName\":\"Elaheh\",\"lastName\":\"Dehghani\",\"initials\":\"E\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-9601-8517\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Sports
+        Medicine Research Center (SMRC), Neuroscience Institute, Tehran University
+        of Medical Sciences (TUMS), Tehran, Iran.\"}]}},{\"fullName\":\"Danandeh K\",\"firstName\":\"Khashayar\",\"lastName\":\"Danandeh\",\"initials\":\"K\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-1361-6205\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Sports
+        Medicine Research Center (SMRC), Neuroscience Institute, Tehran University
+        of Medical Sciences (TUMS), Tehran, Iran.\"}]}}]},\"authorIdList\":{\"authorId\":[{\"type\":\"ORCID\",\"value\":\"0000-0002-1361-6205\"},{\"type\":\"ORCID\",\"value\":\"0000-0002-8703-5462\"},{\"type\":\"ORCID\",\"value\":\"0000-0002-9601-8517\"},{\"type\":\"ORCID\",\"value\":\"0009-0000-0739-5584\"},{\"type\":\"ORCID\",\"value\":\"0009-0000-9638-8043\"},{\"type\":\"ORCID\",\"value\":\"0009-0001-5304-2656\"},{\"type\":\"ORCID\",\"value\":\"0009-0002-3854-6706\"},{\"type\":\"ORCID\",\"value\":\"0009-0007-4855-5661\"}]},\"dataLinksTagsList\":{\"dataLinkstag\":[\"altmetrics\"]},\"journalInfo\":{\"issue\":\"1\",\"volume\":\"23\",\"journalIssueId\":4076785,\"dateOfPublication\":\"2026
+        Dec\",\"monthOfPublication\":12,\"yearOfPublication\":2026,\"printPublicationDate\":\"2026-12-01\",\"journal\":{\"title\":\"Journal
+        of the International Society of Sports Nutrition\",\"medlineAbbreviation\":\"J
+        Int Soc Sports Nutr\",\"essn\":\"1550-2783\",\"isoabbreviation\":\"J Int Soc
+        Sports Nutr\",\"issn\":\"1550-2783\",\"nlmid\":\"101234168\"}},\"pubYear\":\"2026\",\"pageInfo\":\"2670564\",\"abstractText\":\"<h4>Background</h4>Sleep
+        is crucial for recovery and optimal performance in athletes; however, poor
+        sleep is common during periods of intensive training or competition. The microbiota-gut-brain
+        axis suggests probiotics and synbiotics could modulate sleep, but evidence
+        in exercised populations is limited.<h4>Objective</h4>To systematically review
+        randomized controlled trials (RCTs) assessing the effects of probiotic and
+        synbiotic supplementation on sleep in exercised populations, using a Synthesis
+        Without Meta-analysis (SWiM) approach.<h4>Methods</h4>PubMed, Scopus, Web
+        of Science, and ProQuest were searched up to September 2025. Eligible studies
+        were RCTs including exercised individuals, testing probiotics or synbiotics,
+        and reporting sleep outcomes. Data extraction, risk of bias assessment (RoB
+        2), and narrative synthesis followed SWiM guidelines.<h4>Results</h4>Six RCTs
+        (<i>n</i>\u2009=\u2009180) were included: four probiotic and two synbiotic
+        interventions lasting 4-17 weeks. Populations included athletes from multiple
+        sports across four continents. Nine of twelve primary sleep outcomes favored
+        supplementation, with significant effects for probiotics (combined <i>p</i>\u2009<\u20090.01)
+        and synbiotics (<i>p</i>\u2009<\u20090.001). Benefits were most consistent
+        for subjective sleep quality and, in some cases, sleep latency. Secondary
+        outcomes showed occasional reductions in stress, anxiety, and fatigue.<h4>Conclusion</h4>Probiotic
+        and synbiotic supplementation may improve sleep in exercised populations,
+        especially perceived quality and latency. Evidence supports cautious, adjunctive
+        use, but larger, standardized trials are needed to confirm effects.PROSPERO
+        registration number: CRD420251151264.\",\"affiliation\":\"School of Medicine,
+        Shahid Beheshti University of Medical Sciences, Tehran, Iran.\",\"publicationStatus\":\"ppublish\",\"language\":\"eng\",\"pubModel\":\"Print-Electronic\",\"pubTypeList\":{\"pubType\":[\"Systematic
+        Review\",\"review-article\",\"Review\",\"Journal Article\"]},\"meshHeadingList\":{\"meshHeading\":[{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Humans\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Exercise\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"PH\",\"qualifierName\":\"physiology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Sleep\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Dietary
+        Supplements\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Probiotics\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"AD\",\"qualifierName\":\"administration
+        & dosage\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Randomized
+        Controlled Trials as Topic\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Athletes\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Synbiotics\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"AD\",\"qualifierName\":\"administration
+        & dosage\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Sleep
+        Quality\"}]},\"keywordList\":{\"keyword\":[\"Sleep\",\"Exercise\",\"Probiotic\",\"Systematic
+        review\",\"Synbiotic\",\"Sports Nutrition\",\"Narrative Synthesis\"]},\"subsetList\":{\"subset\":[{\"code\":\"IM\",\"name\":\"Index
+        Medicus\"}]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1080/15502783.2026.2670564\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13202683\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13202683?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"Y\",\"citedByCount\":0,\"hasData\":\"Y\",\"hasReferences\":\"Y\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"Y\",\"license\":\"cc
+        by\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2026-05-25\",\"dateOfCreation\":\"2026-05-25\",\"firstIndexDate\":\"2026-05-25\",\"fullTextReceivedDate\":\"2026-05-27\",\"dateOfRevision\":\"2026-05-28\",\"electronicPublicationDate\":\"2026-05-25\",\"firstPublicationDate\":\"2026-05-25\"},{\"id\":\"42181835\",\"source\":\"MED\",\"pmid\":\"42181835\",\"pmcid\":\"PMC13196576\",\"fullTextIdList\":{\"fullTextId\":[\"PMC13196576\"]},\"doi\":\"10.1016/j.sleepx.2026.100189\",\"title\":\"Differences
+        in insomnia-related factors between working-age and older adults: A comparison
+        of nocturnal and daytime symptoms.\",\"authorString\":\"Higami K, Osao M,
+        Okajima I.\",\"authorList\":{\"author\":[{\"fullName\":\"Higami K\",\"firstName\":\"Koyo\",\"lastName\":\"Higami\",\"initials\":\"K\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Behavioral
+        Sleep Medicine and Sciences Laboratory, Department of Psychological Counseling,
+        Faculty of Humanities, Tokyo Kasei University, Tokyo, Japan.\"},{\"affiliation\":\"Japan
+        Somnology Center, Institute of Neuropsychiatry, Tokyo, Japan.\"}]}},{\"fullName\":\"Osao
+        M\",\"firstName\":\"Masumi\",\"lastName\":\"Osao\",\"initials\":\"M\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Yoyogi
+        Sleep Disorder Center, Tokyo, Japan.\"},{\"affiliation\":\"Department of Somnology,
+        Tokyo Medical University, Tokyo, Japan.\"}]}},{\"fullName\":\"Okajima I\",\"firstName\":\"Isa\",\"lastName\":\"Okajima\",\"initials\":\"I\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Behavioral
+        Sleep Medicine and Sciences Laboratory, Department of Psychological Counseling,
+        Faculty of Humanities, Tokyo Kasei University, Tokyo, Japan.\"}]}}]},\"journalInfo\":{\"volume\":\"11\",\"journalIssueId\":4077841,\"dateOfPublication\":\"2026
+        Dec\",\"monthOfPublication\":12,\"yearOfPublication\":2026,\"printPublicationDate\":\"2026-12-01\",\"journal\":{\"title\":\"Sleep
+        medicine: X\",\"medlineAbbreviation\":\"Sleep Med X\",\"essn\":\"2590-1427\",\"isoabbreviation\":\"Sleep
+        Med X\",\"issn\":\"2590-1427\",\"nlmid\":\"101774782\"}},\"pubYear\":\"2026\",\"pageInfo\":\"100189\",\"abstractText\":\"<h4>Objective</h4>This
+        study aimed to (1) clarify the characteristics of nocturnal and daytime symptoms
+        among working-age and older adults and (2) classify insomnia types within
+        each age group and examine the characteristics associated with each type.<h4>Methods</h4>An
+        online survey was conducted, and data from 1655 participants were analyzed.
+        Participants were categorized into working-age adults (30-64 years) and older
+        adults (\u226565 years). Based on the presence or absence of nocturnal symptoms
+        and daytime dysfunction according to the International Classification of Sleep
+        Disorders, Third Edition criteria, participants were classified as normal
+        sleepers, having subsyndromal insomnia, or having insomnia syndrome. Nocturnal
+        and daytime symptoms were assessed using validated self-reported measures.<h4>Results</h4>Compared
+        with older adults, working-age adults showed significantly worse scores for
+        all nocturnal and daytime symptoms. In working-age adults, subsyndromal insomnia
+        was associated with sleep-wake characteristics, whereas insomnia syndrome
+        was strongly associated with sleep debt, fatigue, and anxiety. Conversely,
+        insomnia syndrome was primarily associated with sleep debt and fatigue among
+        older adults. Notably, fatigue showed a greater discriminative ability than
+        daytime sleepiness in distinguishing insomnia types across age groups.<h4>Conclusion</h4>The
+        nocturnal and daytime profiles associated with sleep problems differed between
+        working-age and older adults. These findings suggest that age-specific assessment
+        and treatment strategies are warranted and that fatigue may be a particularly
+        important indicator when evaluating daytime dysfunction related to insomnia.\",\"affiliation\":\"Behavioral
+        Sleep Medicine and Sciences Laboratory, Department of Psychological Counseling,
+        Faculty of Humanities, Tokyo Kasei University, Tokyo, Japan.\",\"publicationStatus\":\"epublish\",\"language\":\"eng\",\"pubModel\":\"Electronic-eCollection\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"keywordList\":{\"keyword\":[\"Insomnia\",\"Fatigue\",\"Older
+        Adults\",\"Daytime Symptoms\",\"Working-age Adults\"]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1016/j.sleepx.2026.100189\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13196576\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13196576?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":0,\"hasData\":\"N\",\"hasReferences\":\"N\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"N\",\"license\":\"cc
+        by-nc\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2026-05-25\",\"dateOfCreation\":\"2026-05-25\",\"firstIndexDate\":\"2026-05-25\",\"fullTextReceivedDate\":\"2026-05-27\",\"dateOfRevision\":\"2026-05-25\",\"electronicPublicationDate\":\"2026-05-12\",\"firstPublicationDate\":\"2026-05-12\"},{\"id\":\"42181834\",\"source\":\"MED\",\"pmid\":\"42181834\",\"pmcid\":\"PMC13197807\",\"fullTextIdList\":{\"fullTextId\":[\"PMC13197807\"]},\"doi\":\"10.1016/j.sleepx.2026.100190\",\"title\":\"Performance
+        of six screening scores for obstructive sleep apnoea in an African population:
+        findings from the BeSAS cross-sectional study.\",\"authorString\":\"Wachinou
+        AP, Diallo BD, Totah T, Solelhac G, Berger M, Fosto P, Amidou S, Fiogbe AA,
+        Marques-Vidal P, Agodokpessi G, Houinato D, Johnson RC, Preux PM, Heinzer
+        R.\",\"authorList\":{\"author\":[{\"fullName\":\"Wachinou AP\",\"firstName\":\"Ablo
+        Prudence\",\"lastName\":\"Wachinou\",\"initials\":\"AP\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Faculty
+        of Health Sciences, University of Abomey-Calavi, Cotonou, Benin.\"},{\"affiliation\":\"National
+        Teaching Hospital for Tuberculosis and Pulmonary Diseases, Cotonou, Benin.\"},{\"affiliation\":\"Laboratory
+        of Epidemiology of Chronic and Neurologic Diseases, Faculty of Health Sciences,
+        University of Abomey-Calavi, Cotonou, Benin.\"},{\"affiliation\":\"Inserm
+        U1094, IRD UMR270, Univ. Limoges, CHU Limoges, EpiMaCT - Epidemiology of Chronic
+        Diseases in Tropical Zone, Institute of Epidemiology and Tropical Neurology,
+        Omega Health, Limoges, France.\"}]}},{\"fullName\":\"Diallo BD\",\"firstName\":\"Boubacar
+        Djelo\",\"lastName\":\"Diallo\",\"initials\":\"BD\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Pneumo-phtisiology, University Hospital Ignace Deen, Conakry, Guinea.\"}]}},{\"fullName\":\"Totah
+        T\",\"firstName\":\"Terence\",\"lastName\":\"Totah\",\"initials\":\"T\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Laboratory
+        of Epidemiology of Chronic and Neurologic Diseases, Faculty of Health Sciences,
+        University of Abomey-Calavi, Cotonou, Benin.\"}]}},{\"fullName\":\"Solelhac
+        G\",\"firstName\":\"Geoffroy\",\"lastName\":\"Solelhac\",\"initials\":\"G\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Center
+        of Investigation and Research on Sleep (CIRS), University Hospital of Lausanne
+        (CHUV) and University of Lausanne (UNIL), Lausanne, Switzerland.\"}]}},{\"fullName\":\"Berger
+        M\",\"firstName\":\"Mathieu\",\"lastName\":\"Berger\",\"initials\":\"M\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Center
+        of Investigation and Research on Sleep (CIRS), University Hospital of Lausanne
+        (CHUV) and University of Lausanne (UNIL), Lausanne, Switzerland.\"}]}},{\"fullName\":\"Fosto
+        P\",\"firstName\":\"Pervenche\",\"lastName\":\"Fosto\",\"initials\":\"P\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Laboratory
+        of Epidemiology of Chronic and Neurologic Diseases, Faculty of Health Sciences,
+        University of Abomey-Calavi, Cotonou, Benin.\"}]}},{\"fullName\":\"Amidou
+        S\",\"firstName\":\"Salmane\",\"lastName\":\"Amidou\",\"initials\":\"S\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Laboratory
+        of Epidemiology of Chronic and Neurologic Diseases, Faculty of Health Sciences,
+        University of Abomey-Calavi, Cotonou, Benin.\"}]}},{\"fullName\":\"Fiogbe
+        AA\",\"firstName\":\"Attanon Arnauld\",\"lastName\":\"Fiogbe\",\"initials\":\"AA\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"National
+        Teaching Hospital for Tuberculosis and Pulmonary Diseases, Cotonou, Benin.\"}]}},{\"fullName\":\"Marques-Vidal
+        P\",\"firstName\":\"Pedro\",\"lastName\":\"Marques-Vidal\",\"initials\":\"P\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Medicine, Internal Medicine, University Hospital of Lausanne (CHUV) and
+        University of Lausanne (UNIL), Lausanne, Switzerland.\"}]}},{\"fullName\":\"Agodokpessi
+        G\",\"firstName\":\"Gildas\",\"lastName\":\"Agodokpessi\",\"initials\":\"G\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Faculty
+        of Health Sciences, University of Abomey-Calavi, Cotonou, Benin.\"},{\"affiliation\":\"National
+        Teaching Hospital for Tuberculosis and Pulmonary Diseases, Cotonou, Benin.\"}]}},{\"fullName\":\"Houinato
+        D\",\"firstName\":\"Dismand\",\"lastName\":\"Houinato\",\"initials\":\"D\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Faculty
+        of Health Sciences, University of Abomey-Calavi, Cotonou, Benin.\"},{\"affiliation\":\"Laboratory
+        of Epidemiology of Chronic and Neurologic Diseases, Faculty of Health Sciences,
+        University of Abomey-Calavi, Cotonou, Benin.\"}]}},{\"fullName\":\"Johnson
+        RC\",\"firstName\":\"Roch Christian\",\"lastName\":\"Johnson\",\"initials\":\"RC\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Interfaculty
+        Center for Environmental Training and Research for Sustainable Development
+        (CIFRED), University of Abomey-Calavi, Cotonou, Benin.\"}]}},{\"fullName\":\"Preux
+        PM\",\"firstName\":\"Pierre-Marie\",\"lastName\":\"Preux\",\"initials\":\"PM\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Inserm
+        U1094, IRD UMR270, Univ. Limoges, CHU Limoges, EpiMaCT - Epidemiology of Chronic
+        Diseases in Tropical Zone, Institute of Epidemiology and Tropical Neurology,
+        Omega Health, Limoges, France.\"}]}},{\"fullName\":\"Heinzer R\",\"firstName\":\"Raphael\",\"lastName\":\"Heinzer\",\"initials\":\"R\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Center
+        of Investigation and Research on Sleep (CIRS), University Hospital of Lausanne
+        (CHUV) and University of Lausanne (UNIL), Lausanne, Switzerland.\"}]}}]},\"journalInfo\":{\"volume\":\"11\",\"journalIssueId\":4077841,\"dateOfPublication\":\"2026
+        Dec\",\"monthOfPublication\":12,\"yearOfPublication\":2026,\"printPublicationDate\":\"2026-12-01\",\"journal\":{\"title\":\"Sleep
+        medicine: X\",\"medlineAbbreviation\":\"Sleep Med X\",\"essn\":\"2590-1427\",\"isoabbreviation\":\"Sleep
+        Med X\",\"issn\":\"2590-1427\",\"nlmid\":\"101774782\"}},\"pubYear\":\"2026\",\"pageInfo\":\"100190\",\"abstractText\":\"<h4>Background</h4>A
+        screening tool for obstructive sleep apnoea (OSA) is useful in low-income
+        countries where it may be difficult to access sleep recordings. The objective
+        of this study was to assess the performance of six screening scores compared
+        with objective sleep recording.<h4>Methods</h4>This analysis is based on the
+        \\\"Benin Sleep and Society\\\" (BeSAS) study, in which respiratory polygraphy
+        (PG) was performed using a type III device and OSA screening questionnaires
+        (STOP, STOP-Bang, Berlin, NOSAS [\u22658 and\_\u2265\_5), No-Apnea, GOAL)
+        were administered to participants. PG-defined OSA severity categories were
+        defined according to the apnoea-hypopnoea index (AHI): mild (AHI 5 to <15/h),
+        moderate (AHI 15 to <30/h) or severe (AHI \u226530/h), and these were compared
+        to score findings.<h4>Results</h4>A total of 1810 subjects (mean age 45.4\_\xB1\_14.6
+        years; 64.3% women) were included. For moderate to severe OSA, the area under
+        the receiver operating characteristic curve was greatest for GOAL and No-Apnea
+        (0.70, CI 0.67-0.73; 0.70, CI 0.68-0.73), followed by NoSAS<sub>5</sub> (0.69,
+        CI 0.65-0.73). The highest sensitivity values were for NoSAS<sub>5</sub> (0.73,
+        CI 0.67-0.79), No-Apnea (0.72, CI 0.66-0.78), and GOAL (0.69, CI 0.67-0.79),
+        while NoSAS<sub>8</sub> had the highest specificity (0.91, CI 0.90-0.93),
+        followed by Berlin (0.88, CI 0.87-0.90) and GOAL (0.71, CI 0.69-0.73). All
+        scores performed poorly with respect to the positive predictive value (PPV),
+        which was highest with NoSAS<sub>8</sub> (0.38, CI 0.31-0.44).<h4>Conclusion</h4>Although
+        overall performance was modest for all instruments, NoSAS<sub>8</sub> showed
+        the highest PPV among the evaluated scores. These findings suggest that NoSAS<sub>8</sub>
+        may be a useful option to support OSA risk stratification in resource-constrained
+        settings, but should be interpreted with caution.\",\"affiliation\":\"Faculty
+        of Health Sciences, University of Abomey-Calavi, Cotonou, Benin.\",\"publicationStatus\":\"epublish\",\"language\":\"eng\",\"pubModel\":\"Electronic-eCollection\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"keywordList\":{\"keyword\":[\"Africa\",\"Obstructive Sleep Apnoea\",\"Polygraphy\",\"Nosas\"]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1016/j.sleepx.2026.100190\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13197807\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13197807?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":0,\"hasData\":\"N\",\"hasReferences\":\"N\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"N\",\"license\":\"cc
+        by\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2026-05-25\",\"dateOfCreation\":\"2026-05-25\",\"firstIndexDate\":\"2026-05-25\",\"fullTextReceivedDate\":\"2026-05-27\",\"dateOfRevision\":\"2026-05-25\",\"electronicPublicationDate\":\"2026-05-15\",\"firstPublicationDate\":\"2026-05-15\"},{\"id\":\"42180173\",\"source\":\"MED\",\"pmid\":\"42180173\",\"pmcid\":\"PMC13193774\",\"fullTextIdList\":{\"fullTextId\":[\"PMC13193774\"]},\"doi\":\"10.1016/j.apjon.2026.100957\",\"title\":\"Patterns
+        of health-promoting lifestyles among patients with colorectal cancer: A latent
+        profile analysis.\",\"authorString\":\"Zhong M, Wu X, Xie J, Li X, Wang X,
+        Du Q, Yuan C, Wu W, Zhang M.\",\"authorList\":{\"author\":[{\"fullName\":\"Zhong
+        M\",\"firstName\":\"Mengjiao\",\"lastName\":\"Zhong\",\"initials\":\"M\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Sun
+        Yat-sen University Cancer Center, State Key Laboratory of Oncology in South
+        China, Collaborative Innovation Center for Cancer Medicine, Institution I,
+        Guangzhou, China.\"}]}},{\"fullName\":\"Wu X\",\"firstName\":\"Xiaodan\",\"lastName\":\"Wu\",\"initials\":\"X\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Sun
+        Yat-sen University Cancer Center, State Key Laboratory of Oncology in South
+        China, Collaborative Innovation Center for Cancer Medicine, Institution I,
+        Guangzhou, China.\"}]}},{\"fullName\":\"Xie J\",\"firstName\":\"Jingyue\",\"lastName\":\"Xie\",\"initials\":\"J\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"School
+        of Nursing, Sun Yat-Sen University, Institution II, Guangzhou, China.\"}]}},{\"fullName\":\"Li
+        X\",\"firstName\":\"Xinxin\",\"lastName\":\"Li\",\"initials\":\"X\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"School
+        of Medicine and Health, Shunde Polytechnic University, Institution III, Shunde,
+        China.\"}]}},{\"fullName\":\"Wang X\",\"firstName\":\"Xiaoxuan\",\"lastName\":\"Wang\",\"initials\":\"X\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Sun
+        Yat-sen University Cancer Center, State Key Laboratory of Oncology in South
+        China, Collaborative Innovation Center for Cancer Medicine, Institution I,
+        Guangzhou, China.\"}]}},{\"fullName\":\"Du Q\",\"firstName\":\"Qianqian\",\"lastName\":\"Du\",\"initials\":\"Q\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"School
+        of Nursing, Sun Yat-Sen University, Institution II, Guangzhou, China.\"}]}},{\"fullName\":\"Yuan
+        C\",\"firstName\":\"Chen\",\"lastName\":\"Yuan\",\"initials\":\"C\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"School
+        of Nursing, Sun Yat-Sen University, Institution II, Guangzhou, China.\"}]}},{\"fullName\":\"Wu
+        W\",\"firstName\":\"Wenwen\",\"lastName\":\"Wu\",\"initials\":\"W\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"School
+        of Nursing, Sun Yat-Sen University, Institution II, Guangzhou, China.\"}]}},{\"fullName\":\"Zhang
+        M\",\"firstName\":\"Meifen\",\"lastName\":\"Zhang\",\"initials\":\"M\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"School
+        of Nursing, Sun Yat-Sen University, Institution II, Guangzhou, China.\"}]}}]},\"journalInfo\":{\"volume\":\"13\",\"journalIssueId\":4092379,\"dateOfPublication\":\"2026
+        Dec\",\"monthOfPublication\":12,\"yearOfPublication\":2026,\"printPublicationDate\":\"2026-12-01\",\"journal\":{\"title\":\"Asia-Pacific
+        journal of oncology nursing\",\"medlineAbbreviation\":\"Asia Pac J Oncol Nurs\",\"essn\":\"2349-6673\",\"isoabbreviation\":\"Asia
+        Pac J Oncol Nurs\",\"issn\":\"2347-5625\",\"nlmid\":\"101673157\"}},\"pubYear\":\"2026\",\"pageInfo\":\"100957\",\"abstractText\":\"<h4>Objective</h4>To
+        identify the latent profiles of health-promoting lifestyle and explore the
+        correlates of these profiles among patients with colorectal cancer.<h4>Methods</h4>A
+        total of 561 hospitalized patients with colorectal cancer at a tertiary hospital
+        in Guangzhou between July 2023 and June 2024 were enrolled. The Health-Promoting
+        Lifestyle Profile II Revised (HPLP-II R) was used to assess health-promoting
+        behaviors. Latent profile analysis (LPA) was conducted to identify health-promoting
+        lifestyle subgroups. Univariate analysis and multinomial logistic regression
+        were performed to examine the association between profiles and sociodemographic
+        characteristics, physical frailty, and psychosocial factors.<h4>Results</h4>Four
+        distinct health-promoting lifestyle profiles were identified: profile 1 -
+        \\\"the comprehensively positive high health-promotion (8.4%)\\\", profile
+        2 - \\\"the nutrition-spiritual growth retained low health-promotion (41.5%)\\\",
+        profile 3 - \\\"the globally low health-promotion (14.4%)\\\", and profile
+        4 - \\\"the balanced moderate health-promotion (35.7%)\\\". Psychological
+        frailty and friendship isolation were more likely to be associated with Profile
+        2 (<i>OR</i> <i>=</i> 1.799, <i>P</i> <i>=</i> 0.001; <i>OR</i> <i>=</i> 5.484,
+        <i>P</i> <i>=</i> 0.043) and Profile 3 (<i>OR</i> <i>=</i> 2.249, <i>P <</i>
+        0.001; <i>OR</i> <i>=</i> 11.449, <i>P</i> <i>=</i> 0.005). Patients with
+        high depression scores (<i>OR</i> <i>=</i> 4.332, <i>P</i> <i>=</i> 0.015)
+        and who are currently smoking (<i>OR</i> <i>=</i> 3.288, <i>P</i> <i>=</i>
+        0.025) were more likely to be classified into Profile 3. Profile 1 and Profile
+        4 exhibited a difference in per capita monthly household income.<h4>Conclusions</h4>Health-promoting
+        lifestyle profiles of patients with colorectal cancer has distinct characteristics.
+        These findings provide a basis for nurses to identify high-risk subgroups
+        and implement profile-specific, targeted lifestyle interventions in clinical
+        practice. Target intervention tailored to each profile's characteristics and
+        correlates may modify the lifestyle among patients with colorectal cancer.\",\"affiliation\":\"Sun
+        Yat-sen University Cancer Center, State Key Laboratory of Oncology in South
+        China, Collaborative Innovation Center for Cancer Medicine, Institution I,
+        Guangzhou, China.\",\"publicationStatus\":\"epublish\",\"language\":\"eng\",\"pubModel\":\"Electronic-eCollection\",\"pubTypeList\":{\"pubType\":[\"research-article\",\"Journal
+        Article\"]},\"keywordList\":{\"keyword\":[\"Depression\",\"Frailty\",\"Colorectal
+        Cancer\",\"Social Isolation\",\"Latent Profile Analysis\",\"Health-promoting
+        Lifestyle\"]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1016/j.apjon.2026.100957\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13193774\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13193774?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"N\",\"citedByCount\":0,\"hasData\":\"N\",\"hasReferences\":\"N\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"N\",\"license\":\"cc
+        by-nc-nd\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2026-05-25\",\"dateOfCreation\":\"2026-05-25\",\"firstIndexDate\":\"2026-05-25\",\"fullTextReceivedDate\":\"2026-05-27\",\"dateOfRevision\":\"2026-05-25\",\"electronicPublicationDate\":\"2026-04-16\",\"firstPublicationDate\":\"2026-04-16\"},{\"id\":\"42165222\",\"source\":\"MED\",\"pmid\":\"42165222\",\"pmcid\":\"PMC13196627\",\"fullTextIdList\":{\"fullTextId\":[\"PMC13196627\"]},\"doi\":\"10.1080/19420862.2026.2675077\",\"title\":\"Development
+        and non-clinical characterization of Procizumab (invobenitug): a humanized
+        antibody neutralizing circulating DPP3.\",\"authorString\":\"Genest M, Van
+        Lier D, Uba TI, Schroeter A, Picod A, Nordin H, Assad N, Marguerit G, Nguyen
+        A, Bergmann A, Pickkers P, Mebazaa A, Santos K, Azibani F.\",\"authorList\":{\"author\":[{\"fullName\":\"Genest
+        M\",\"firstName\":\"Magali\",\"lastName\":\"Genest\",\"initials\":\"M\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"INSERM
+        UMR-S 942, Cardiovascular Markers in Stress Condition (MASCOT), Paris Cit\xE9
+        University, Paris, France.\"}]}},{\"fullName\":\"Van Lier D\",\"firstName\":\"Dirk\",\"lastName\":\"Van
+        Lier\",\"initials\":\"D\",\"authorId\":{\"type\":\"ORCID\",\"value\":\"0000-0002-9176-4852\"},\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Intensive Care Medicine and Radboud Center for Infectious Diseases (RCI),
+        Radboud University Medical Center, Nijmegen, The Netherlands.\"}]}},{\"fullName\":\"Uba
+        TI\",\"firstName\":\"Theo Ikenna\",\"lastName\":\"Uba\",\"initials\":\"TI\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"4TEEN4
+        Pharmaceuticals GmbH, Hennigsdorf, Germany.\"}]}},{\"fullName\":\"Schroeter
+        A\",\"firstName\":\"Anika\",\"lastName\":\"Schroeter\",\"initials\":\"A\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Dr.
+        Anika Schroeter e.U, Vienna, Austria.\"}]}},{\"fullName\":\"Picod A\",\"firstName\":\"Adrien\",\"lastName\":\"Picod\",\"initials\":\"A\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"INSERM
+        UMR-S 942, Cardiovascular Markers in Stress Condition (MASCOT), Paris Cit\xE9
+        University, Paris, France.\"}]}},{\"fullName\":\"Nordin H\",\"firstName\":\"Hugo\",\"lastName\":\"Nordin\",\"initials\":\"H\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"INSERM
+        UMR-S 942, Cardiovascular Markers in Stress Condition (MASCOT), Paris Cit\xE9
+        University, Paris, France.\"}]}},{\"fullName\":\"Assad N\",\"firstName\":\"Noma\",\"lastName\":\"Assad\",\"initials\":\"N\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"INSERM
+        UMR-S 942, Cardiovascular Markers in Stress Condition (MASCOT), Paris Cit\xE9
+        University, Paris, France.\"}]}},{\"fullName\":\"Marguerit G\",\"firstName\":\"Gwendolyn\",\"lastName\":\"Marguerit\",\"initials\":\"G\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"INSERM
+        UMR-S 942, Cardiovascular Markers in Stress Condition (MASCOT), Paris Cit\xE9
+        University, Paris, France.\"}]}},{\"fullName\":\"Nguyen A\",\"firstName\":\"Alexis\",\"lastName\":\"Nguyen\",\"initials\":\"A\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"INSERM
+        UMR-S 942, Cardiovascular Markers in Stress Condition (MASCOT), Paris Cit\xE9
+        University, Paris, France.\"}]}},{\"fullName\":\"Bergmann A\",\"firstName\":\"Andreas\",\"lastName\":\"Bergmann\",\"initials\":\"A\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"4TEEN4
+        Pharmaceuticals GmbH, Hennigsdorf, Germany.\"}]}},{\"fullName\":\"Pickkers
+        P\",\"firstName\":\"Peter\",\"lastName\":\"Pickkers\",\"initials\":\"P\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"Department
+        of Intensive Care Medicine and Radboud Center for Infectious Diseases (RCI),
+        Radboud University Medical Center, Nijmegen, The Netherlands.\"}]}},{\"fullName\":\"Mebazaa
+        A\",\"firstName\":\"Alexandre\",\"lastName\":\"Mebazaa\",\"initials\":\"A\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"INSERM
+        UMR-S 942, Cardiovascular Markers in Stress Condition (MASCOT), Paris Cit\xE9
+        University, Paris, France.\"},{\"affiliation\":\"Department of Anesthesiology
+        and Intensive Care, Lariboisi\xE8re - Saint Louis Hospitals, APHP, Paris,
+        France.\"}]}},{\"fullName\":\"Santos K\",\"firstName\":\"Karine\",\"lastName\":\"Santos\",\"initials\":\"K\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"4TEEN4
+        Pharmaceuticals GmbH, Hennigsdorf, Germany.\"}]}},{\"fullName\":\"Azibani
+        F\",\"firstName\":\"Feriel\",\"lastName\":\"Azibani\",\"initials\":\"F\",\"authorAffiliationDetailsList\":{\"authorAffiliation\":[{\"affiliation\":\"INSERM
+        UMR-S 942, Cardiovascular Markers in Stress Condition (MASCOT), Paris Cit\xE9
+        University, Paris, France.\"}]}}]},\"authorIdList\":{\"authorId\":[{\"type\":\"ORCID\",\"value\":\"0000-0002-9176-4852\"}]},\"journalInfo\":{\"issue\":\"1\",\"volume\":\"18\",\"journalIssueId\":4069768,\"dateOfPublication\":\"2026
+        Dec\",\"monthOfPublication\":12,\"yearOfPublication\":2026,\"printPublicationDate\":\"2026-12-01\",\"journal\":{\"title\":\"mAbs\",\"medlineAbbreviation\":\"MAbs\",\"essn\":\"1942-0870\",\"isoabbreviation\":\"MAbs\",\"issn\":\"1942-0862\",\"nlmid\":\"101479829\"}},\"pubYear\":\"2026\",\"pageInfo\":\"2675077\",\"abstractText\":\"Dipeptidyl
+        peptidase 3 (DPP3) is an intracellular protein involved in cellular antioxidant
+        responses. Upon acute stress and tissue damage, DPP3 is released into the
+        circulation (circulating DPP3, cDPP3), where it induces vascular, cardiac,
+        and immune dysregulation. Elevated cDPP3 levels have been implicated in multiple
+        organ dysfunction during circulatory failure. Here, we describe the development
+        and characterization of Procizumab (PCZ), a human immunoglobulin (Ig) G1 kappa
+        monoclonal antibody targeting human cDPP3. The murine variant (mAb1967) was
+        generated by immunizing BALB/c mice with a DPP3-derived peptide mimicking
+        an exposed loop of human DPP3 and conjugated to bovine serum albumin. The
+        humanized recombinant antibody was produced by complementarity-determining
+        region grafting into a human framework, expressed in Chinese hamster ovary
+        cells and purified. Binding kinetics and affinity of PCZ for human DPP3 were
+        assessed by biolayer interferometry. The lack of Fc-mediated immune effector
+        functions, including antibody-dependent cellular cytotoxicity, phagocytosis,
+        and complement-dependent cytotoxicity, was demonstrated in human peripheral
+        blood mononuclear cells. Potential cross-reactivity and specificity were evaluated
+        using a human cell microarray assay. In vivo validation was performed in Dpp3
+        knock-out mice. Pharmacokinetics and tissue distribution of PCZ were assessed
+        by quantitative whole-body autoradiography in male and female Wistar rats
+        administered radio-labeled antibody. Finally, dose-range finding studies evaluating
+        PCZ efficacy and safety were conducted in an acute cardiac dysfunction mouse
+        model. Inhibition of circulating DPP3 activity represents a novel therapeutic
+        approach for the treatment of shock, and PCZ is currently under investigation
+        in clinical studies.\",\"affiliation\":\"INSERM UMR-S 942, Cardiovascular
+        Markers in Stress Condition (MASCOT), Paris Cit\xE9 University, Paris, France.\",\"publicationStatus\":\"ppublish\",\"language\":\"eng\",\"pubModel\":\"Print-Electronic\",\"pubTypeList\":{\"pubType\":[\"report\",\"Journal
+        Article\"]},\"grantsList\":{\"grant\":[{\"agency\":\"Fondation pour la recherche
+        m\xE9dicale\",\"orderIn\":0},{\"agency\":\"Universit\xE9 Paris Cit\xE9\",\"orderIn\":0},{\"grantId\":\"ANR-24-CE17-5491\",\"agency\":\"Agence
+        Nationale de la Recherche\",\"orderIn\":0},{\"agency\":\"4TEEN4 Pharmaceuticals
+        GmbH\",\"orderIn\":0},{\"agency\":\"Institut National de la Sant\xE9 et de
+        la Recherche M\xE9dicale\",\"orderIn\":0}]},\"meshHeadingList\":{\"meshHeading\":[{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Leukocytes,
+        Mononuclear\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"IM\",\"qualifierName\":\"immunology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"CHO
+        Cells\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Animals\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Mice,
+        Inbred BALB C\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Humans\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Cricetulus\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Mice\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Rats\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Female\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Cricetinae\"},{\"majorTopic_YN\":\"N\",\"descriptorName\":\"Male\"},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Dipeptidyl-Peptidases
+        and Tripeptidyl-Peptidases\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"AI\",\"qualifierName\":\"antagonists
+        & inhibitors\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"BL\",\"qualifierName\":\"blood\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"IM\",\"qualifierName\":\"immunology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Antibodies,
+        Neutralizing\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"IM\",\"qualifierName\":\"immunology\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"PD\",\"qualifierName\":\"pharmacology\",\"majorTopic_YN\":\"N\"}]}},{\"majorTopic_YN\":\"Y\",\"descriptorName\":\"Antibodies,
+        Monoclonal, Humanized\",\"meshQualifierList\":{\"meshQualifier\":[{\"abbreviation\":\"IM\",\"qualifierName\":\"immunology\",\"majorTopic_YN\":\"N\"},{\"abbreviation\":\"PD\",\"qualifierName\":\"pharmacology\",\"majorTopic_YN\":\"N\"}]}}]},\"keywordList\":{\"keyword\":[\"Antibody\",\"Cardiac
+        function\",\"Vascular Function\",\"Circulatory Failure\",\"Dpp3\",\"Procizumab\",\"Ak1967\",\"Invobenitug\"]},\"chemicalList\":{\"chemical\":[{\"name\":\"Dipeptidyl-Peptidases
+        and Tripeptidyl-Peptidases\",\"registryNumber\":\"EC 3.4.14.-\"},{\"name\":\"Antibodies,
+        Neutralizing\",\"registryNumber\":\"0\"},{\"name\":\"Antibodies, Monoclonal,
+        Humanized\",\"registryNumber\":\"0\"}]},\"subsetList\":{\"subset\":[{\"code\":\"IM\",\"name\":\"Index
+        Medicus\"}]},\"fullTextUrlList\":{\"fullTextUrl\":[{\"availability\":\"Subscription
+        required\",\"availabilityCode\":\"S\",\"documentStyle\":\"doi\",\"site\":\"DOI\",\"url\":\"https://doi.org/10.1080/19420862.2026.2675077\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"html\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13196627\"},{\"availability\":\"Open
+        access\",\"availabilityCode\":\"OA\",\"documentStyle\":\"pdf\",\"site\":\"Europe_PMC\",\"url\":\"https://europepmc.org/articles/PMC13196627?pdf=render\"}]},\"isOpenAccess\":\"Y\",\"inEPMC\":\"Y\",\"inPMC\":\"Y\",\"hasPDF\":\"Y\",\"hasBook\":\"N\",\"hasSuppl\":\"Y\",\"citedByCount\":0,\"hasData\":\"Y\",\"hasReferences\":\"Y\",\"hasTextMinedTerms\":\"Y\",\"hasDbCrossReferences\":\"N\",\"hasLabsLinks\":\"N\",\"license\":\"cc
+        by\",\"hasEvaluations\":\"N\",\"authMan\":\"N\",\"epmcAuthMan\":\"N\",\"nihAuthMan\":\"N\",\"hasTMAccessionNumbers\":\"N\",\"dateOfCompletion\":\"2026-05-21\",\"dateOfCreation\":\"2026-05-21\",\"firstIndexDate\":\"2026-05-22\",\"fullTextReceivedDate\":\"2026-05-26\",\"dateOfRevision\":\"2026-05-24\",\"electronicPublicationDate\":\"2026-05-21\",\"firstPublicationDate\":\"2026-05-21\"}]}}"
+    headers:
+      Access-Control-Allow-Headers:
+      - Content-Type,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Max-Age:
+      - '3600'
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json;charset=UTF-8
+      Date:
+      - Fri, 29 May 2026 12:46:45 GMT
+      Set-Cookie:
+      - JSESSIONID=71B56E8793EF8FBD9E020908EA93A0EC; Path=/europepmc/webservices/;
+        HttpOnly
+      Strict-Transport-Security:
+      - max-age=0
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
 version: 1
