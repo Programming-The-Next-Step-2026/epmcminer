@@ -359,7 +359,10 @@ class ReportService:
         not_downloaded = len(results) - downloaded
 
         def _make_cell(
-            label: str, value: str, value_style_key: str, sub: str,
+            label: str,
+            value: str,
+            value_style_key: str,
+            sub: str,
         ) -> list[Paragraph]:
             return [
                 Paragraph(label, styles["stat_label"]),
@@ -367,32 +370,44 @@ class ReportService:
                 Paragraph(sub, styles["stat_sub"]),
             ]
 
-        data = [[
-            _make_cell(
-                "Downloaded", str(downloaded), "stat_value_accent",
-                f"of {len(results)} processed",
-            ),
-            _make_cell(
-                "Skipped", str(not_downloaded), "stat_value_danger",
-                "see reasons below",
-            ),
-            _make_cell(
-                "Total results", f"{total_found:,}", "stat_value_accent",
-                "found in Europe PMC",
-            ),
-        ]]
+        data = [
+            [
+                _make_cell(
+                    "Downloaded",
+                    str(downloaded),
+                    "stat_value_accent",
+                    f"of {len(results)} processed",
+                ),
+                _make_cell(
+                    "Skipped",
+                    str(not_downloaded),
+                    "stat_value_danger",
+                    "see reasons below",
+                ),
+                _make_cell(
+                    "Total results",
+                    f"{total_found:,}",
+                    "stat_value_accent",
+                    "found in Europe PMC",
+                ),
+            ]
+        ]
 
         w = _PDF_STAT_COL_WIDTH
         table = Table(data, colWidths=[w, w, w])
-        table.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), _PDF_CARD),
-            ("TOPPADDING", (0, 0), (-1, -1), 14),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 14),
-            ("LEFTPADDING", (0, 0), (-1, -1), 16),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 16),
-            ("LINEAFTER", (0, 0), (1, -1), 0.5, _PDF_BORDER),
-            ("VALIGN", (0, 0), (-1, -1), "TOP"),
-        ]))
+        table.setStyle(
+            TableStyle(
+                [
+                    ("BACKGROUND", (0, 0), (-1, -1), _PDF_CARD),
+                    ("TOPPADDING", (0, 0), (-1, -1), 14),
+                    ("BOTTOMPADDING", (0, 0), (-1, -1), 14),
+                    ("LEFTPADDING", (0, 0), (-1, -1), 16),
+                    ("RIGHTPADDING", (0, 0), (-1, -1), 16),
+                    ("LINEAFTER", (0, 0), (1, -1), 0.5, _PDF_BORDER),
+                    ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ]
+            )
+        )
         return table
 
     def _pdf_params_card(
@@ -488,14 +503,18 @@ class ReportService:
                     Paragraph(result.file_path.name, styles["paper_filepath"]),
                 ]
             row_table = Table([[cell_content]], colWidths=[_PDF_USABLE_WIDTH])
-            row_table.setStyle(TableStyle([
-                ("BACKGROUND", (0, 0), (-1, -1), _PDF_CARD),
-                ("TOPPADDING", (0, 0), (-1, -1), 10),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
-                ("LEFTPADDING", (0, 0), (-1, -1), 12),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 12),
-                ("VALIGN", (0, 0), (-1, -1), "TOP"),
-            ]))
+            row_table.setStyle(
+                TableStyle(
+                    [
+                        ("BACKGROUND", (0, 0), (-1, -1), _PDF_CARD),
+                        ("TOPPADDING", (0, 0), (-1, -1), 10),
+                        ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
+                        ("LEFTPADDING", (0, 0), (-1, -1), 12),
+                        ("RIGHTPADDING", (0, 0), (-1, -1), 12),
+                        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                    ]
+                )
+            )
             items.append(row_table)
             if i < len(downloaded) - 1:
                 items.append(Spacer(1, 3))
@@ -535,14 +554,18 @@ class ReportService:
                 Paragraph(result.reason or "Unknown reason", styles["paper_reason"]),
             ]
             row_table = Table([[cell_content]], colWidths=[_PDF_USABLE_WIDTH])
-            row_table.setStyle(TableStyle([
-                ("BACKGROUND", (0, 0), (-1, -1), _PDF_CARD),
-                ("TOPPADDING", (0, 0), (-1, -1), 10),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
-                ("LEFTPADDING", (0, 0), (-1, -1), 12),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 12),
-                ("VALIGN", (0, 0), (-1, -1), "TOP"),
-            ]))
+            row_table.setStyle(
+                TableStyle(
+                    [
+                        ("BACKGROUND", (0, 0), (-1, -1), _PDF_CARD),
+                        ("TOPPADDING", (0, 0), (-1, -1), 10),
+                        ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
+                        ("LEFTPADDING", (0, 0), (-1, -1), 12),
+                        ("RIGHTPADDING", (0, 0), (-1, -1), 12),
+                        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                    ]
+                )
+            )
             items.append(row_table)
             if i < len(not_downloaded) - 1:
                 items.append(Spacer(1, 3))
@@ -553,7 +576,9 @@ class ReportService:
     # ------------------------------------------------------------------
 
     def _build_dataframe(
-        self, results: list[DownloadResult], params: SearchParams,
+        self,
+        results: list[DownloadResult],
+        params: SearchParams,
     ) -> pd.DataFrame:
         """Build a pandas DataFrame from download results and search parameters.
 

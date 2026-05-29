@@ -21,9 +21,9 @@ ACCENT = "#ff7a3d"
 TEXT_PRIMARY = "#ededed"
 TEXT_BODY = "#cfcfcf"
 TEXT_MUTED = "#8a8a8d"
-BORDER = "rgba(255, 255, 255, 18)"         # card borders
+BORDER = "rgba(255, 255, 255, 18)"  # card borders
 BORDER_STRONG = "rgba(255, 255, 255, 41)"  # button and menu borders
-BORDER_FAINT = "rgba(255, 255, 255, 10)"   # title-bar border + dividers
+BORDER_FAINT = "rgba(255, 255, 255, 10)"  # title-bar border + dividers
 
 CARD_STYLE = f"""
     QFrame#card {{

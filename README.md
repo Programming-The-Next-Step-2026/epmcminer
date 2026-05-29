@@ -159,19 +159,48 @@ report.save_csv(results, params, params.output_folder)
 
 <!-- TOC --><a name="development"></a>
 ## Development
-Useful commands for development and testing
-```python
+
+### Setup
+
+```bash
 # activate local virtual environment (if set up previously)
 source .venv/bin/activate
 
-# install package from root folder
-pip install -e .
+# install package with all dev dependencies from the root folder
+pip install -e ".[dev]"
 ```
 
-Useful commands for testing
+### Linting and formatting
+
+```bash
+# check for lint errors (ruff rules: E, F, W, I, B, C4, UP, SIM)
+ruff check src/ tests/
+
+# auto-fix lint errors where possible
+ruff check --fix src/ tests/
+
+# check formatting
+ruff format --check src/ tests/
+
+# apply formatting
+ruff format src/ tests/
 ```
-# run the full test suite (unit + integration, as CI does)
-pytest tests/ --block-network
+
+### Type checking
+
+```bash
+# run mypy across the full source tree
+mypy src/epmcminer
+```
+
+### Testing
+
+```bash
+# run docstring examples as tests (pure utility functions only)
+pytest --doctest-modules src/epmcminer/utils/
+
+# run the full test suite (unit + integration, replays cassettes, no network)
+pytest tests/
 
 # run only unit tests (fast, no network, fully mocked)
 pytest -m "not integration"
@@ -179,12 +208,12 @@ pytest -m "not integration"
 # run only integration tests (replays from cassettes, no network)
 pytest -m integration
 
-# run integration tests against the live API and refresh cassettes
-# (do this after Europe PMC changes its response format)
-pytest -m integration --record-mode=all
-
 # run with coverage report
 pytest --cov=src/epmcminer --cov-report=term-missing
+
+# re-record integration cassettes against the live API
+# (required when Europe PMC changes its response format)
+pytest -m integration --record-mode=all --override-ini="addopts="
 ```
 
 #### How integration tests work

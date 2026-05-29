@@ -261,17 +261,13 @@ class TestBuildQuery:
 class TestPreview:
     """Tests for SearchService.preview."""
 
-    def test_preview_returns_search_result(
-        self, service: SearchService, mock_client
-    ) -> None:
+    def test_preview_returns_search_result(self, service: SearchService, mock_client) -> None:
         """preview returns a SearchResult instance."""
         mock_client.search.return_value = MOCK_SEARCH_RESPONSE
 
         assert isinstance(service.preview(make_params()), SearchResult)
 
-    def test_preview_maps_raw_fields_to_paper(
-        self, service: SearchService, mock_client
-    ) -> None:
+    def test_preview_maps_raw_fields_to_paper(self, service: SearchService, mock_client) -> None:
         """Raw API fields are mapped to the correct Paper attributes."""
         mock_client.search.return_value = MOCK_SEARCH_RESPONSE
 
@@ -305,9 +301,7 @@ class TestPreview:
 
         assert service.preview(make_params()).papers[0].pdf_url is None
 
-    def test_preview_total_found_from_hit_count(
-        self, service: SearchService, mock_client
-    ) -> None:
+    def test_preview_total_found_from_hit_count(self, service: SearchService, mock_client) -> None:
         """total_found in SearchResult reflects the API hitCount."""
         mock_client.search.return_value = MOCK_SEARCH_RESPONSE
 
@@ -333,9 +327,7 @@ class TestPreview:
 
         assert service.preview(make_params()).estimated_downloadable == 0
 
-    def test_preview_ppr_paper_uses_id_as_pmid(
-        self, service: SearchService, mock_client
-    ) -> None:
+    def test_preview_ppr_paper_uses_id_as_pmid(self, service: SearchService, mock_client) -> None:
         """For papers without a pmid (e.g. preprints), the id field is used."""
         mock_client.search.return_value = PPR_RESPONSE
 
@@ -353,9 +345,7 @@ class TestPreview:
 
         assert paper.pdf_url == "https://www.biorxiv.org/content/ppr123.full.pdf"
 
-    def test_preview_does_not_call_get_pdf_url(
-        self, service: SearchService, mock_client
-    ) -> None:
+    def test_preview_does_not_call_get_pdf_url(self, service: SearchService, mock_client) -> None:
         """preview reads PDF URLs from the search response; get_pdf_url is not called."""
         mock_client.search.return_value = MOCK_SEARCH_RESPONSE
 
@@ -363,9 +353,7 @@ class TestPreview:
 
         mock_client.get_pdf_url.assert_not_called()
 
-    def test_preview_uses_preview_page_size(
-        self, service: SearchService, mock_client
-    ) -> None:
+    def test_preview_uses_preview_page_size(self, service: SearchService, mock_client) -> None:
         """preview always requests exactly PREVIEW_PAGE_SIZE results."""
         mock_client.search.return_value = MOCK_SEARCH_RESPONSE
 
@@ -428,27 +416,21 @@ class TestPreview:
 
         assert paper.pdf_url is None
 
-    def test_preview_propagates_api_error(
-        self, service: SearchService, mock_client
-    ) -> None:
+    def test_preview_propagates_api_error(self, service: SearchService, mock_client) -> None:
         """APIError raised by client.search is not caught and propagates to the caller."""
         mock_client.search.side_effect = APIError(500, "Internal Server Error")
 
         with pytest.raises(APIError):
             service.preview(make_params())
 
-    def test_preview_propagates_connection_error(
-        self, service: SearchService, mock_client
-    ) -> None:
+    def test_preview_propagates_connection_error(self, service: SearchService, mock_client) -> None:
         """ConnectionError raised by client.search propagates to the caller."""
         mock_client.search.side_effect = ConnectionError("timeout")
 
         with pytest.raises(ConnectionError):
             service.preview(make_params())
 
-    def test_preview_empty_results(
-        self, service: SearchService, mock_client
-    ) -> None:
+    def test_preview_empty_results(self, service: SearchService, mock_client) -> None:
         """preview with no API results returns an empty SearchResult."""
         mock_client.search.return_value = EMPTY_SEARCH_RESPONSE
 

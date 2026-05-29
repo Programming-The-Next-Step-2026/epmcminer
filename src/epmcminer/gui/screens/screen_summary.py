@@ -274,13 +274,22 @@ class ScreenSummary(QWidget):
         row.setSpacing(16)
 
         card_dl, self._stat_downloaded_lbl, self._stat_downloaded_sub = self._make_stat_card(
-            "Downloaded", "—", "of 0 processed", theme.ACCENT,
+            "Downloaded",
+            "—",
+            "of 0 processed",
+            theme.ACCENT,
         )
         card_sk, self._stat_skipped_lbl, _ = self._make_stat_card(
-            "Skipped", "—", "see reasons below", theme.DANGER,
+            "Skipped",
+            "—",
+            "see reasons below",
+            theme.DANGER,
         )
         card_tot, self._stat_total_lbl, _ = self._make_stat_card(
-            "Total results", "—", "found in Europe PMC", theme.ACCENT,
+            "Total results",
+            "—",
+            "found in Europe PMC",
+            theme.ACCENT,
         )
 
         row.addWidget(card_dl)
@@ -608,7 +617,10 @@ class ScreenSummary(QWidget):
         if self._params is None:
             return
         path, _ = QFileDialog.getSaveFileName(
-            self, "Export Excel", "results.xlsx", "Excel Files (*.xlsx)",
+            self,
+            "Export Excel",
+            "results.xlsx",
+            "Excel Files (*.xlsx)",
         )
         if not path:
             return
@@ -624,7 +636,10 @@ class ScreenSummary(QWidget):
         if self._params is None:
             return
         path, _ = QFileDialog.getSaveFileName(
-            self, "Export PDF", "results.pdf", "PDF Files (*.pdf)",
+            self,
+            "Export PDF",
+            "results.pdf",
+            "PDF Files (*.pdf)",
         )
         if not path:
             return

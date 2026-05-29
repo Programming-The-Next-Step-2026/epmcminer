@@ -148,8 +148,10 @@ class TestSearch:
     def test_search_429_uses_retry_after_header(self, client: EuropePMCClient) -> None:
         """search() uses the Retry-After header value as the sleep delay on 429."""
         responses.add(
-            responses.GET, SEARCH_URL,
-            body="Too Many Requests", status=429,
+            responses.GET,
+            SEARCH_URL,
+            body="Too Many Requests",
+            status=429,
             headers={"Retry-After": "7"},
         )
         responses.add(responses.GET, SEARCH_URL, json=SEARCH_RESPONSE, status=200)
@@ -165,8 +167,10 @@ class TestSearch:
     ) -> None:
         """A non-numeric Retry-After header (e.g. HTTP-date) falls back to backoff delay."""
         responses.add(
-            responses.GET, SEARCH_URL,
-            body="Too Many Requests", status=429,
+            responses.GET,
+            SEARCH_URL,
+            body="Too Many Requests",
+            status=429,
             headers={"Retry-After": "Wed, 21 Oct 2015 07:28:00 GMT"},
         )
         responses.add(responses.GET, SEARCH_URL, json=SEARCH_RESPONSE, status=200)
@@ -178,12 +182,11 @@ class TestSearch:
         mock_sleep.assert_called_once_with(1)
 
     @responses.activate
-    def test_search_connection_error_is_retried_and_succeeds(
-        self, client: EuropePMCClient
-    ) -> None:
+    def test_search_connection_error_is_retried_and_succeeds(self, client: EuropePMCClient) -> None:
         """A transient ConnectionError on search is retried and succeeds."""
         responses.add(
-            responses.GET, SEARCH_URL,
+            responses.GET,
+            SEARCH_URL,
             body=requests.exceptions.ConnectionError("dropped"),
         )
         responses.add(responses.GET, SEARCH_URL, json=SEARCH_RESPONSE, status=200)
@@ -201,7 +204,8 @@ class TestSearch:
         """Persistent ConnectionError on search raises ConnectionError after all retries."""
         for _ in range(3):
             responses.add(
-                responses.GET, SEARCH_URL,
+                responses.GET,
+                SEARCH_URL,
                 body=requests.exceptions.ConnectionError("dropped"),
             )
 
@@ -254,9 +258,7 @@ class TestDownloadPdf:
         assert result == self.PDF_BYTES
 
     @responses.activate
-    def test_html_response_raises_invalid_pdf_content_error(
-        self, client: EuropePMCClient
-    ) -> None:
+    def test_html_response_raises_invalid_pdf_content_error(self, client: EuropePMCClient) -> None:
         """A 200 response whose body is not PDF bytes raises InvalidPdfContentError."""
         html_body = b"<html><head><title>Preparing to download...</title></head></html>"
         responses.add(responses.GET, self.PDF_URL, body=html_body, status=200)
@@ -265,9 +267,7 @@ class TestDownloadPdf:
             client.download_pdf(url=self.PDF_URL)
 
     @responses.activate
-    def test_non_pdf_bytes_raise_invalid_pdf_content_error(
-        self, client: EuropePMCClient
-    ) -> None:
+    def test_non_pdf_bytes_raise_invalid_pdf_content_error(self, client: EuropePMCClient) -> None:
         """Any 200 response body not starting with %PDF raises InvalidPdfContentError."""
         responses.add(responses.GET, self.PDF_URL, body=b"not a pdf", status=200)
 
@@ -363,9 +363,7 @@ class TestDownloadPdf:
         assert len(responses.calls) == 3
 
     @responses.activate
-    def test_connection_error_retry_uses_exponential_backoff(
-        self, client: EuropePMCClient
-    ) -> None:
+    def test_connection_error_retry_uses_exponential_backoff(self, client: EuropePMCClient) -> None:
         """Retry delays follow 1 s, 2 s exponential backoff."""
         for _ in range(3):
             responses.add(
@@ -395,9 +393,7 @@ class TestDownloadPdf:
     @responses.activate
     def test_timeout_is_retried_and_succeeds(self, client: EuropePMCClient) -> None:
         """A transient Timeout is retried and succeeds on a later attempt."""
-        responses.add(
-            responses.GET, self.PDF_URL, body=requests.exceptions.Timeout("timed out")
-        )
+        responses.add(responses.GET, self.PDF_URL, body=requests.exceptions.Timeout("timed out"))
         responses.add(responses.GET, self.PDF_URL, body=self.PDF_BYTES, status=200)
 
         with patch("epmcminer.api.client.time.sleep"):
@@ -438,9 +434,7 @@ class TestDownloadPdf:
     ) -> None:
         """Setting cancel_event during a backoff sleep aborts further retry attempts."""
         cancel_event = threading.Event()
-        responses.add(
-            responses.GET, self.PDF_URL, body=requests.exceptions.ConnectionError("drop")
-        )
+        responses.add(responses.GET, self.PDF_URL, body=requests.exceptions.ConnectionError("drop"))
 
         def fake_wait(timeout: float) -> bool:
             cancel_event.set()
@@ -459,9 +453,7 @@ class TestDownloadPdf:
     def test_cancel_event_not_set_uses_time_sleep(self, client: EuropePMCClient) -> None:
         """When cancel_event is not provided, time.sleep is used for backoff."""
         cancel_event = threading.Event()  # not set
-        responses.add(
-            responses.GET, self.PDF_URL, body=requests.exceptions.ConnectionError("drop")
-        )
+        responses.add(responses.GET, self.PDF_URL, body=requests.exceptions.ConnectionError("drop"))
         responses.add(responses.GET, self.PDF_URL, body=self.PDF_BYTES, status=200)
 
         with patch("epmcminer.api.client.time.sleep") as mock_sleep:
@@ -477,8 +469,10 @@ class TestDownloadPdf:
     ) -> None:
         """A 429 with a Retry-After header is retried using the header value as delay."""
         responses.add(
-            responses.GET, self.PDF_URL,
-            body="Too Many Requests", status=429,
+            responses.GET,
+            self.PDF_URL,
+            body="Too Many Requests",
+            status=429,
             headers={"Retry-After": "3"},
         )
         responses.add(responses.GET, self.PDF_URL, body=self.PDF_BYTES, status=200)

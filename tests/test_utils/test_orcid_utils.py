@@ -104,7 +104,4 @@ class TestNormaliseOrcid:
 
     def test_whitespace_around_url_stripped(self) -> None:
         """Whitespace is stripped even when a URL prefix is present."""
-        assert (
-            normalise_orcid("  https://orcid.org/0000-0001-5109-3700  ")
-            == "0000-0001-5109-3700"
-        )
+        assert normalise_orcid("  https://orcid.org/0000-0001-5109-3700  ") == "0000-0001-5109-3700"

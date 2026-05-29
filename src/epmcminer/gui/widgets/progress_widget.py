@@ -28,6 +28,7 @@ class _StatsWidgets(NamedTuple):
     eta_col: QWidget
     eta_value: QLabel
 
+
 # Colour tokens from ui.jsx / handoff.jsx.
 # Qt QSS rgba() uses 0-255 integer alpha; 0.06×255≈15.
 _PROGRESS_BAR_STYLE = """
@@ -177,9 +178,7 @@ class ProgressWidget(QWidget):
         self._bar = self._make_bar()
         layout.addWidget(self._bar)
 
-        self._loading_row, self._loading_dot_frames, self._msg_label = (
-            self._make_loading_row()
-        )
+        self._loading_row, self._loading_dot_frames, self._msg_label = self._make_loading_row()
         layout.addWidget(self._loading_row)
 
         stats = self._make_stats_row()
@@ -392,6 +391,9 @@ class ProgressWidget(QWidget):
                 thread(s)" instead of "N thread(s) running".
 
         """
+        if thread_count is None:
+            self._thread_row.setVisible(False)
+            return
         if not self._thread_row.isVisible():
             self._dot_phase = 0
         self._thread_row.setVisible(True)

@@ -8,9 +8,9 @@ from epmcminer.services.report_service import ReportService
 from epmcminer.services.search_service import SearchService
 
 
-def create_application_services() -> (
-    tuple[SearchService, DownloadService, ReportService, OrcidValidationService]
-):
+def create_application_services() -> tuple[
+    SearchService, DownloadService, ReportService, OrcidValidationService
+]:
     """Create and wire all application services with their required dependencies.
 
     Returns:

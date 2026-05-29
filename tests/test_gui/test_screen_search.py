@@ -190,16 +190,20 @@ class TestScreenSearchHintLabel:
         w._license.set_tags([])
         assert "license" in w._hint_lbl.text().lower()
 
-    def test_hint_label_mentions_all_missing_fields(self, qapp: QApplication) -> None:
-        """Hint text covers all three missing fields simultaneously."""
+    def test_hint_label_mentions_only_single_missing_field(self, qapp: QApplication) -> None:
+        """Hint shows only the first unsatisfied field, not all missing fields at once.
+
+        _validate uses elif so only one message is shown at a time — the
+        highest-priority missing field: keyword > publication type > license.
+        """
         w = ScreenSearch()
-        # query empty, pub types cleared, license cleared
+        # All three fields missing — only "keyword" should appear (highest priority).
         w._pub_types.set_tags([])
         w._license.set_tags([])
         text = w._hint_lbl.text().lower()
         assert "keyword" in text
-        assert "publication" in text
-        assert "license" in text
+        assert "publication" not in text
+        assert "license" not in text
 
 
 # ---------------------------------------------------------------------------
@@ -324,9 +328,7 @@ class TestScreenSearchDateRange:
         w._date_from.setDate(new_from)
         assert w._date_to.minimumDate() == new_from
 
-    def test_from_date_later_than_to_date_advances_to_date(
-        self, qapp: QApplication
-    ) -> None:
+    def test_from_date_later_than_to_date_advances_to_date(self, qapp: QApplication) -> None:
         """If the start date is set past the end date, end date is moved to match."""
         w = ScreenSearch()
         future_from = QDate.currentDate()
@@ -351,9 +353,7 @@ class TestOrcidExistenceWorker:
         mock_client.check_exists.return_value = exists
         return OrcidValidationService(client=mock_client)
 
-    def test_run_emits_validation_done_true_when_orcid_exists(
-        self, qapp: QApplication
-    ) -> None:
+    def test_run_emits_validation_done_true_when_orcid_exists(self, qapp: QApplication) -> None:
         """run() emits validation_done(orcid, True) when the registry confirms the ORCID."""
         service = self._make_service(exists=True)
         worker = OrcidExistenceWorker(self.ORCID, service)
@@ -364,9 +364,7 @@ class TestOrcidExistenceWorker:
 
         assert received == [(self.ORCID, True)]
 
-    def test_run_emits_validation_done_false_when_orcid_not_found(
-        self, qapp: QApplication
-    ) -> None:
+    def test_run_emits_validation_done_false_when_orcid_not_found(self, qapp: QApplication) -> None:
         """run() emits validation_done(orcid, False) when the ORCID is not in the registry."""
         service = self._make_service(exists=False)
         worker = OrcidExistenceWorker(self.ORCID, service)
@@ -377,9 +375,7 @@ class TestOrcidExistenceWorker:
 
         assert received == [(self.ORCID, False)]
 
-    def test_run_emits_network_error_on_connection_error(
-        self, qapp: QApplication
-    ) -> None:
+    def test_run_emits_network_error_on_connection_error(self, qapp: QApplication) -> None:
         """run() emits network_error(orcid) when check_exists raises ConnectionError."""
         mock_client = MagicMock(spec=OrcidClient)
         mock_client.check_exists.side_effect = ConnectionError("network unreachable")
@@ -407,9 +403,7 @@ class TestOrcidTagValidation:
         """Return an OrcidValidationService backed by a mock network client."""
         return OrcidValidationService(client=MagicMock(spec=OrcidClient))
 
-    def test_url_prefixed_orcid_is_replaced_with_bare_form(
-        self, qapp: QApplication
-    ) -> None:
+    def test_url_prefixed_orcid_is_replaced_with_bare_form(self, qapp: QApplication) -> None:
         """A URL-prefixed ORCID is normalised to its bare form in the tag list."""
         w = ScreenSearch(orcid_service=self._make_service())
         url_orcid = f"https://orcid.org/{self.VALID_ORCID}"
@@ -421,9 +415,7 @@ class TestOrcidTagValidation:
         assert self.VALID_ORCID in tags
         assert url_orcid not in tags
 
-    def test_invalid_format_orcid_gets_invalid_status(
-        self, qapp: QApplication
-    ) -> None:
+    def test_invalid_format_orcid_gets_invalid_status(self, qapp: QApplication) -> None:
         """A syntactically invalid ORCID tag is marked with 'invalid' status."""
         w = ScreenSearch(orcid_service=self._make_service())
 
@@ -442,9 +434,7 @@ class TestOrcidTagValidation:
 
         assert self.VALID_ORCID in w._orcids.get_tags_by_status(["pending"])
 
-    def test_on_orcid_existence_checked_sets_valid_status(
-        self, qapp: QApplication
-    ) -> None:
+    def test_on_orcid_existence_checked_sets_valid_status(self, qapp: QApplication) -> None:
         """_on_orcid_existence_checked marks the pill 'valid' when exists=True."""
         w = ScreenSearch(orcid_service=self._make_service())
 
@@ -468,9 +458,7 @@ class TestOrcidTagValidation:
 
         assert self.VALID_ORCID in w._orcids.get_tags_by_status(["invalid"])
 
-    def test_on_orcid_network_error_keeps_pending_status(
-        self, qapp: QApplication
-    ) -> None:
+    def test_on_orcid_network_error_keeps_pending_status(self, qapp: QApplication) -> None:
         """_on_orcid_network_error leaves the pill in 'pending' (fail-open behaviour)."""
         w = ScreenSearch(orcid_service=self._make_service())
 
@@ -481,9 +469,7 @@ class TestOrcidTagValidation:
 
         assert self.VALID_ORCID in w._orcids.get_tags_by_status(["pending"])
 
-    def test_no_service_orcids_accepted_without_validation(
-        self, qapp: QApplication
-    ) -> None:
+    def test_no_service_orcids_accepted_without_validation(self, qapp: QApplication) -> None:
         """Without an orcid_service, tags are added but _on_orcid_tags_changed returns early."""
         w = ScreenSearch(orcid_service=None)
         w._orcids.add_tag("anything")

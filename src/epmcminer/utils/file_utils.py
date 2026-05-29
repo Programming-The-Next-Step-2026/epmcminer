@@ -57,4 +57,3 @@ def build_pdf_filename(doi: str, title: str) -> str:
     doi_part = sanitise_filename(doi) if doi else "no_doi"
     title_part = sanitise_filename(title) if title else "no_title"
     return f"{doi_part}_{title_part}.pdf"
-

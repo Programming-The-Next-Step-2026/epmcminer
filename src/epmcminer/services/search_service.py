@@ -31,11 +31,9 @@ _PUB_TYPE_API_EXCEPTIONS: dict[str, str] = {
 
 # Prepended to every pub-type clause so that regular journal articles
 # (stored as "research-article" / "Journal Article" in Europe PMC) are included
-# alongside the explicitly named review/study types.  This mirrors the query
+# alongside the explicitly named review/study types. This mirrors the query
 # the Europe PMC website itself generates.
-_PUB_TYPE_CATCH_ALL = (
-    "HAS_BOOK:Y OR (SRC:(MED OR PMC OR AGR OR CBA) NOT PUB_TYPE:(Review))"
-)
+_PUB_TYPE_CATCH_ALL = "HAS_BOOK:Y OR (SRC:(MED OR PMC OR AGR OR CBA) NOT PUB_TYPE:(Review))"
 
 
 def _pub_type_to_api(display_name: str) -> str:
@@ -215,8 +213,7 @@ class SearchService:
         data = self._client.search(query=query, page_size=PREVIEW_PAGE_SIZE, sort=sort)
 
         papers: list[Paper] = [
-            paper_from_raw(raw)
-            for raw in data.get("resultList", {}).get("result", [])
+            paper_from_raw(raw) for raw in data.get("resultList", {}).get("result", [])
         ]
 
         estimated_downloadable = sum(1 for p in papers if p.pdf_url is not None)

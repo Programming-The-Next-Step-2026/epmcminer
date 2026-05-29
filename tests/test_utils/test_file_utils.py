@@ -154,4 +154,3 @@ class TestBuildPdfFilename:
         long_title = "y" * 200
         result = build_pdf_filename(long_doi, long_title)
         assert len(result) <= 2 * MAX_FILENAME_COMPONENT_LENGTH + len("_.pdf")
-

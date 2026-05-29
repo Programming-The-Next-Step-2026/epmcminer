@@ -48,8 +48,7 @@ def make_section_label(text: str) -> QWidget:
 
     lbl = QLabel(text.upper())
     lbl.setStyleSheet(
-        f"color: {theme.TEXT_PRIMARY}; font-size: 11px;"
-        f" letter-spacing: 1.6px; font-weight: 600;",
+        f"color: {theme.TEXT_PRIMARY}; font-size: 11px; letter-spacing: 1.6px; font-weight: 600;",
     )
     row_layout.addWidget(lbl)
     row_layout.addStretch()

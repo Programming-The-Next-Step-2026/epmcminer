@@ -4,7 +4,15 @@ from importlib.metadata import PackageNotFoundError
 from importlib.metadata import version as _pkg_version
 
 from PyQt6.QtCore import QPoint, QRectF, Qt
-from PyQt6.QtGui import QColor, QMouseEvent, QPaintEvent, QPainter, QPainterPath, QRegion, QResizeEvent
+from PyQt6.QtGui import (
+    QColor,
+    QMouseEvent,
+    QPainter,
+    QPainterPath,
+    QPaintEvent,
+    QRegion,
+    QResizeEvent,
+)
 from PyQt6.QtWidgets import (
     QFrame,
     QHBoxLayout,
@@ -159,11 +167,14 @@ class _TitleBar(QWidget):
         for color, action in [
             (_CLOSE_COLOR, lambda: self.window().close()),  # type: ignore[union-attr]
             (_MINIMIZE_COLOR, lambda: self.window().showMinimized()),  # type: ignore[union-attr]
-            (_ZOOM_COLOR, lambda: (
-                self.window().showNormal()  # type: ignore[union-attr]
-                if self.window().isMaximized()  # type: ignore[union-attr]
-                else self.window().showMaximized()  # type: ignore[union-attr]
-            )),
+            (
+                _ZOOM_COLOR,
+                lambda: (
+                    self.window().showNormal()  # type: ignore[union-attr]
+                    if self.window().isMaximized()  # type: ignore[union-attr]
+                    else self.window().showMaximized()  # type: ignore[union-attr]
+                ),
+            ),
         ]:
             btn = QPushButton()
             btn.setFixedSize(_TRAFFIC_LIGHT_SIZE, _TRAFFIC_LIGHT_SIZE)
@@ -262,8 +273,7 @@ class _TitleBar(QWidget):
                     f" border: none;",
                 )
                 text.setStyleSheet(
-                    f"color: {theme.ACCENT};"
-                    f" font-size: {_STEP_FONT_SIZE}px; font-weight: 600;",
+                    f"color: {theme.ACCENT}; font-size: {_STEP_FONT_SIZE}px; font-weight: 600;",
                 )
             else:
                 circle.setText(str(i + 1))

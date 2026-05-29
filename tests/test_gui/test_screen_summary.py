@@ -32,7 +32,9 @@ def _make_paper() -> Paper:
 
 def _make_downloaded() -> DownloadResult:
     return DownloadResult(
-        paper=_make_paper(), status="downloaded", reason=None,
+        paper=_make_paper(),
+        status="downloaded",
+        reason=None,
         file_path=Path("/tmp/test.pdf"),
     )
 

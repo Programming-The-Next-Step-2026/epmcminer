@@ -412,13 +412,16 @@ class ScreenPreview(QWidget):
         layout.setSpacing(16)
 
         tile_total, self._stat_total_value = self._make_stat_tile(
-            "Total results", "matching your query",
+            "Total results",
+            "matching your query",
         )
         tile_pdf, self._stat_pdf_value = self._make_stat_tile(
-            "PDF available", "of previewed results",
+            "PDF available",
+            "of previewed results",
         )
         tile_prev, self._stat_previewing_value = self._make_stat_tile(
-            "Previewing", "top results shown below",
+            "Previewing",
+            "top results shown below",
         )
 
         layout.addWidget(tile_total)

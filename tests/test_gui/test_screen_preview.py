@@ -95,9 +95,7 @@ class TestPreviewWorkerRun:
 
     def test_worker_emits_error_on_exception(self, qapp: QApplication) -> None:
         """run() emits error_occurred with the exception message when preview() raises."""
-        worker = PreviewWorker(
-            _make_service(exc=ConnectionError("timed out")), _make_params()
-        )
+        worker = PreviewWorker(_make_service(exc=ConnectionError("timed out")), _make_params())
         errors: list[str] = []
         worker.error_occurred.connect(errors.append)
         worker.run()
@@ -269,7 +267,8 @@ class TestScreenPreviewResultsState:
         w._on_result(_make_result(n_papers=4))
         # count() includes the trailing stretch spacer item
         widget_count = sum(
-            1 for i in range(w._paper_list_layout.count())
+            1
+            for i in range(w._paper_list_layout.count())
             if w._paper_list_layout.itemAt(i).widget() is not None
         )
         assert widget_count == 4
@@ -280,7 +279,8 @@ class TestScreenPreviewResultsState:
         w._on_result(_make_result(n_papers=3))
         w._on_result(_make_result(n_papers=2))
         widget_count = sum(
-            1 for i in range(w._paper_list_layout.count())
+            1
+            for i in range(w._paper_list_layout.count())
             if w._paper_list_layout.itemAt(i).widget() is not None
         )
         assert widget_count == 2
@@ -390,9 +390,7 @@ class TestScreenPreviewValidation:
         w._validate()
         assert w._start_btn.isEnabled()
 
-    def test_browse_folder_sets_not_writable_on_unwritable_path(
-        self, qapp: QApplication
-    ) -> None:
+    def test_browse_folder_sets_not_writable_on_unwritable_path(self, qapp: QApplication) -> None:
         """Selecting a non-writable folder via Browse sets _folder_writable to False."""
 
         w = ScreenPreview(_make_service())

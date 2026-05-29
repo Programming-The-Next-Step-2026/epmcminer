@@ -26,6 +26,8 @@ _HTTP_429_TOO_MANY_REQUESTS = 429
 _MAX_RETRIES = 3
 _RETRY_BACKOFF_BASE = 1
 
+_PDF_MAGIC_BYTES = b"%PDF"
+
 
 def _parse_retry_after(response: requests.Response) -> float | None:
     """Return the Retry-After delay in seconds, or None if the header is absent or invalid.
@@ -44,9 +46,6 @@ def _parse_retry_after(response: requests.Response) -> float | None:
         return float(header)
     except ValueError:
         return None
-
-
-_PDF_MAGIC_BYTES = b"%PDF"
 
 
 class InvalidPdfContentError(Exception):
@@ -148,7 +147,7 @@ class EuropePMCClient:
             except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:
                 last_exc = exc
                 if attempt < _MAX_RETRIES - 1:
-                    delay = _RETRY_BACKOFF_BASE * (2 ** attempt)
+                    delay = _RETRY_BACKOFF_BASE * (2**attempt)
                     _logger.warning(
                         "search transient error (attempt %d/%d), retrying in %ds: %s",
                         attempt + 1,
@@ -161,9 +160,7 @@ class EuropePMCClient:
             if response.status_code == 200:
                 return cast(dict[str, Any], response.json())
             if response.status_code == _HTTP_429_TOO_MANY_REQUESTS:
-                delay = _parse_retry_after(response) or (
-                    _RETRY_BACKOFF_BASE * (2 ** attempt)
-                )
+                delay = _parse_retry_after(response) or (_RETRY_BACKOFF_BASE * (2**attempt))
                 last_exc = APIError(response.status_code, response.text)
                 if attempt < _MAX_RETRIES - 1:
                     _logger.warning(
@@ -240,7 +237,7 @@ class EuropePMCClient:
             except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:
                 last_exc = exc
                 if attempt < _MAX_RETRIES - 1:
-                    delay = _RETRY_BACKOFF_BASE * (2 ** attempt)
+                    delay = _RETRY_BACKOFF_BASE * (2**attempt)
                     _logger.warning(
                         "download_pdf transient error (attempt %d/%d), retrying in %ds: %s",
                         attempt + 1,
@@ -265,9 +262,7 @@ class EuropePMCClient:
                 if response.status_code == _HTTP_429_TOO_MANY_REQUESTS:
                     # Rate-limited: honour the Retry-After hint; fall back to
                     # the same exponential schedule used for 5xx errors.
-                    delay = _parse_retry_after(response) or (
-                        _RETRY_BACKOFF_BASE * (2 ** attempt)
-                    )
+                    delay = _parse_retry_after(response) or (_RETRY_BACKOFF_BASE * (2**attempt))
                     last_exc = APIError(response.status_code, response.text)
                     if attempt < _MAX_RETRIES - 1:
                         _logger.warning(
@@ -287,7 +282,7 @@ class EuropePMCClient:
                 # 5xx: treat as transient and retry
                 last_exc = APIError(response.status_code, response.text)
                 if attempt < _MAX_RETRIES - 1:
-                    delay = _RETRY_BACKOFF_BASE * (2 ** attempt)
+                    delay = _RETRY_BACKOFF_BASE * (2**attempt)
                     _logger.warning(
                         "download_pdf HTTP %d (attempt %d/%d), retrying in %ds",
                         response.status_code,

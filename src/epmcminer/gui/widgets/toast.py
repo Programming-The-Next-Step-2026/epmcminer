@@ -70,8 +70,7 @@ _BADGE_STYLE_TMPL: str = (
 )
 
 _TEXT_STYLE: str = (
-    f"color: {theme.TEXT_PRIMARY}; font-size: 14px; font-weight: 500;"
-    " background: transparent;"
+    f"color: {theme.TEXT_PRIMARY}; font-size: 14px; font-weight: 500; background: transparent;"
 )
 
 

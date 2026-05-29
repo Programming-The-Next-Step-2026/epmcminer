@@ -183,9 +183,7 @@ class TestSaveCsv:
             row = list(csv.DictReader(f))[0]
         assert row["file_path"] == ""
 
-    def test_csv_includes_search_params(
-        self, service: ReportService, tmp_path: Path
-    ) -> None:
+    def test_csv_includes_search_params(self, service: ReportService, tmp_path: Path) -> None:
         """Search parameters are written as columns in every row."""
         params = make_params(
             query="cancer",
@@ -201,9 +199,7 @@ class TestSaveCsv:
         assert row["date_from"] == "2021-01-01"
         assert row["date_to"] == "2023-12-31"
 
-    def test_csv_licenses_joined(
-        self, service: ReportService, tmp_path: Path
-    ) -> None:
+    def test_csv_licenses_joined(self, service: ReportService, tmp_path: Path) -> None:
         """Multiple licenses are joined with ', ' in the CSV."""
         params = make_params(licenses=["CC-BY", "CC0"])
         path = service.save_csv([make_result()], params, tmp_path)
@@ -211,9 +207,7 @@ class TestSaveCsv:
             row = list(csv.DictReader(f))[0]
         assert row["licenses"] == "CC-BY, CC0"
 
-    def test_csv_publication_types_joined(
-        self, service: ReportService, tmp_path: Path
-    ) -> None:
+    def test_csv_publication_types_joined(self, service: ReportService, tmp_path: Path) -> None:
         """Multiple publication types are joined with ', ' in the CSV."""
         params = make_params(publication_types=["research-article", "review"])
         path = service.save_csv([make_result()], params, tmp_path)
@@ -242,9 +236,7 @@ class TestSaveCsv:
             row = list(csv.DictReader(f))[0]
         assert row["file_path"] == str(file_path)
 
-    def test_csv_empty_licenses(
-        self, service: ReportService, tmp_path: Path
-    ) -> None:
+    def test_csv_empty_licenses(self, service: ReportService, tmp_path: Path) -> None:
         """An empty licenses list is written as an empty string in the CSV."""
         params = make_params(licenses=[])
         path = service.save_csv([make_result()], params, tmp_path)
@@ -252,9 +244,7 @@ class TestSaveCsv:
             row = list(csv.DictReader(f))[0]
         assert row["licenses"] == ""
 
-    def test_csv_empty_publication_types(
-        self, service: ReportService, tmp_path: Path
-    ) -> None:
+    def test_csv_empty_publication_types(self, service: ReportService, tmp_path: Path) -> None:
         """An empty publication_types list is written as an empty string in the CSV."""
         params = make_params(publication_types=[])
         path = service.save_csv([make_result()], params, tmp_path)
@@ -380,9 +370,7 @@ class TestExportExcel:
         assert data_row["title"] == result.paper.title
         assert data_row["doi"] == result.paper.doi
 
-    def test_search_params_in_excel(
-        self, service: ReportService, tmp_path: Path
-    ) -> None:
+    def test_search_params_in_excel(self, service: ReportService, tmp_path: Path) -> None:
         """Search parameters appear as column values in each Excel data row."""
         params = make_params(query="anxiety", sort_order="date")
         out = tmp_path / "report.xlsx"
@@ -510,9 +498,7 @@ class TestExportPdf:
     ) -> None:
         """All-skipped results produce a valid PDF with a skipped section."""
         results = [
-            make_result(
-                status="skipped", reason="PDF unavailable", file_path=None, pmid=str(i)
-            )
+            make_result(status="skipped", reason="PDF unavailable", file_path=None, pmid=str(i))
             for i in range(3)
         ]
         out = tmp_path / "report.pdf"
@@ -538,9 +524,7 @@ class TestExportPdf:
         assert out.exists()
         assert out.read_bytes().startswith(b"%PDF-")
 
-    def test_pdf_mixed_params_filters(
-        self, service: ReportService, tmp_path: Path
-    ) -> None:
+    def test_pdf_mixed_params_filters(self, service: ReportService, tmp_path: Path) -> None:
         """Non-empty licenses, publication_types, and author_orcids produce a valid PDF."""
         params = make_params(
             licenses=["CC BY", "CC0"],

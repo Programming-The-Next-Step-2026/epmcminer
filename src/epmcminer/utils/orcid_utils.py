@@ -29,7 +29,7 @@ def normalise_orcid(orcid: str) -> str:
     orcid = orcid.strip()
     for prefix in _URL_PREFIXES:
         if orcid.startswith(prefix):
-            orcid = orcid[len(prefix):]
+            orcid = orcid[len(prefix) :]
             break
     return orcid
 

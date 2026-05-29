@@ -40,9 +40,7 @@ def _make_download_result(status: str = "downloaded") -> DownloadResult:
         return DownloadResult(
             paper=paper, status="skipped", reason="PDF unavailable", file_path=None
         )
-    return DownloadResult(
-        paper=paper, status="failed", reason="HTTP 404", file_path=None
-    )
+    return DownloadResult(paper=paper, status="failed", reason="HTTP 404", file_path=None)
 
 
 def _make_params(count: int = 10, output_folder: Path = Path("/tmp/out")) -> SearchParams:
@@ -89,9 +87,7 @@ def _make_screen(
 def _log_row_count(w: ScreenDownload) -> int:
     """Return the number of row *widgets* in the log layout (excludes the trailing stretch)."""
     return sum(
-        1
-        for i in range(w._log_layout.count())
-        if w._log_layout.itemAt(i).widget() is not None
+        1 for i in range(w._log_layout.count()) if w._log_layout.itemAt(i).widget() is not None
     )
 
 
@@ -135,9 +131,7 @@ class TestDownloadWorkerRun:
 
     def test_worker_emits_error_on_exception(self, qapp: QApplication) -> None:
         """error_occurred is emitted with the exception message when download() raises."""
-        worker = DownloadWorker(
-            _make_service(exc=ConnectionError("timeout")), _make_params()
-        )
+        worker = DownloadWorker(_make_service(exc=ConnectionError("timeout")), _make_params())
         errors: list[str] = []
         worker.error_occurred.connect(errors.append)
         worker.run()

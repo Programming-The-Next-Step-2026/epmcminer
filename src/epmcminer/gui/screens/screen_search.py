@@ -85,6 +85,7 @@ _CONTINUE_BTN_STYLE = f"""
 """
 
 _HINT_STYLE = f"color: {theme.TEXT_MUTED}; font-size: 13px;"
+_QUERY_HINT_TEXT = "Use AND / OR to combine keywords. Defaults to AND if no operator is specified"
 
 
 # ---------------------------------------------------------------------------
@@ -266,7 +267,7 @@ class ScreenSearch(QWidget):
         self._query_edit.setMaxLength(500)
         layout.addWidget(self._query_edit)
 
-        hint = QLabel("Use AND / OR to combine keywords. Defaults to AND if no operator is specified")
+        hint = QLabel(_QUERY_HINT_TEXT)
         hint.setStyleSheet(_HINT_STYLE)
         layout.addWidget(hint)
         return card
@@ -301,7 +302,8 @@ class ScreenSearch(QWidget):
         layout.addWidget(make_section_label("Publication types"))
 
         self._pub_types = TagInput(
-            available_options=DEFAULT_PUBLICATION_TYPES, add_label="+ Add type",
+            available_options=DEFAULT_PUBLICATION_TYPES,
+            add_label="+ Add type",
         )
         self._pub_types.set_tags(list(DEFAULT_PUBLICATION_TYPES))
         layout.addWidget(self._pub_types)

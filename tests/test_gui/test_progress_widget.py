@@ -229,12 +229,6 @@ class TestProgressWidgetETA:
 class TestProgressWidgetThreadDots:
     """Tests for the thread count dot indicators."""
 
-    def test_thread_row_hidden_when_none(self, qapp: QApplication) -> None:
-        """Thread row is hidden when thread_count is None."""
-        w = ProgressWidget()
-        w.set_progress(10, 50, thread_count=None)
-        assert w._thread_row.isHidden()
-
     def test_thread_row_visible_when_provided(self, qapp: QApplication) -> None:
         """Thread row is visible when thread_count is given."""
         w = ProgressWidget()

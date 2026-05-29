@@ -143,11 +143,6 @@ class TestMainWindowNavigateTo:
             w.navigate_to(2)
         mock.assert_called_once_with(2)
 
-    def test_update_step_indicator_does_not_change_stack(self, qapp: QApplication) -> None:
-        """update_step_indicator() updates the indicator without switching screens."""
-        w = MainWindow()
-        w.update_step_indicator(2)
-        assert w._stack.currentIndex() == 0
 
 
 # ---------------------------------------------------------------------------

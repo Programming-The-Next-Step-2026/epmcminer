@@ -335,7 +335,8 @@ class ScreenDownload(QWidget):
             try:
                 size = result.file_path.stat().st_size
                 size_str = (
-                    f"{size / _BYTES_PER_MB:.1f} MB" if size >= _BYTES_PER_MB
+                    f"{size / _BYTES_PER_MB:.1f} MB"
+                    if size >= _BYTES_PER_MB
                     else f"{size / _BYTES_PER_KB:.0f} KB"
                 )
             except OSError:
@@ -460,7 +461,9 @@ class ScreenDownload(QWidget):
         _logger.error("Download worker error: %s", message)
         self._cancel_btn.setEnabled(False)
         self._progress.set_progress(
-            self._downloaded_count(), max(self._total, 1), processed=self._completed,
+            self._downloaded_count(),
+            max(self._total, 1),
+            processed=self._completed,
         )
         self._toast.show_message(f"Download error: {message}", success=False)  # type: ignore[union-attr]
 

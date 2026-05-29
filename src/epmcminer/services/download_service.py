@@ -132,7 +132,10 @@ class DownloadService:
 
             if page_size == DOWNLOAD_PAGE_SIZE:
                 page_results = self._download_page(
-                    raw_results, pdfs_dir, progress_callback, cancel_event,
+                    raw_results,
+                    pdfs_dir,
+                    progress_callback,
+                    cancel_event,
                 )
                 all_results.extend(page_results)
                 success_count += sum(
@@ -266,9 +269,7 @@ class DownloadService:
             )
         except APIError as exc:
             _logger.warning("Failed to download %s: HTTP %s", paper.pmid, exc.status_code)
-            reason = (
-                _REASON_RATE_LIMITED if exc.status_code == 429 else str(exc.status_code)
-            )
+            reason = _REASON_RATE_LIMITED if exc.status_code == 429 else str(exc.status_code)
             return DownloadResult(
                 paper=paper,
                 status=DownloadResult.STATUS_FAILED,
@@ -304,5 +305,8 @@ class DownloadService:
             )
         _logger.info("Downloaded %s to %s", paper.pmid, file_path)
         return DownloadResult(
-            paper=paper, status=DownloadResult.STATUS_DOWNLOADED, reason=None, file_path=file_path,
+            paper=paper,
+            status=DownloadResult.STATUS_DOWNLOADED,
+            reason=None,
+            file_path=file_path,
         )

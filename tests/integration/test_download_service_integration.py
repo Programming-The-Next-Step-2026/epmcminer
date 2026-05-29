@@ -103,9 +103,7 @@ class TestDownloadIntegration:
         downloaded = [r for r in results if r.status == "downloaded"]
         assert len(downloaded) >= 1
 
-    def test_downloaded_file_exists_on_disk(
-        self, service: DownloadService, tmp_path: Path
-    ) -> None:
+    def test_downloaded_file_exists_on_disk(self, service: DownloadService, tmp_path: Path) -> None:
         """Each result with status='downloaded' has a file_path that exists on disk."""
         results = service.download(
             make_params(tmp_path, count=1),
@@ -119,9 +117,7 @@ class TestDownloadIntegration:
                 assert result.file_path.exists()
                 assert result.file_path.stat().st_size > 0
 
-    def test_downloaded_file_is_valid_pdf(
-        self, service: DownloadService, tmp_path: Path
-    ) -> None:
+    def test_downloaded_file_is_valid_pdf(self, service: DownloadService, tmp_path: Path) -> None:
         """The saved file starts with the PDF magic bytes ``%PDF``."""
         results = service.download(
             make_params(tmp_path, count=1),
@@ -150,9 +146,7 @@ class TestDownloadIntegration:
 
         assert len(calls) == len(results)
 
-    def test_cancel_event_stops_download(
-        self, service: DownloadService, tmp_path: Path
-    ) -> None:
+    def test_cancel_event_stops_download(self, service: DownloadService, tmp_path: Path) -> None:
         """A pre-set cancel_event returns an empty list without calling the API."""
         cancel_event = threading.Event()
         cancel_event.set()

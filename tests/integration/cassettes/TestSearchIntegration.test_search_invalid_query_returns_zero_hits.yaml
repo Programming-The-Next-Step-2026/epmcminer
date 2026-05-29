@@ -213,4 +213,45 @@ interactions:
     status:
       code: 200
       message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - JSESSIONID=3AFDA9F234CCA77C045F436692CBF77C
+      User-Agent:
+      - python-requests/2.32.5
+    method: GET
+    uri: https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%28xyzzy_impossible_query_string_that_matches_nothing_12345%29+AND+%28HAS_FT%3AY+OR+HAS_FREE_FULLTEXT%3AY%29&format=json&resultType=core&pageSize=5&cursorMark=%2A
+  response:
+    body:
+      string: '{"version":"6.9","hitCount":0,"request":{"queryString":"(xyzzy_impossible_query_string_that_matches_nothing_12345)
+        AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)","resultType":"core","cursorMark":"%2A","pageSize":5,"sort":"","synonym":false},"resultList":{"result":[]}}'
+    headers:
+      Access-Control-Allow-Headers:
+      - Content-Type,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Max-Age:
+      - '3600'
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json;charset=UTF-8
+      Date:
+      - Fri, 29 May 2026 12:24:18 GMT
+      Strict-Transport-Security:
+      - max-age=0
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
 version: 1
