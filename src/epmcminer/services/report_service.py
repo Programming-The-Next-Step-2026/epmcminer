@@ -65,6 +65,7 @@ def _draw_pdf_bg(canvas: Any, doc: Any) -> None:
     Args:
         canvas: The reportlab canvas for the current page.
         doc: The reportlab document template.
+
     """
     canvas.saveState()
     canvas.setFillColor(_PDF_BG)
@@ -107,6 +108,7 @@ class ReportService:
             >>> report_path = service.save_csv(results, params, Path("/tmp/my_run"))
             >>> print(report_path.name)
             report.csv
+
         """
         output_folder.mkdir(parents=True, exist_ok=True)
         path = output_folder / _CSV_FILENAME
@@ -133,6 +135,7 @@ class ReportService:
         Examples:
             >>> from pathlib import Path
             >>> service.export_excel(results, params, Path("/tmp/my_run/report.xlsx"))
+
         """
         output_path.parent.mkdir(parents=True, exist_ok=True)
         self._build_dataframe(results, params).to_excel(output_path, index=False, engine="openpyxl")
@@ -165,6 +168,7 @@ class ReportService:
             >>> from pathlib import Path
             >>> out = Path("/tmp/my_run/report.pdf")
             >>> service.export_pdf(results, params, out, total_found=1024)
+
         """
         output_path.parent.mkdir(parents=True, exist_ok=True)
         doc = SimpleDocTemplate(
@@ -189,6 +193,7 @@ class ReportService:
 
         Returns:
             A mapping from style name to ParagraphStyle instance.
+
         """
         return {
             "title": ParagraphStyle(
@@ -299,6 +304,7 @@ class ReportService:
 
         Returns:
             A list of reportlab flowable objects ready to pass to ``doc.build()``.
+
         """
         story: list[Any] = []
         story.extend(self._pdf_header(styles))
@@ -323,6 +329,7 @@ class ReportService:
 
         Returns:
             List of flowable elements for the header section.
+
         """
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
         return [
@@ -346,12 +353,13 @@ class ReportService:
 
         Returns:
             A reportlab Table containing the three stat cards side by side.
+
         """
         downloaded = sum(1 for r in results if r.status == DownloadResult.STATUS_DOWNLOADED)
         not_downloaded = len(results) - downloaded
 
         def _make_cell(
-            label: str, value: str, value_style_key: str, sub: str
+            label: str, value: str, value_style_key: str, sub: str,
         ) -> list[Paragraph]:
             return [
                 Paragraph(label, styles["stat_label"]),
@@ -403,6 +411,7 @@ class ReportService:
 
         Returns:
             List of flowable elements for the parameters section.
+
         """
         rows: list[tuple[str, str]] = [
             ("Query", params.query),
@@ -458,6 +467,7 @@ class ReportService:
         Returns:
             List of flowable elements for the downloaded papers section, or ``[]``
             when no result has status ``"downloaded"``.
+
         """
         downloaded = [r for r in results if r.status == DownloadResult.STATUS_DOWNLOADED]
         if not downloaded:
@@ -507,6 +517,7 @@ class ReportService:
         Returns:
             List of flowable elements for the skipped papers section, or ``[]``
             when every result has status ``"downloaded"``.
+
         """
         not_downloaded = [r for r in results if r.status != DownloadResult.STATUS_DOWNLOADED]
         if not not_downloaded:
@@ -542,7 +553,7 @@ class ReportService:
     # ------------------------------------------------------------------
 
     def _build_dataframe(
-        self, results: list[DownloadResult], params: SearchParams
+        self, results: list[DownloadResult], params: SearchParams,
     ) -> pd.DataFrame:
         """Build a pandas DataFrame from download results and search parameters.
 
@@ -552,6 +563,7 @@ class ReportService:
 
         Returns:
             A DataFrame with one row per result and columns matching REPORT_COLUMNS.
+
         """
         rows = [
             {

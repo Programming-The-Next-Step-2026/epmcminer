@@ -35,6 +35,7 @@ def _parse_retry_after(response: requests.Response) -> float | None:
 
     Returns:
         The number of seconds to wait as a float, or None.
+
     """
     header = response.headers.get("Retry-After")
     if header is None:
@@ -62,6 +63,7 @@ class APIError(Exception):
     Attributes:
         status_code: The HTTP status code returned by the API.
         body: The raw response body text.
+
     """
 
     def __init__(self, status_code: int, body: str) -> None:
@@ -70,6 +72,7 @@ class APIError(Exception):
         Args:
             status_code: The HTTP status code returned by the API.
             body: The raw response body text.
+
         """
         super().__init__(f"Europe PMC API error {status_code}: {body}")
         self.status_code = status_code
@@ -125,6 +128,7 @@ class EuropePMCClient:
             4231
             >>> print(data["resultList"]["result"][0]["title"])
             'Cognitive behavioural therapy for depression: a meta-analysis'
+
         """
         full_query = f"({query}) AND ({FREE_FULL_TEXT_FILTER})"
         params: dict[str, Any] = {
@@ -225,6 +229,7 @@ class EuropePMCClient:
             >>> import threading
             >>> cancel = threading.Event()
             >>> pdf_bytes = client.download_pdf(url, cancel_event=cancel)
+
         """
         last_exc: Exception | None = None
         for attempt in range(_MAX_RETRIES):
@@ -254,7 +259,7 @@ class EuropePMCClient:
                     if not response.content.startswith(_PDF_MAGIC_BYTES):
                         raise InvalidPdfContentError(
                             f"Response from {url!r} is not a valid PDF "
-                            f"(got {response.content[:16]!r})"
+                            f"(got {response.content[:16]!r})",
                         )
                     return cast(bytes, response.content)
                 if response.status_code == _HTTP_429_TOO_MANY_REQUESTS:

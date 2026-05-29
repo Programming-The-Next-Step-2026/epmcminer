@@ -107,6 +107,7 @@ class Toast(QWidget):
 
         Args:
             parent: The parent widget this toast overlays.  Must not be None.
+
         """
         super().__init__(parent)
         self.setObjectName("toast")
@@ -145,6 +146,7 @@ class Toast(QWidget):
                 holds for ``_HOLD_MS_SUCCESS`` milliseconds.  If ``False``,
                 red error styling is used and the hold extends to
                 ``_HOLD_MS_ERROR`` milliseconds.
+
         """
         # Cancel any running animation / hold timer before starting fresh.
         self._hold_timer.stop()
@@ -157,7 +159,7 @@ class Toast(QWidget):
         hold_ms = _HOLD_MS_SUCCESS if success else _HOLD_MS_ERROR
 
         self.setStyleSheet(
-            _TOAST_STYLE_TMPL.format(bg=_TOAST_BG, stripe=stripe, sw=_STRIPE_WIDTH)
+            _TOAST_STYLE_TMPL.format(bg=_TOAST_BG, stripe=stripe, sw=_STRIPE_WIDTH),
         )
         self._icon_lbl.setStyleSheet(_BADGE_STYLE_TMPL.format(badge_bg=badge_bg))
         self._icon_lbl.setText(icon)

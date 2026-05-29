@@ -15,6 +15,7 @@ class SearchResult:
             which may exceed the length of ``papers``.
         estimated_downloadable: Number of papers in the previewed batch
             that have a freely available PDF URL.
+
     """
 
     papers: list[Paper] = field(default_factory=list)

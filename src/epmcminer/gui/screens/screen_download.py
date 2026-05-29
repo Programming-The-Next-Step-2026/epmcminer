@@ -71,6 +71,7 @@ class DownloadWorker(QThread):
         download_finished: Emitted with the full list of results on completion.
         error_occurred: Emitted with an error message string on failure.
         cancel_event: Set this to request cancellation of the download loop.
+
     """
 
     progress_updated = pyqtSignal(DownloadResult)
@@ -83,6 +84,7 @@ class DownloadWorker(QThread):
         Args:
             service: The DownloadService to use.
             params: The search/download parameters.
+
         """
         super().__init__()
         self._service = service
@@ -133,6 +135,7 @@ class ScreenDownload(QWidget):
             download_service: Injected service that performs the downloads.
             report_service: Injected service that writes report.csv.
             parent: Optional parent widget.
+
         """
         super().__init__(parent)
         self._service = download_service
@@ -158,6 +161,7 @@ class ScreenDownload(QWidget):
 
         Args:
             params: SearchParams including query, count, and output_folder.
+
         """
         self._params = params
         self._results = []
@@ -199,7 +203,7 @@ class ScreenDownload(QWidget):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setStyleSheet(
-            f"QScrollArea {{ background-color: {theme.APP_BG}; border: none; }}"
+            f"QScrollArea {{ background-color: {theme.APP_BG}; border: none; }}",
         )
 
         content_widget = QWidget()
@@ -236,10 +240,10 @@ class ScreenDownload(QWidget):
         self._log_scroll.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self._log_scroll.setStyleSheet(
             f"QScrollArea {{ background-color: {theme.CARD_BG}; border: none; }}"
-            f"QScrollArea > QWidget > QWidget {{ background-color: {theme.CARD_BG}; }}"
+            f"QScrollArea > QWidget > QWidget {{ background-color: {theme.CARD_BG}; }}",
         )
         self._log_scroll.verticalScrollBar().rangeChanged.connect(  # type: ignore[union-attr]
-            lambda _, max_val: self._log_scroll.verticalScrollBar().setValue(max_val)  # type: ignore[union-attr]
+            lambda _, max_val: self._log_scroll.verticalScrollBar().setValue(max_val),  # type: ignore[union-attr]
         )
 
         log_container = QWidget()
@@ -257,7 +261,7 @@ class ScreenDownload(QWidget):
         bar = QWidget()
         bar.setFixedHeight(72)
         bar.setStyleSheet(
-            f"background-color: {theme.APP_BG}; border-top: 1px solid {theme.BORDER};"
+            f"background-color: {theme.APP_BG}; border-top: 1px solid {theme.BORDER};",
         )
         bar_layout = QHBoxLayout(bar)
         bar_layout.setContentsMargins(22, 0, 22, 0)
@@ -294,7 +298,7 @@ class ScreenDownload(QWidget):
         dot.setAlignment(Qt.AlignmentFlag.AlignCenter)
         dot.setStyleSheet(
             f"background-color: {bg}; color: {fg}; border-radius: {_DOT_RADIUS}px;"
-            f" font-size: 13px; font-weight: 700; border: none;"
+            f" font-size: 13px; font-weight: 700; border: none;",
         )
         return dot
 
@@ -343,7 +347,7 @@ class ScreenDownload(QWidget):
         filename_lbl.setWordWrap(True)
         filename_lbl.setStyleSheet(
             f"color: {theme.TEXT_PRIMARY}; font-size: 14px; font-weight: 600;"
-            f" font-family: monospace; letter-spacing: -0.2px;"
+            f" font-family: monospace; letter-spacing: -0.2px;",
         )
         text_layout.addWidget(filename_lbl)
 
@@ -355,7 +359,7 @@ class ScreenDownload(QWidget):
         separator = QFrame()
         separator.setFrameShape(QFrame.Shape.HLine)
         separator.setStyleSheet(
-            f"background-color: {_DIVIDER}; border: none; max-height: 1px; margin-top: 8px;"
+            f"background-color: {_DIVIDER}; border: none; max-height: 1px; margin-top: 8px;",
         )
         text_layout.addWidget(separator)
 
@@ -437,7 +441,7 @@ class ScreenDownload(QWidget):
         _logger.error("Download worker error: %s", message)
         self._cancel_btn.setEnabled(False)
         self._progress.set_progress(
-            self._downloaded_count(), max(self._total, 1), processed=self._completed
+            self._downloaded_count(), max(self._total, 1), processed=self._completed,
         )
         self._toast.show_message(f"Download error: {message}", success=False)  # type: ignore[union-attr]
 

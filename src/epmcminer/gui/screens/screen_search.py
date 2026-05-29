@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from PyQt6.QtCore import QDate, Qt, QThread, pyqtSignal
+from PyQt6.QtGui import QResizeEvent
 from PyQt6.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -17,6 +18,7 @@ import epmcminer.gui.theme as theme
 from epmcminer.gui.widgets.card import make_card, make_section_label
 from epmcminer.gui.widgets.date_picker import DatePicker
 from epmcminer.gui.widgets.tag_input import TagInput
+from epmcminer.gui.widgets.toast import Toast
 from epmcminer.services.models import SearchParams
 from epmcminer.services.orcid_validation_service import OrcidValidationService
 
@@ -118,6 +120,7 @@ class OrcidExistenceWorker(QThread):
             orcid: The bare ORCID identifier to look up.
             service: The validation service used to perform the HTTP check.
             parent: Optional parent for ownership / lifetime management.
+
         """
         super().__init__(parent)
         self._orcid = orcid
@@ -165,6 +168,7 @@ class ScreenSearch(QWidget):
                 When ``None``, ORCIDs are accepted without validation (useful
                 in tests that do not need the validation feature).
             parent: Optional parent widget.
+
         """
         super().__init__(parent)
         self._orcid_service = orcid_service
@@ -173,6 +177,7 @@ class ScreenSearch(QWidget):
         self._validated_orcids: set[str] = set()
         # Keep worker references alive until Qt delivers the signals.
         self._workers: list[OrcidExistenceWorker] = []
+        self._toast: Toast | None = None
         self.setStyleSheet(f"background-color: {theme.APP_BG};")
         self._build_ui()
         self._connect_signals()
@@ -187,6 +192,7 @@ class ScreenSearch(QWidget):
 
         Returns:
             A SearchParams built from the current widget state.
+
         """
         return SearchParams(
             query=self._query_edit.text().strip(),
@@ -209,7 +215,7 @@ class ScreenSearch(QWidget):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setStyleSheet(
-            f"QScrollArea {{ background-color: {theme.APP_BG}; border: none; }}"
+            f"QScrollArea {{ background-color: {theme.APP_BG}; border: none; }}",
         )
 
         content = QWidget()
@@ -227,6 +233,14 @@ class ScreenSearch(QWidget):
         scroll.setWidget(content)
         root.addWidget(scroll)
         root.addWidget(self._make_action_bar())
+
+        self._toast = Toast(self)
+
+    def resizeEvent(self, event: QResizeEvent | None) -> None:
+        """Reposition the toast whenever the screen is resized."""
+        super().resizeEvent(event)
+        if self._toast is not None and not self._toast.isHidden():
+            self._toast.reposition()
 
     def _connect_signals(self) -> None:
         """Wire validation signals after all widgets are constructed."""
@@ -268,7 +282,7 @@ class ScreenSearch(QWidget):
         layout.addWidget(make_section_label("Publication types"))
 
         self._pub_types = TagInput(
-            available_options=DEFAULT_PUBLICATION_TYPES, add_label="+ Add type"
+            available_options=DEFAULT_PUBLICATION_TYPES, add_label="+ Add type",
         )
         self._pub_types.set_tags(list(DEFAULT_PUBLICATION_TYPES))
         layout.addWidget(self._pub_types)
@@ -331,7 +345,7 @@ class ScreenSearch(QWidget):
         bar = QWidget()
         bar.setFixedHeight(72)
         bar.setStyleSheet(
-            f"background-color: {theme.APP_BG}; border-top: 1px solid {theme.BORDER};"
+            f"background-color: {theme.APP_BG}; border-top: 1px solid {theme.BORDER};",
         )
         bar_layout = QHBoxLayout(bar)
         bar_layout.setContentsMargins(22, 0, 22, 0)
@@ -451,6 +465,7 @@ class ScreenSearch(QWidget):
         Args:
             orcid: The ORCID that was checked.
             exists: ``True`` if the registry returned HTTP 200.
+
         """
         self._orcids.set_tag_status(orcid, "valid" if exists else "invalid")
         # Discard completed workers to avoid unbounded growth.
@@ -464,6 +479,12 @@ class ScreenSearch(QWidget):
 
         Args:
             orcid: The ORCID whose existence check failed due to a network error.
+
         """
         # Pill already shows "pending" — no style change needed. Just clean up.
         self._workers = [w for w in self._workers if w.isRunning()]
+        if self._toast is not None:
+            self._toast.show_message(
+                f"Could not verify ORCID {orcid} — network unreachable. Accepted as pending.",
+                success=False,
+            )

@@ -13,6 +13,7 @@ def make_card(padding: int = 22) -> tuple[QFrame, QVBoxLayout]:
 
     Returns:
         A tuple of (QFrame with ``objectName='card'``, QVBoxLayout inside it).
+
     """
     frame = QFrame()
     frame.setObjectName("card")
@@ -31,6 +32,7 @@ def make_section_label(text: str) -> QWidget:
 
     Returns:
         A QWidget containing a 3 × 14 px accent bar and a styled QLabel.
+
     """
     row = QWidget()
     row_layout = QHBoxLayout(row)
@@ -40,14 +42,14 @@ def make_section_label(text: str) -> QWidget:
     bar = QFrame()
     bar.setFixedSize(3, 14)
     bar.setStyleSheet(
-        f"background-color: {theme.ACCENT}; border-radius: 2px; border: none;"
+        f"background-color: {theme.ACCENT}; border-radius: 2px; border: none;",
     )
     row_layout.addWidget(bar)
 
     lbl = QLabel(text.upper())
     lbl.setStyleSheet(
         f"color: {theme.TEXT_PRIMARY}; font-size: 11px;"
-        f" letter-spacing: 1.6px; font-weight: 600;"
+        f" letter-spacing: 1.6px; font-weight: 600;",
     )
     row_layout.addWidget(lbl)
     row_layout.addStretch()

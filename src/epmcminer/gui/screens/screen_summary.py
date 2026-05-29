@@ -80,6 +80,7 @@ class ExportWorker(QThread):
     Attributes:
         export_done: Emitted with the output file path string on success.
         export_error: Emitted with an error message string on failure.
+
     """
 
     export_done = pyqtSignal(str)
@@ -92,6 +93,7 @@ class ExportWorker(QThread):
             fn: Zero-argument callable that performs the export (already bound
                 with results, params, and output_path).
             path: Display path emitted with export_done on success.
+
         """
         super().__init__()
         self._fn = fn
@@ -135,6 +137,7 @@ class ScreenSummary(QWidget):
         Args:
             report_service: Injected service used for Excel and PDF export.
             parent: Optional parent widget.
+
         """
         super().__init__(parent)
         self._report_service = report_service
@@ -165,6 +168,7 @@ class ScreenSummary(QWidget):
             results: List of DownloadResult objects from the download phase.
             params: The SearchParams used to produce the results.
             total_found: Total number of papers found in the API search.
+
         """
         self._results = results
         self._params = params
@@ -199,7 +203,7 @@ class ScreenSummary(QWidget):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setStyleSheet(
-            f"QScrollArea {{ background-color: {theme.APP_BG}; border: none; }}"
+            f"QScrollArea {{ background-color: {theme.APP_BG}; border: none; }}",
         )
 
         content_widget = QWidget()
@@ -236,7 +240,7 @@ class ScreenSummary(QWidget):
 
         value_lbl = QLabel(initial_value)
         value_lbl.setStyleSheet(
-            f"color: {value_color}; font-size: 32px; font-weight: 600; line-height: 1;"
+            f"color: {value_color}; font-size: 32px; font-weight: 600; line-height: 1;",
         )
         layout.addWidget(value_lbl)
 
@@ -251,13 +255,13 @@ class ScreenSummary(QWidget):
         row.setSpacing(16)
 
         card_dl, self._stat_downloaded_lbl, self._stat_downloaded_sub = self._make_stat_card(
-            "Downloaded", "—", "of 0 processed", theme.ACCENT
+            "Downloaded", "—", "of 0 processed", theme.ACCENT,
         )
         card_sk, self._stat_skipped_lbl, _ = self._make_stat_card(
-            "Skipped", "—", "see reasons below", theme.DANGER
+            "Skipped", "—", "see reasons below", theme.DANGER,
         )
         card_tot, self._stat_total_lbl, _ = self._make_stat_card(
-            "Total results", "—", "found in Europe PMC", theme.ACCENT
+            "Total results", "—", "found in Europe PMC", theme.ACCENT,
         )
 
         row.addWidget(card_dl)
@@ -288,7 +292,7 @@ class ScreenSummary(QWidget):
         scroll.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         scroll.setStyleSheet(
             f"QScrollArea {{ background-color: {theme.CARD_BG}; border: none; }}"
-            f"QScrollArea > QWidget > QWidget {{ background-color: {theme.CARD_BG}; }}"
+            f"QScrollArea > QWidget > QWidget {{ background-color: {theme.CARD_BG}; }}",
         )
 
         list_container = QWidget()
@@ -305,7 +309,7 @@ class ScreenSummary(QWidget):
         bar = QWidget()
         bar.setFixedHeight(72)
         bar.setStyleSheet(
-            f"background-color: {theme.APP_BG}; border-top: 1px solid {theme.BORDER};"
+            f"background-color: {theme.APP_BG}; border-top: 1px solid {theme.BORDER};",
         )
         bar_layout = QHBoxLayout(bar)
         bar_layout.setContentsMargins(22, 0, 22, 0)
@@ -345,6 +349,7 @@ class ScreenSummary(QWidget):
 
         Returns:
             Tuple of (the containing widget, the value QLabel).
+
         """
         widget = QWidget()
         widget.setStyleSheet(f"background-color: {theme.CARD_BG};")
@@ -358,7 +363,7 @@ class ScreenSummary(QWidget):
 
         value_lbl = QLabel(value)
         value_lbl.setStyleSheet(
-            f"color: {theme.TEXT_PRIMARY}; font-size: 15px; font-weight: 600;"
+            f"color: {theme.TEXT_PRIMARY}; font-size: 15px; font-weight: 600;",
         )
         h.addWidget(value_lbl)
         return widget, value_lbl
@@ -376,6 +381,7 @@ class ScreenSummary(QWidget):
 
         Returns:
             The containing row widget.
+
         """
         widget = QWidget()
         widget.setStyleSheet(f"background-color: {theme.CARD_BG};")
@@ -390,7 +396,7 @@ class ScreenSummary(QWidget):
 
         value_lbl = QLabel(value)
         value_lbl.setStyleSheet(
-            f"color: {theme.TEXT_PRIMARY}; font-size: 15px; font-weight: 600;"
+            f"color: {theme.TEXT_PRIMARY}; font-size: 15px; font-weight: 600;",
         )
         value_lbl.setWordWrap(True)
         h.addWidget(value_lbl, 1)
@@ -404,6 +410,7 @@ class ScreenSummary(QWidget):
 
         Returns:
             Tuple of (the row widget, list of value QLabels in order).
+
         """
         row = QWidget()
         row.setStyleSheet(f"background-color: {theme.CARD_BG};")
@@ -447,15 +454,15 @@ class ScreenSummary(QWidget):
 
         if license_str and not license_inline:
             self._param_pairs_layout.addWidget(
-                self._make_param_line("License", license_str)
+                self._make_param_line("License", license_str),
             )
         if params.publication_types:
             self._param_pairs_layout.addWidget(
-                self._make_param_line("Publication types", ", ".join(params.publication_types))
+                self._make_param_line("Publication types", ", ".join(params.publication_types)),
             )
         if params.author_orcids:
             self._param_pairs_layout.addWidget(
-                self._make_param_line("Authors", f"{len(params.author_orcids)} ORCIDs")
+                self._make_param_line("Authors", f"{len(params.author_orcids)} ORCIDs"),
             )
 
     def _populate_skipped(self, results: list[DownloadResult]) -> None:
@@ -485,7 +492,7 @@ class ScreenSummary(QWidget):
         dot.setStyleSheet(
             f"background-color: {theme.DANGER_BG}; color: {theme.DANGER};"
             f" border-radius: {_DOT_RADIUS}px; font-size: 12px;"
-            f" font-weight: 700; border: none;"
+            f" font-weight: 700; border: none;",
         )
         row_layout.addWidget(dot)
 
@@ -498,7 +505,7 @@ class ScreenSummary(QWidget):
         title_lbl = QLabel(result.paper.title)
         title_lbl.setWordWrap(True)
         title_lbl.setStyleSheet(
-            f"color: {theme.TEXT_PRIMARY}; font-size: 16px; font-weight: 600;"
+            f"color: {theme.TEXT_PRIMARY}; font-size: 16px; font-weight: 600;",
         )
         text_layout.addWidget(title_lbl)
 
@@ -511,7 +518,7 @@ class ScreenSummary(QWidget):
 
         reason_lbl = QLabel(result.reason or "Unknown reason")
         reason_lbl.setStyleSheet(
-            f"color: {theme.DANGER}; font-size: 14px; font-weight: 500;"
+            f"color: {theme.DANGER}; font-size: 14px; font-weight: 500;",
         )
         text_layout.addWidget(reason_lbl)
 
@@ -519,7 +526,7 @@ class ScreenSummary(QWidget):
             separator = QFrame()
             separator.setFrameShape(QFrame.Shape.HLine)
             separator.setStyleSheet(
-                f"background-color: {_DIVIDER}; border: none; max-height: 1px; margin-top: 8px;"
+                f"background-color: {_DIVIDER}; border: none; max-height: 1px; margin-top: 8px;",
             )
             text_layout.addWidget(separator)
 
@@ -539,7 +546,7 @@ class ScreenSummary(QWidget):
         if self._params is None:
             return
         path, _ = QFileDialog.getSaveFileName(
-            self, "Export Excel", "results.xlsx", "Excel Files (*.xlsx)"
+            self, "Export Excel", "results.xlsx", "Excel Files (*.xlsx)",
         )
         if not path:
             return
@@ -555,7 +562,7 @@ class ScreenSummary(QWidget):
         if self._params is None:
             return
         path, _ = QFileDialog.getSaveFileName(
-            self, "Export PDF", "results.pdf", "PDF Files (*.pdf)"
+            self, "Export PDF", "results.pdf", "PDF Files (*.pdf)",
         )
         if not path:
             return
@@ -572,6 +579,7 @@ class ScreenSummary(QWidget):
         Args:
             fn: Zero-argument callable that performs the export.
             path: File path string to emit with export_done on success.
+
         """
         self._worker = ExportWorker(fn, path)
         self._worker.export_done.connect(self._on_export_done)

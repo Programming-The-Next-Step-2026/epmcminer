@@ -27,6 +27,7 @@ class OrcidValidationService:
         >>> service = OrcidValidationService(client=OrcidClient())
         >>> service.validate_format("0000-0001-5109-3700")
         True
+
     """
 
     def __init__(self, client: OrcidClient) -> None:
@@ -45,6 +46,7 @@ class OrcidValidationService:
 
         Returns:
             ``True`` if the format and checksum are correct, ``False`` otherwise.
+
         """
         return validate_orcid_format(orcid)
 
@@ -65,6 +67,7 @@ class OrcidValidationService:
         Raises:
             ConnectionError: If a network-level failure prevents the request
                 from completing.
+
         """
         return self._client.check_exists(orcid)
 
@@ -80,5 +83,6 @@ class OrcidValidationService:
 
         Returns:
             The bare ORCID identifier, e.g. ``"0000-0001-5109-3700"``.
+
         """
         return normalise_orcid(orcid)

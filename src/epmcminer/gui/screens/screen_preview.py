@@ -153,6 +153,7 @@ class PreviewWorker(QThread):
         result_ready: Emitted with the SearchResult on success (unless cancelled).
         error_occurred: Emitted with an error message string on failure (unless cancelled).
         cancel_event: Set this to discard the result when it arrives instead of emitting.
+
     """
 
     result_ready = pyqtSignal(SearchResult)
@@ -164,6 +165,7 @@ class PreviewWorker(QThread):
         Args:
             service: The SearchService to query.
             params: The search parameters to pass to preview().
+
         """
         super().__init__()
         self._service = service
@@ -218,6 +220,7 @@ class ScreenPreview(QWidget):
         Args:
             search_service: Injected SearchService used to fetch preview results.
             parent: Optional parent widget.
+
         """
         super().__init__(parent)
         self._service = search_service
@@ -243,6 +246,7 @@ class ScreenPreview(QWidget):
 
         Args:
             params: Search parameters to pass to the service.
+
         """
         self._params = params
         sort_idx = (
@@ -276,7 +280,7 @@ class ScreenPreview(QWidget):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setStyleSheet(
-            f"QScrollArea {{ background-color: {theme.APP_BG}; border: none; }}"
+            f"QScrollArea {{ background-color: {theme.APP_BG}; border: none; }}",
         )
 
         content_widget = QWidget()
@@ -316,6 +320,7 @@ class ScreenPreview(QWidget):
 
         Returns:
             The card QWidget containing the section label and progress widget.
+
         """
         card, layout = make_card(padding=26)
         layout.addWidget(make_section_label("Search progress"))
@@ -370,7 +375,7 @@ class ScreenPreview(QWidget):
 
         value_lbl = QLabel("—")
         value_lbl.setStyleSheet(
-            f"color: {theme.ACCENT}; font-size: 32px; font-weight: 600; line-height: 1;"
+            f"color: {theme.ACCENT}; font-size: 32px; font-weight: 600; line-height: 1;",
         )
         layout.addWidget(value_lbl)
 
@@ -388,13 +393,13 @@ class ScreenPreview(QWidget):
         layout.setSpacing(16)
 
         tile_total, self._stat_total_value = self._make_stat_tile(
-            "Total results", "matching your query"
+            "Total results", "matching your query",
         )
         tile_pdf, self._stat_pdf_value = self._make_stat_tile(
-            "PDF available", "of previewed results"
+            "PDF available", "of previewed results",
         )
         tile_prev, self._stat_previewing_value = self._make_stat_tile(
-            "Previewing", "top results shown below"
+            "Previewing", "top results shown below",
         )
 
         layout.addWidget(tile_total)
@@ -445,7 +450,7 @@ class ScreenPreview(QWidget):
         paper_scroll.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         paper_scroll.setStyleSheet(
             f"QScrollArea {{ background-color: {theme.CARD_BG}; border: none; }}"
-            f"QScrollArea > QWidget > QWidget {{ background-color: {theme.CARD_BG}; }}"
+            f"QScrollArea > QWidget > QWidget {{ background-color: {theme.CARD_BG}; }}",
         )
 
         paper_container = QWidget()
@@ -470,7 +475,7 @@ class ScreenPreview(QWidget):
         title_lbl = QLabel(paper.title)
         title_lbl.setWordWrap(True)
         title_lbl.setStyleSheet(
-            f"color: {theme.TEXT_PRIMARY}; font-size: 16px; font-weight: 600;"
+            f"color: {theme.TEXT_PRIMARY}; font-size: 16px; font-weight: 600;",
         )
         layout.addWidget(title_lbl)
 
@@ -487,7 +492,7 @@ class ScreenPreview(QWidget):
         separator = QFrame()
         separator.setFrameShape(QFrame.Shape.HLine)
         separator.setStyleSheet(
-            f"background-color: {_DIVIDER}; border: none; max-height: 1px; margin-top: 10px;"
+            f"background-color: {_DIVIDER}; border: none; max-height: 1px; margin-top: 10px;",
         )
         layout.addWidget(separator)
 
@@ -553,7 +558,7 @@ class ScreenPreview(QWidget):
         bar = QWidget()
         bar.setFixedHeight(72)
         bar.setStyleSheet(
-            f"background-color: {theme.APP_BG}; border-top: 1px solid {theme.BORDER};"
+            f"background-color: {theme.APP_BG}; border-top: 1px solid {theme.BORDER};",
         )
         bar_layout = QHBoxLayout(bar)
         bar_layout.setContentsMargins(22, 0, 22, 0)

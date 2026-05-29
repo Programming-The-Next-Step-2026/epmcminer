@@ -16,6 +16,7 @@ class Paper:
         year: Publication year as a four-digit string, e.g. ``"2022"``.
         abstract: Full abstract text.
         pdf_url: Direct URL to the open-access PDF, or ``None`` if unavailable.
+
     """
 
     pmid: str

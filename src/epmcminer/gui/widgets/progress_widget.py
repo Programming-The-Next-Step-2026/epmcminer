@@ -77,6 +77,7 @@ class ProgressWidget(QWidget):
 
         Args:
             parent: Optional parent widget.
+
         """
         super().__init__(parent)
         self._dot_phase: int = 0
@@ -98,6 +99,7 @@ class ProgressWidget(QWidget):
 
         Args:
             message: Status text displayed beside the animated dots.
+
         """
         self._anim_timer.stop()
         self._bar.setRange(0, 0)
@@ -132,6 +134,7 @@ class ProgressWidget(QWidget):
             cancelling: When ``True``, the thread label reads
                 "cancelling, waiting for N thread(s)" instead of
                 "N thread(s) running".
+
         """
         if not self._anim_timer.isActive():
             self._anim_timer.start()
@@ -143,7 +146,7 @@ class ProgressWidget(QWidget):
         self._pct_label.setText(f"{pct}%")
         if processed is not None:
             self._count_label.setText(
-                f"downloaded {current} out of {total}  –  processed {processed} results"
+                f"downloaded {current} out of {total}  –  processed {processed} results",
             )
         else:
             self._count_label.setText(f"downloaded {current} out of {total}")
@@ -331,7 +334,7 @@ class ProgressWidget(QWidget):
             self._thread_label.setText(f"cancelling, waiting for {thread_count} {noun}")
         else:
             self._thread_label.setText(
-                "1 thread running" if thread_count == 1 else f"{thread_count} threads running"
+                "1 thread running" if thread_count == 1 else f"{thread_count} threads running",
             )
 
     def _tick_dots(self) -> None:

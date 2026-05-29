@@ -22,6 +22,7 @@ class DownloadResult:
         active_threads: Number of download threads that were running at the
             moment this result was emitted, including the thread that just
             finished.
+
     """
 
     STATUS_DOWNLOADED: ClassVar[Literal["downloaded"]] = "downloaded"

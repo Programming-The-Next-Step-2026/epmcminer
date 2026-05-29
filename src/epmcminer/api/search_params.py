@@ -29,6 +29,7 @@ class SearchParams:
         ValueError: If ``count`` is not greater than 0.
         ValueError: If ``date_from`` or ``date_to`` is not a valid ISO-8601 date (YYYY-MM-DD).
         ValueError: If ``date_from`` is later than ``date_to``.
+
     """
 
     query: str
@@ -48,6 +49,7 @@ class SearchParams:
             ValueError: If ``count`` is not greater than 0.
             ValueError: If ``date_from`` or ``date_to`` is not a valid ISO-8601 date.
             ValueError: If ``date_from`` is later than ``date_to``.
+
         """
         if self.count <= 0:
             raise ValueError(f"count must be greater than 0, got {self.count}.")
@@ -55,15 +57,15 @@ class SearchParams:
             parsed_from = date.fromisoformat(self.date_from)
         except ValueError as exc:
             raise ValueError(
-                f"date_from must be a valid ISO-8601 date (YYYY-MM-DD), got {self.date_from!r}."
+                f"date_from must be a valid ISO-8601 date (YYYY-MM-DD), got {self.date_from!r}.",
             ) from exc
         try:
             parsed_to = date.fromisoformat(self.date_to)
         except ValueError as exc:
             raise ValueError(
-                f"date_to must be a valid ISO-8601 date (YYYY-MM-DD), got {self.date_to!r}."
+                f"date_to must be a valid ISO-8601 date (YYYY-MM-DD), got {self.date_to!r}.",
             ) from exc
         if parsed_from > parsed_to:
             raise ValueError(
-                f"date_from ({self.date_from}) must not be later than date_to ({self.date_to})."
+                f"date_from ({self.date_from}) must not be later than date_to ({self.date_to}).",
             )

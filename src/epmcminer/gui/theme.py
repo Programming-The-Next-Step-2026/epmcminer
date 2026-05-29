@@ -117,6 +117,7 @@ def get_fusion_style() -> QStyle | None:
 
     Returns:
         The Fusion QStyle, or ``None`` if the style is unavailable.
+
     """
     global _fusion_style
     if _fusion_style is None:

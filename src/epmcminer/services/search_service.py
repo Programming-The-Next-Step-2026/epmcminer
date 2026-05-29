@@ -46,6 +46,7 @@ def _pub_type_to_api(display_name: str) -> str:
 
     Returns:
         The lowercase API value accepted by the Europe PMC search endpoint.
+
     """
     return _PUB_TYPE_API_EXCEPTIONS.get(display_name, display_name.lower())
 
@@ -62,6 +63,7 @@ def pdf_url_from_raw(raw: dict[str, Any]) -> str | None:
 
     Returns:
         The PDF URL string, or None if no PDF link is present.
+
     """
     entries = raw.get("fullTextUrlList", {}).get("fullTextUrl", [])
     for entry in entries:
@@ -81,6 +83,7 @@ def paper_from_raw(raw: dict[str, Any]) -> Paper:
 
     Returns:
         A fully populated Paper instance.
+
     """
     pmid = raw.get("pmid") or raw.get("id", "")
     return Paper(
@@ -107,6 +110,7 @@ class SearchService:
 
         Args:
             client: An EuropePMCClient instance for making HTTP requests.
+
         """
         self._client = client
 
@@ -147,6 +151,7 @@ class SearchService:
             ... )
             >>> service.build_query(params)  # doctest: +ELLIPSIS
             'memory AND sleep AND (FIRST_PDATE:[2021-01-01 TO 2023-12-31]) AND ...'
+
         """
         parts: list[str] = []
 
@@ -203,6 +208,7 @@ class SearchService:
             142
             >>> print(len(result.papers))
             10
+
         """
         query = self.build_query(params)
         sort = SORT_ORDER_MAP.get(params.sort_order)

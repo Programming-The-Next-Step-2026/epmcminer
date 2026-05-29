@@ -36,6 +36,7 @@ dev = [
     "pytest-recording",  # VCR cassette recording for deterministic integration tests
     "responses",
     "ruff",
+    "mypy"
 ]
 
 [project.scripts]

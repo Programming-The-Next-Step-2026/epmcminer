@@ -23,11 +23,12 @@ def setup_logger(output_folder: Path) -> logging.Logger:
 
     Returns:
         The configured ``epmcminer`` root logger instance.
+
     """
     logs_dir = output_folder / "logs"
     logs_dir.mkdir(parents=True, exist_ok=True)
 
-    timestamp = datetime.now().strftime(_LOG_DATE_FORMAT)
+    timestamp = datetime.now().strftime(_LOG_DATE_FORMAT)  # noqa: DTZ005 — local time intentional for human-readable log filenames
     log_file = logs_dir / f"{timestamp}.log"
 
     logger = logging.getLogger(_ROOT_LOGGER_NAME)
@@ -56,5 +57,6 @@ def get_logger(name: str) -> logging.Logger:
 
     Returns:
         A configured :class:`logging.Logger` instance.
+
     """
     return logging.getLogger(name)

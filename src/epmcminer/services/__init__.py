@@ -16,6 +16,7 @@ def create_application_services() -> (
     Returns:
         A 4-tuple of ``(SearchService, DownloadService, ReportService,
         OrcidValidationService)`` ready for injection into the GUI screens.
+
     """
     client = EuropePMCClient()
     search_service = SearchService(client=client)

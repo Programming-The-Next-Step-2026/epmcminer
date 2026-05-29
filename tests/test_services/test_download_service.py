@@ -327,7 +327,10 @@ class TestDownload:
         )
 
         assert mock_client.search.call_count == 1
-        assert len(results) == 1
+        # With one-at-a-time submission, cancel is already set before any
+        # future is queued, so the page produces 0 results (cleaner than the
+        # old all-at-once behaviour which emitted a single "Cancelled" entry).
+        assert len(results) == 0
 
     def test_cancel_mid_batch_does_not_raise(
         self, service: DownloadService, mock_client: MagicMock, tmp_path: Path

@@ -79,7 +79,7 @@ class _TitleBar(QWidget):
         self.setFixedHeight(_TITLE_BAR_HEIGHT)
         self.setStyleSheet(
             f"background-color: {theme.TITLE_BAR_BG};"
-            f" border-bottom: 1px solid {theme.BORDER_FAINT};"
+            f" border-bottom: 1px solid {theme.BORDER_FAINT};",
         )
         self._drag_pos: QPoint | None = None
 
@@ -103,7 +103,7 @@ class _TitleBar(QWidget):
         lay.setSpacing(0)
         lbl = QLabel(f"epmcminer  v{APP_VERSION}")
         lbl.setStyleSheet(
-            f"color: {theme.ACCENT}; font-size: 12px; background-color: transparent;"
+            f"color: {theme.ACCENT}; font-size: 12px; background-color: transparent;",
         )
         lay.addWidget(lbl)
         return lay
@@ -129,7 +129,7 @@ class _TitleBar(QWidget):
                 f" background-color: {color};"
                 f" border-radius: {_TRAFFIC_LIGHT_RADIUS}px;"
                 f" border: none;"
-                f"}}"
+                f"}}",
             )
             btn.clicked.connect(action)
             btn_layout.addWidget(btn)
@@ -187,6 +187,7 @@ class _TitleBar(QWidget):
 
         Args:
             active: Zero-based index of the currently active step (0–3).
+
         """
         for i, (circle, text) in enumerate(zip(self._circles, self._step_texts, strict=False)):
             if i < active:
@@ -196,10 +197,10 @@ class _TitleBar(QWidget):
                     f" color: {theme.ACCENT};"
                     f" border-radius: {_CIRCLE_RADIUS}px;"
                     f" font-size: 13px; font-weight: 700;"
-                    f" border: 1.5px solid {theme.ACCENT};"
+                    f" border: 1.5px solid {theme.ACCENT};",
                 )
                 text.setStyleSheet(
-                    f"color: {theme.TEXT_MUTED}; font-size: {_STEP_FONT_SIZE}px;"
+                    f"color: {theme.TEXT_MUTED}; font-size: {_STEP_FONT_SIZE}px;",
                 )
             elif i == active:
                 circle.setText(str(i + 1))
@@ -208,11 +209,11 @@ class _TitleBar(QWidget):
                     f" color: white;"
                     f" border-radius: {_CIRCLE_RADIUS}px;"
                     f" font-size: 13px; font-weight: 700;"
-                    f" border: none;"
+                    f" border: none;",
                 )
                 text.setStyleSheet(
                     f"color: {theme.ACCENT};"
-                    f" font-size: {_STEP_FONT_SIZE}px; font-weight: 600;"
+                    f" font-size: {_STEP_FONT_SIZE}px; font-weight: 600;",
                 )
             else:
                 circle.setText(str(i + 1))
@@ -221,10 +222,10 @@ class _TitleBar(QWidget):
                     f" color: {theme.TEXT_MUTED};"
                     f" border-radius: {_CIRCLE_RADIUS}px;"
                     f" font-size: 13px;"
-                    f" border: 1.5px solid {theme.TEXT_MUTED};"
+                    f" border: 1.5px solid {theme.TEXT_MUTED};",
                 )
                 text.setStyleSheet(
-                    f"color: {theme.TEXT_MUTED}; font-size: {_STEP_FONT_SIZE}px;"
+                    f"color: {theme.TEXT_MUTED}; font-size: {_STEP_FONT_SIZE}px;",
                 )
 
         for i, line in enumerate(self._connector_lines):
@@ -297,6 +298,7 @@ class MainWindow(QMainWindow):
 
         Args:
             screen_index: Zero-based index of the target screen (0–3).
+
         """
         self._stack.setCurrentIndex(screen_index)
         self._title_bar.update_steps(screen_index)
@@ -306,6 +308,7 @@ class MainWindow(QMainWindow):
 
         Args:
             active_step: Zero-based index of the currently active step (0–3).
+
         """
         self._title_bar.update_steps(active_step)
 

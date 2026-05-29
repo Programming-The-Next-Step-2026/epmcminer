@@ -232,6 +232,7 @@ class _TagPill(QPushButton):
             tag: The tag string displayed on the pill.
             status: Visual state — ``"valid"``, ``"pending"``, or ``"invalid"``.
             parent: Optional parent widget.
+
         """
         super().__init__(f"{tag}  ×", parent)
         self._tag = tag
@@ -272,6 +273,7 @@ class _InputSlot(QWidget):
             add_label: Text shown on the idle add button.
             available_options: If provided, a QMenu is used instead of QLineEdit.
             parent: Optional parent widget.
+
         """
         super().__init__(parent)
         self._available_options = list(available_options or [])
@@ -327,6 +329,7 @@ class _InputSlot(QWidget):
 
         Args:
             tags: Currently selected tags to omit from the popup menu.
+
         """
         self._excluded = set(tags)
         self._update_add_btn_visibility()
@@ -361,7 +364,7 @@ class _InputSlot(QWidget):
             if option not in self._excluded:
                 action = self._menu.addAction(option)
                 action.triggered.connect(  # type: ignore[union-attr]
-                    lambda checked, o=option: self.tag_confirmed.emit(o)
+                    lambda checked, o=option: self.tag_confirmed.emit(o),
                 )
 
     def _show_menu(self) -> None:
@@ -440,6 +443,7 @@ class TagInput(QWidget):
             parent: Optional parent widget.
             available_options: If provided, restricts input to these choices.
             add_label: Label on the add button, e.g. '+ Add ORCID'.
+
         """
         super().__init__(parent)
         self._tags: list[str] = []
@@ -457,6 +461,7 @@ class TagInput(QWidget):
 
         Returns:
             A list of tag strings in insertion order.
+
         """
         return list(self._tags)
 
@@ -468,6 +473,7 @@ class TagInput(QWidget):
 
         Args:
             tag: The tag string to add.
+
         """
         cleaned = tag.strip()
         if not cleaned or cleaned in self._tags:
@@ -483,6 +489,7 @@ class TagInput(QWidget):
 
         Args:
             tag: The tag string to remove.
+
         """
         if tag not in self._tags:
             return
@@ -500,6 +507,7 @@ class TagInput(QWidget):
 
         Args:
             tags: The new list of tag strings.
+
         """
         seen: list[str] = []
         for tag in tags:
@@ -521,6 +529,7 @@ class TagInput(QWidget):
         Args:
             tag: The tag string to update.
             status: One of ``"valid"``, ``"pending"``, or ``"invalid"``.
+
         """
         if tag not in self._tags:
             return
@@ -538,6 +547,7 @@ class TagInput(QWidget):
 
         Returns:
             Tags in insertion order whose status is in ``statuses``.
+
         """
         return [t for t in self._tags if self._tag_statuses.get(t, "valid") in statuses]
 

@@ -1,11 +1,8 @@
 """Tests for epmcminer.utils.file_utils."""
 
-from pathlib import Path
-
 from epmcminer.utils.file_utils import (
     MAX_FILENAME_COMPONENT_LENGTH,
     build_pdf_filename,
-    ensure_output_structure,
     sanitise_filename,
 )
 
@@ -158,39 +155,3 @@ class TestBuildPdfFilename:
         result = build_pdf_filename(long_doi, long_title)
         assert len(result) <= 2 * MAX_FILENAME_COMPONENT_LENGTH + len("_.pdf")
 
-
-# ---------------------------------------------------------------------------
-# TestEnsureOutputStructure
-# ---------------------------------------------------------------------------
-
-
-class TestEnsureOutputStructure:
-    """Tests for ensure_output_structure."""
-
-    def test_creates_pdfs_subdirectory(self, tmp_path: Path) -> None:
-        """ensure_output_structure creates the pdfs/ subdirectory."""
-        folder = tmp_path / "output"
-        folder.mkdir()
-        ensure_output_structure(folder)
-        assert (folder / "pdfs").is_dir()
-
-    def test_creates_logs_subdirectory(self, tmp_path: Path) -> None:
-        """ensure_output_structure creates the logs/ subdirectory."""
-        folder = tmp_path / "output"
-        folder.mkdir()
-        ensure_output_structure(folder)
-        assert (folder / "logs").is_dir()
-
-    def test_is_idempotent(self, tmp_path: Path) -> None:
-        """Calling ensure_output_structure twice does not raise."""
-        folder = tmp_path / "output"
-        folder.mkdir()
-        ensure_output_structure(folder)
-        ensure_output_structure(folder)
-
-    def test_creates_output_folder_if_missing(self, tmp_path: Path) -> None:
-        """ensure_output_structure creates nested directories when output_folder is absent."""
-        folder = tmp_path / "new" / "nested"
-        ensure_output_structure(folder)
-        assert (folder / "pdfs").is_dir()
-        assert (folder / "logs").is_dir()

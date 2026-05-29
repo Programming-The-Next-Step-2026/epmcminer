@@ -43,6 +43,7 @@ class DownloadService:
         Args:
             client: An EuropePMCClient instance for HTTP requests and PDF downloads.
             search_service: A SearchService instance used to build the API query string.
+
         """
         self._client = client
         self._search_service = search_service
@@ -93,10 +94,11 @@ class DownloadService:
             >>> results = service.download(params, progress_callback=print, cancel_event=cancel)
             >>> print(sum(1 for r in results if r.status == "downloaded"))
             5
+
         """
         if params.output_folder is None:
             raise ValueError(
-                "SearchParams.output_folder must be set before calling download()."
+                "SearchParams.output_folder must be set before calling download().",
             )
 
         setup_logger(params.output_folder)
@@ -130,7 +132,7 @@ class DownloadService:
 
             if page_size == DOWNLOAD_PAGE_SIZE:
                 page_results = self._download_page(
-                    raw_results, pdfs_dir, progress_callback, cancel_event
+                    raw_results, pdfs_dir, progress_callback, cancel_event,
                 )
                 all_results.extend(page_results)
                 success_count += sum(
@@ -172,6 +174,7 @@ class DownloadService:
 
         Returns:
             A list of DownloadResult objects in completion order.
+
         """
         results: list[DownloadResult] = []
         active = 0
@@ -195,7 +198,13 @@ class DownloadService:
             return result
 
         with ThreadPoolExecutor(max_workers=self.MAX_WORKERS) as executor:
-            futures = {executor.submit(run_one, raw): raw for raw in raw_results}
+            # Submit one at a time so cancellation can bail before all page
+            # tasks are queued rather than waiting for a full batch to finish.
+            futures: dict[Any, dict[str, Any]] = {}
+            for raw in raw_results:
+                if cancel_event.is_set():
+                    break
+                futures[executor.submit(run_one, raw)] = raw
             for future in as_completed(futures):
                 result = future.result()
                 results.append(result)
@@ -220,6 +229,7 @@ class DownloadService:
 
         Returns:
             A DownloadResult describing the outcome.
+
         """
         paper = paper_from_raw(raw)
         _logger.info("Processing paper: %s", paper.pmid)
@@ -294,5 +304,5 @@ class DownloadService:
             )
         _logger.info("Downloaded %s to %s", paper.pmid, file_path)
         return DownloadResult(
-            paper=paper, status=DownloadResult.STATUS_DOWNLOADED, reason=None, file_path=file_path
+            paper=paper, status=DownloadResult.STATUS_DOWNLOADED, reason=None, file_path=file_path,
         )

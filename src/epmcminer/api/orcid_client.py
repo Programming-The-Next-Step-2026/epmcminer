@@ -23,6 +23,7 @@ class OrcidClient:
         >>> client = OrcidClient()
         >>> client.check_exists("0000-0001-5109-3700")
         True
+
     """
 
     def __init__(self) -> None:
@@ -47,6 +48,7 @@ class OrcidClient:
         Raises:
             ConnectionError: If a network-level failure (connection error or
                 timeout) prevents the request from completing.
+
         """
         url = f"{ORCID_API_BASE}/{orcid}"
         try:
