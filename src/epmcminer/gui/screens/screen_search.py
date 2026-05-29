@@ -499,9 +499,12 @@ class ScreenSearch(QWidget):
 
             # Step 3: existence check (async, HTTP).
             self._orcids.set_tag_status(tag, "pending")
-            worker = OrcidExistenceWorker(tag, self._orcid_service)
+            worker = OrcidExistenceWorker(tag, self._orcid_service, parent=self)
             worker.validation_done.connect(self._on_orcid_existence_checked)
             worker.network_error.connect(self._on_orcid_network_error)
+            # deleteLater schedules C++ cleanup via the event loop once the
+            # thread finishes — safe to call from within a signal handler.
+            worker.finished.connect(worker.deleteLater)
             self._workers.append(worker)
             worker.start()
 
@@ -514,8 +517,6 @@ class ScreenSearch(QWidget):
 
         """
         self._orcids.set_tag_status(orcid, "valid" if exists else "invalid")
-        # Discard completed workers to avoid unbounded growth.
-        self._workers = [w for w in self._workers if w.isRunning()]
 
     def _on_orcid_network_error(self, orcid: str) -> None:
         """Keep the pill in ``"pending"`` state when the network is unreachable.
@@ -527,8 +528,7 @@ class ScreenSearch(QWidget):
             orcid: The ORCID whose existence check failed due to a network error.
 
         """
-        # Pill already shows "pending" — no style change needed. Just clean up.
-        self._workers = [w for w in self._workers if w.isRunning()]
+        # Pill already shows "pending" — no style change needed.
         if self._toast is not None:
             self._toast.show_message(
                 f"Could not verify ORCID {orcid} — network unreachable. Accepted as pending.",
