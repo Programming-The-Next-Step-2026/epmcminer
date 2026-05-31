@@ -259,36 +259,47 @@ cancel.set()  # gracefully stops after the current batch
 ### ReportService
 
 ```python
+from pathlib import Path
+import epmcminer
 from epmcminer.services.report_service import ReportService
 
 report = ReportService()
-```
 
-All three export methods accept the same `(results, params, output_folder)` arguments and return a `Path` to the written file.
+# results comes from DownloadService.download(); params is the SearchParams used for the search.
+# Minimal example for illustration:
+output_folder = Path("/tmp/papers")
+results = []   # replace with the list returned by download.download(...)
+params = epmcminer.SearchParams(
+    query="depression AND therapy",
+    date_from="2020-01-01",
+    date_to="2024-12-31",
+    output_folder=output_folder,
+)
+```
 
 #### `save_csv(results, params, output_folder) → Path`
 
 Writes `report.csv` to `output_folder`. One row per paper (downloaded and skipped alike). Columns: `title`, `authors`, `journal`, `year`, `doi`, `status`, `reason`, `file_path`, `query`, `sort_order`, `date_from`, `date_to`, `licenses`, `publication_types`.
 
 ```python
-csv_path = report.save_csv(results, params, params.output_folder)
+csv_path = report.save_csv(results, params, output_folder)
 print(f"Report saved to {csv_path}")
 ```
 
-#### `export_excel(results, params, output_folder) → Path`
+#### `export_excel(results, params, output_path)`
 
-Writes `report.xlsx` — same columns as the CSV but with auto-formatted cells via openpyxl.
+Writes an Excel file to the given path. Same columns as the CSV but with auto-formatted cells via openpyxl.
 
 ```python
-xlsx_path = report.export_excel(results, params, params.output_folder)
+report.export_excel(results, params, output_folder / "report.xlsx")
 ```
 
-#### `export_pdf(results, params, output_folder) → Path`
+#### `export_pdf(results, params, output_path)`
 
-Writes `report.pdf` — a portrait A4 document with a stat block, search parameters, and per-paper sections for downloaded and skipped papers.
+Writes a portrait A4 PDF to the given path, containing a stat block, search parameters, and per-paper sections for downloaded and skipped papers.
 
 ```python
-pdf_path = report.export_pdf(results, params, params.output_folder)
+report.export_pdf(results, params, output_folder / "report.pdf")
 ```
 
 ---
