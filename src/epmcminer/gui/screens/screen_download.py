@@ -37,6 +37,7 @@ _DOT_SIZE = 26
 _DOT_RADIUS = _DOT_SIZE // 2
 _BYTES_PER_MB = 1_000_000
 _BYTES_PER_KB = 1_000
+_REASON_NO_PDF = "PDF unavailable"
 
 _CANCEL_BTN_STYLE = f"""
     QPushButton {{
@@ -303,11 +304,11 @@ class ScreenDownload(QWidget):
     # Log row construction
     # ------------------------------------------------------------------
 
-    def _make_status_dot(self, status: str) -> QLabel:
+    def _make_status_dot(self, result: DownloadResult) -> QLabel:
         """Return a circular status indicator for a download row."""
-        if status == DownloadResult.STATUS_DOWNLOADED:
+        if result.status == DownloadResult.STATUS_DOWNLOADED:
             bg, fg, symbol = theme.SUCCESS_BG, theme.SUCCESS, "✓"
-        elif status == DownloadResult.STATUS_FAILED:
+        elif result.status == DownloadResult.STATUS_FAILED or result.reason == _REASON_NO_PDF:
             bg, fg, symbol = theme.DANGER_BG, theme.DANGER, "✗"
         else:
             bg, fg, symbol = theme.SKIPPED_BG, theme.ACCENT, "–"
@@ -342,7 +343,7 @@ class ScreenDownload(QWidget):
             except OSError:
                 size_str = ""
             return f"Saved · {size_str}".rstrip(" ·"), theme.TEXT_MUTED
-        if result.status == DownloadResult.STATUS_FAILED:
+        if result.status == DownloadResult.STATUS_FAILED or result.reason == _REASON_NO_PDF:
             return result.reason or "Download failed", theme.DANGER
         return result.reason or "Skipped", theme.TEXT_MUTED
 
@@ -355,7 +356,7 @@ class ScreenDownload(QWidget):
         layout.setSpacing(16)
         layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        layout.addWidget(self._make_status_dot(result.status))
+        layout.addWidget(self._make_status_dot(result))
 
         text_col = QWidget()
         text_col.setStyleSheet(f"background-color: {theme.CARD_BG};")

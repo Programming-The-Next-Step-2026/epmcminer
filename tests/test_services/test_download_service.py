@@ -51,7 +51,7 @@ def make_raw_paper(
         "doi": doi,
         "title": title,
         "authorString": "Smith J",
-        "journalTitle": "Test Journal",
+        "journalInfo": {"journal": {"title": "Test Journal"}},
         "pubYear": "2022",
         "abstractText": "Abstract.",
     }
@@ -206,7 +206,7 @@ class TestDownload:
     def test_failed_download_on_http_error(
         self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
     ) -> None:
-        """A non-429 HTTP error returns status='failed' with the numeric status code."""
+        """Any HTTP error returns status='failed' with reason 'PDF unavailable'."""
         mock_client.search.return_value = make_search_response([make_raw_paper()], next_cursor="*")
         mock_client.download_pdf.side_effect = APIError(503, "Service Unavailable")
 
@@ -218,7 +218,7 @@ class TestDownload:
 
         assert len(results) == 1
         assert results[0].status == "failed"
-        assert results[0].reason == "503"
+        assert results[0].reason == "PDF unavailable"
         assert results[0].file_path is None
 
     def test_429_error_reported_as_server_rate_limiting(

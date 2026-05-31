@@ -34,6 +34,7 @@ _DIVIDER = theme.BORDER_FAINT
 _SKIPPED_LIST_MIN_HEIGHT = theme.EXPANDABLE_MIN_HEIGHT
 _DOT_SIZE = 26
 _DOT_RADIUS = _DOT_SIZE // 2
+_REASON_NO_PDF = "PDF unavailable"
 # License strings up to this many characters are placed inline on row 1;
 # longer strings (many licenses selected) fall back to their own wrapping row.
 _LICENSE_INLINE_MAX_CHARS = 40
@@ -557,11 +558,17 @@ class ScreenSummary(QWidget):
         row_layout.setSpacing(16)
         row_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        dot = QLabel("✗")
+        is_failure = (
+            result.status == DownloadResult.STATUS_FAILED or result.reason == _REASON_NO_PDF
+        )
+        dot_symbol = "✗" if is_failure else "–"
+        dot_bg = theme.DANGER_BG if is_failure else theme.SKIPPED_BG
+        dot_fg = theme.DANGER if is_failure else theme.ACCENT
+        dot = QLabel(dot_symbol)
         dot.setFixedSize(_DOT_SIZE, _DOT_SIZE)
         dot.setAlignment(Qt.AlignmentFlag.AlignCenter)
         dot.setStyleSheet(
-            f"background-color: {theme.DANGER_BG}; color: {theme.DANGER};"
+            f"background-color: {dot_bg}; color: {dot_fg};"
             f" border-radius: {_DOT_RADIUS}px; font-size: 12px;"
             f" font-weight: 700; border: none;",
         )
@@ -587,9 +594,10 @@ class ScreenSummary(QWidget):
         meta_lbl.setStyleSheet(f"color: {theme.TEXT_MUTED}; font-size: 14px;")
         text_layout.addWidget(meta_lbl)
 
+        reason_color = theme.DANGER if is_failure else theme.ACCENT
         reason_lbl = QLabel(result.reason or "Unknown reason")
         reason_lbl.setStyleSheet(
-            f"color: {theme.DANGER}; font-size: 14px; font-weight: 500;",
+            f"color: {reason_color}; font-size: 14px; font-weight: 500;",
         )
         text_layout.addWidget(reason_lbl)
 

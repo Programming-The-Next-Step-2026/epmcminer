@@ -281,7 +281,7 @@ class DownloadService:
             )
         except APIError as exc:
             _logger.warning("Failed to download %s: HTTP %s", paper.pmid, exc.status_code)
-            reason = _REASON_RATE_LIMITED if exc.status_code == 429 else str(exc.status_code)
+            reason = _REASON_RATE_LIMITED if exc.status_code == 429 else _REASON_NO_PDF
             return DownloadResult(
                 paper=paper,
                 status=DownloadResult.STATUS_FAILED,
