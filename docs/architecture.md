@@ -211,7 +211,7 @@ The worker thread calls `self.progress_updated.emit(result)` for each paper. Qt 
 
 ## Testing
 
-**618 tests** across unit and integration suites.
+**612 tests** across unit and integration suites.
 
 - **Unit tests** mock all HTTP with the `responses` library or `pytest-mock`. GUI tests run headless with a `QApplication` fixture.
 - **Integration tests** use `pytest-recording` (VCR cassettes). Real HTTP responses are captured once and replayed deterministically. `--block-network` is set as the default pytest `addopts` so any un-mocked request fails loudly. To re-record: `pytest tests/integration/ --record-mode=all --override-ini="addopts="`.
