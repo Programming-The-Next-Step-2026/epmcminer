@@ -113,7 +113,7 @@ pip install jupyter
 jupyter lab docs/vignette.ipynb
 ```
 
-You can also view the rendered notebook on GitHub: [docs/vignette.html](docs/vignette.html).
+You can also view the rendered notebook on GitHub: [docs/vignette](docs/vignette.pdf).
 
 ---
 
