@@ -80,6 +80,16 @@ class ReportService:
     Produces a CSV report, an Excel workbook, and a PDF summary document
     from a list of DownloadResult objects. All file I/O runs in the caller's
     thread; callers are responsible for offloading to a QThread worker.
+
+    Examples:
+        >>> service = ReportService()
+        >>> callable(service.save_csv)
+        True
+        >>> callable(service.export_excel)
+        True
+        >>> callable(service.export_pdf)
+        True
+
     """
 
     def save_csv(
@@ -104,9 +114,14 @@ class ReportService:
             OSError: If the file cannot be written.
 
         Examples:
+            >>> import tempfile
             >>> from pathlib import Path
-            >>> report_path = service.save_csv(results, params, Path("/tmp/my_run"))
-            >>> print(report_path.name)
+            >>> from epmcminer.api.search_params import SearchParams
+            >>> service = ReportService()
+            >>> params = SearchParams(query="sleep", date_from="2020-01-01", date_to="2024-12-31")
+            >>> with tempfile.TemporaryDirectory() as tmp:
+            ...     report_path = service.save_csv([], params, Path(tmp))
+            ...     print(report_path.name)
             report.csv
 
         """
@@ -133,8 +148,13 @@ class ReportService:
             OSError: If the file cannot be written.
 
         Examples:
+            >>> import tempfile
             >>> from pathlib import Path
-            >>> service.export_excel(results, params, Path("/tmp/my_run/report.xlsx"))
+            >>> from epmcminer.api.search_params import SearchParams
+            >>> service = ReportService()
+            >>> params = SearchParams(query="sleep", date_from="2020-01-01", date_to="2024-12-31")
+            >>> with tempfile.TemporaryDirectory() as tmp:
+            ...     service.export_excel([], params, Path(tmp) / "report.xlsx")
 
         """
         output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -165,9 +185,13 @@ class ReportService:
             OSError: If the file cannot be written.
 
         Examples:
+            >>> import tempfile
             >>> from pathlib import Path
-            >>> out = Path("/tmp/my_run/report.pdf")
-            >>> service.export_pdf(results, params, out, total_found=1024)
+            >>> from epmcminer.api.search_params import SearchParams
+            >>> service = ReportService()
+            >>> params = SearchParams(query="sleep", date_from="2020-01-01", date_to="2024-12-31")
+            >>> with tempfile.TemporaryDirectory() as tmp:
+            ...     service.export_pdf([], params, Path(tmp) / "report.pdf", total_found=0)
 
         """
         output_path.parent.mkdir(parents=True, exist_ok=True)

@@ -23,6 +23,22 @@ class DownloadResult:
             moment this result was emitted, including the thread that just
             finished.
 
+    Examples:
+        >>> from pathlib import Path
+        >>> from epmcminer.api.paper import Paper
+        >>> paper = Paper(
+        ...     pmid="1", doi="10.1/test", title="Sleep study", authors="Smith J",
+        ...     journal="Sleep", year="2023", abstract="", pdf_url=None,
+        ... )
+        >>> result = DownloadResult(
+        ...     paper=paper, status=DownloadResult.STATUS_DOWNLOADED,
+        ...     reason=None, file_path=Path("/tmp/paper.pdf"),
+        ... )
+        >>> result.status
+        'downloaded'
+        >>> result.reason is None
+        True
+
     """
 
     STATUS_DOWNLOADED: ClassVar[Literal["downloaded"]] = "downloaded"

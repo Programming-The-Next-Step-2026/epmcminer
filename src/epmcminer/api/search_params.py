@@ -30,6 +30,19 @@ class SearchParams:
         ValueError: If ``date_from`` or ``date_to`` is not a valid ISO-8601 date (YYYY-MM-DD).
         ValueError: If ``date_from`` is later than ``date_to``.
 
+    Examples:
+        >>> params = SearchParams(
+        ...     query="depression AND therapy",
+        ...     date_from="2020-01-01",
+        ...     date_to="2024-12-31",
+        ...     licenses=["CC-BY"],
+        ...     count=50,
+        ... )
+        >>> params.sort_order
+        'relevance'
+        >>> params.count
+        50
+
     """
 
     query: str

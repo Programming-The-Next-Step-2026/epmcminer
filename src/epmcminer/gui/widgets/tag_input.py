@@ -155,32 +155,41 @@ class _FlowLayout(QLayout):
         self._v_spacing = v_spacing
 
     def addItem(self, item: QLayoutItem | None) -> None:
+        """Append a layout item to the managed item list."""
         if item is not None:
             self._items.append(item)
 
     def count(self) -> int:
+        """Return the number of layout items currently managed."""
         return len(self._items)
 
     def itemAt(self, index: int) -> QLayoutItem | None:
+        """Return the layout item at *index*, or ``None`` if out of range."""
         return self._items[index] if 0 <= index < len(self._items) else None
 
     def takeAt(self, index: int) -> QLayoutItem | None:
+        """Remove and return the item at *index*, or ``None`` if out of range."""
         return self._items.pop(index) if 0 <= index < len(self._items) else None
 
     def hasHeightForWidth(self) -> bool:
+        """Return ``True`` — this layout's height depends on its width."""
         return True
 
     def heightForWidth(self, width: int) -> int:
+        """Return the height required to lay out all items within *width* pixels."""
         return self._do_layout(QRect(0, 0, width, 0), test_only=True)
 
     def setGeometry(self, rect: QRect) -> None:
+        """Apply *rect* as the layout's geometry and reflow all child items."""
         super().setGeometry(rect)
         self._do_layout(rect, test_only=False)
 
     def sizeHint(self) -> QSize:
+        """Return the preferred size, which equals the minimum size for this layout."""
         return self.minimumSize()
 
     def minimumSize(self) -> QSize:
+        """Return the smallest size that can contain all managed items."""
         size = QSize()
         for item in self._items:
             size = size.expandedTo(item.minimumSize())
@@ -340,6 +349,11 @@ class _InputSlot(QWidget):
         Args:
             tags: Currently selected tags to omit from the popup menu.
 
+        Examples:
+            >>> widget = TagInput(available_options=["CC-BY", "CC-BY-SA"])  # doctest: +SKIP
+            >>> widget.set_excluded(["CC-BY"])  # doctest: +SKIP
+            >>> # "CC-BY" no longer appears in the add-tag dropdown
+
         """
         self._excluded = set(tags)
         self._update_add_btn_visibility()
@@ -352,7 +366,13 @@ class _InputSlot(QWidget):
         self._add_btn.setVisible(not all_taken)
 
     def reset(self) -> None:
-        """Return to idle state without emitting a signal."""
+        """Return to idle state without emitting a signal.
+
+        Examples:
+            >>> widget = TagInput()  # doctest: +SKIP
+            >>> widget.reset()  # doctest: +SKIP  — clears any pending text input
+
+        """
         if self._input is not None:
             self._add_btn.setVisible(True)
             self._input.setVisible(False)
@@ -440,6 +460,18 @@ class TagInput(QWidget):
 
     Signals:
         tags_changed: Emitted with the current list of tags after any change.
+
+    Examples:
+        >>> widget = TagInput()  # doctest: +SKIP
+        >>> widget.set_tags(["CC-BY", "CC-BY-SA"])  # doctest: +SKIP
+        >>> widget.get_tags()  # doctest: +SKIP
+        ['CC-BY', 'CC-BY-SA']
+
+        With a constrained option list:
+
+        >>> licenses = ["CC-BY", "CC-BY-SA", "CC0"]
+        >>> widget = TagInput(available_options=licenses)  # doctest: +SKIP
+
     """
 
     tags_changed = pyqtSignal(list)
@@ -475,6 +507,12 @@ class TagInput(QWidget):
         Returns:
             A list of tag strings in insertion order.
 
+        Examples:
+            >>> widget = TagInput()  # doctest: +SKIP
+            >>> widget.add_tag("CC-BY")  # doctest: +SKIP
+            >>> widget.get_tags()  # doctest: +SKIP
+            ['CC-BY']
+
         """
         return list(self._tags)
 
@@ -486,6 +524,13 @@ class TagInput(QWidget):
 
         Args:
             tag: The tag string to add.
+
+        Examples:
+            >>> widget = TagInput()  # doctest: +SKIP
+            >>> widget.add_tag("CC-BY")  # doctest: +SKIP
+            >>> widget.add_tag("CC-BY")  # doctest: +SKIP  — duplicates are silently ignored
+            >>> widget.get_tags()  # doctest: +SKIP
+            ['CC-BY']
 
         """
         cleaned = tag.strip()
@@ -502,6 +547,13 @@ class TagInput(QWidget):
 
         Args:
             tag: The tag string to remove.
+
+        Examples:
+            >>> widget = TagInput()  # doctest: +SKIP
+            >>> widget.set_tags(["CC-BY", "CC-BY-SA"])  # doctest: +SKIP
+            >>> widget.remove_tag("CC-BY-SA")  # doctest: +SKIP
+            >>> widget.get_tags()  # doctest: +SKIP
+            ['CC-BY']
 
         """
         if tag not in self._tags:
@@ -520,6 +572,12 @@ class TagInput(QWidget):
 
         Args:
             tags: The new list of tag strings.
+
+        Examples:
+            >>> widget = TagInput()  # doctest: +SKIP
+            >>> widget.set_tags(["CC-BY", "CC-BY-SA", "CC-BY"])  # duplicates removed
+            >>> widget.get_tags()  # doctest: +SKIP
+            ['CC-BY', 'CC-BY-SA']
 
         """
         seen: list[str] = []
@@ -543,6 +601,13 @@ class TagInput(QWidget):
             tag: The tag string to update.
             status: One of ``"valid"``, ``"pending"``, or ``"invalid"``.
 
+        Examples:
+            >>> widget = TagInput()  # doctest: +SKIP
+            >>> widget.add_tag("0000-0001-5109-3700")  # doctest: +SKIP
+            >>> widget.set_tag_status("0000-0001-5109-3700", "pending")  # doctest: +SKIP
+            >>> widget.get_tags_by_status(["valid"])  # doctest: +SKIP
+            []
+
         """
         if tag not in self._tags:
             return
@@ -560,6 +625,13 @@ class TagInput(QWidget):
 
         Returns:
             Tags in insertion order whose status is in ``statuses``.
+
+        Examples:
+            >>> widget = TagInput()  # doctest: +SKIP
+            >>> widget.set_tags(["0000-0001-5109-3700", "bad-id"])  # doctest: +SKIP
+            >>> widget.set_tag_status("bad-id", "invalid")  # doctest: +SKIP
+            >>> widget.get_tags_by_status(["valid", "pending"])  # doctest: +SKIP
+            ['0000-0001-5109-3700']
 
         """
         return [t for t in self._tags if self._tag_statuses.get(t, "valid") in statuses]

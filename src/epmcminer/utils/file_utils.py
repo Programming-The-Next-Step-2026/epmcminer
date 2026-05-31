@@ -53,6 +53,14 @@ def build_pdf_filename(doi: str, title: str) -> str:
     Returns:
         A filename string in the format ``{sanitised_doi}_{sanitised_title}.pdf``.
 
+    Examples:
+        >>> build_pdf_filename("10.1111/jcpp.13842", "My Study on ADHD")
+        '10.1111_jcpp.13842_My_Study_on_ADHD.pdf'
+        >>> build_pdf_filename("", "Untitled")
+        'no_doi_Untitled.pdf'
+        >>> build_pdf_filename("10.1/x", "")
+        '10.1_x_no_title.pdf'
+
     """
     doi_part = sanitise_filename(doi) if doi else "no_doi"
     title_part = sanitise_filename(title) if title else "no_title"

@@ -24,6 +24,14 @@ def setup_logger(output_folder: Path) -> logging.Logger:
     Returns:
         The configured ``epmcminer`` root logger instance.
 
+    Examples:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> with tempfile.TemporaryDirectory() as tmp:
+        ...     logger = setup_logger(Path(tmp))
+        ...     logger.name
+        'epmcminer'
+
     """
     logs_dir = output_folder / "logs"
     logs_dir.mkdir(parents=True, exist_ok=True)
@@ -57,6 +65,11 @@ def get_logger(name: str) -> logging.Logger:
 
     Returns:
         A configured :class:`logging.Logger` instance.
+
+    Examples:
+        >>> logger = get_logger("epmcminer.api.client")
+        >>> logger.name
+        'epmcminer.api.client'
 
     """
     return logging.getLogger(name)

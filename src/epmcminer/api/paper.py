@@ -17,6 +17,22 @@ class Paper:
         abstract: Full abstract text.
         pdf_url: Direct URL to the open-access PDF, or ``None`` if unavailable.
 
+    Examples:
+        >>> paper = Paper(
+        ...     pmid="34567890",
+        ...     doi="10.1234/example",
+        ...     title="Sleep and memory consolidation",
+        ...     authors="Walker MP, Stickgold R",
+        ...     journal="Neuron",
+        ...     year="2022",
+        ...     abstract="Sleep plays a crucial role in memory.",
+        ...     pdf_url="https://europepmc.org/articles/PMC1234567?pdf=render",
+        ... )
+        >>> paper.doi
+        '10.1234/example'
+        >>> paper.pdf_url is not None
+        True
+
     """
 
     pmid: str

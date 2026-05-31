@@ -295,6 +295,7 @@ class _TitleBar(QWidget):
                 line.setStyleSheet("background-color: rgba(255,255,255,15); border: none;")
 
     def mousePressEvent(self, event: QMouseEvent) -> None:  # type: ignore[override]
+        """Record the drag start position when the left mouse button is pressed."""
         if event.button() == Qt.MouseButton.LeftButton:
             self._drag_pos = (
                 event.globalPosition().toPoint() - self.window().frameGeometry().topLeft()  # type: ignore[union-attr]
@@ -302,11 +303,13 @@ class _TitleBar(QWidget):
             event.accept()
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:  # type: ignore[override]
+        """Move the window while the left button is held and the bar is being dragged."""
         if event.buttons() == Qt.MouseButton.LeftButton and self._drag_pos is not None:
             self.window().move(event.globalPosition().toPoint() - self._drag_pos)  # type: ignore[union-attr]
             event.accept()
 
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:  # type: ignore[override]
+        """Clear the stored drag position when the mouse button is released."""
         self._drag_pos = None
 
 
@@ -359,6 +362,11 @@ class MainWindow(QMainWindow):
 
         Args:
             screen_index: Zero-based index of the target screen (0–3).
+
+        Examples:
+            >>> window = MainWindow()  # doctest: +SKIP
+            >>> window.navigate_to(1)  # doctest: +SKIP  — go to preview screen
+            >>> window.navigate_to(0)  # doctest: +SKIP  — back to search screen
 
         """
         self._stack.setCurrentIndex(screen_index)

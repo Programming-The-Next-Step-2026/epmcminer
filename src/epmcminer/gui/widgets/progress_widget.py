@@ -71,6 +71,13 @@ class ProgressWidget(QWidget):
     (``set_progress``) shows a determinate orange-filled bar with percentage,
     count, optional ETA, and optional thread-count dots. ``reset`` returns
     the widget to its blank initial state.
+
+    Examples:
+        >>> widget = ProgressWidget()  # doctest: +SKIP
+        >>> widget.set_loading("Searching Europe PMC…")  # doctest: +SKIP
+        >>> widget.set_progress(23, 50, eta_seconds=90, processed=31)  # doctest: +SKIP
+        >>> widget.reset()  # doctest: +SKIP
+
     """
 
     def __init__(self, parent: QWidget | None = None) -> None:
@@ -100,6 +107,11 @@ class ProgressWidget(QWidget):
 
         Args:
             message: Status text displayed beside the animated dots.
+
+        Examples:
+            >>> widget = ProgressWidget()  # doctest: +SKIP
+            >>> widget.set_loading("Searching Europe PMC…")  # doctest: +SKIP
+            >>> widget.set_loading()  # doctest: +SKIP  — default message "Loading..."
 
         """
         self._anim_timer.stop()
@@ -136,6 +148,12 @@ class ProgressWidget(QWidget):
                 "cancelling, waiting for N thread(s)" instead of
                 "N thread(s) running".
 
+        Examples:
+            >>> widget = ProgressWidget()  # doctest: +SKIP
+            >>> widget.set_progress(  # doctest: +SKIP
+            ...     23, 50, eta_seconds=90, thread_count=2, processed=31
+            ... )
+
         """
         if not self._anim_timer.isActive():
             self._anim_timer.start()
@@ -159,7 +177,14 @@ class ProgressWidget(QWidget):
         self._stats_row.setVisible(True)
 
     def reset(self) -> None:
-        """Clear the widget back to its blank initial state."""
+        """Clear the widget back to its blank initial state.
+
+        Examples:
+            >>> widget = ProgressWidget()  # doctest: +SKIP
+            >>> widget.set_loading("Loading...")  # doctest: +SKIP
+            >>> widget.reset()  # doctest: +SKIP  — hides all content
+
+        """
         self._anim_timer.stop()
         self._bar.setVisible(False)
         self._loading_row.setVisible(False)

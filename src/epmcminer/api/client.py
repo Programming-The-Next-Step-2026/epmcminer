@@ -53,6 +53,14 @@ class InvalidPdfContentError(Exception):
 
     This typically occurs when the server returns an HTML challenge or error page
     instead of the PDF file (e.g. a bot-detection Proof-of-Work page).
+
+    Examples:
+        >>> try:
+        ...     raise InvalidPdfContentError("Got HTML instead of PDF")
+        ... except InvalidPdfContentError as exc:
+        ...     print(exc)
+        Got HTML instead of PDF
+
     """
 
 
@@ -62,6 +70,13 @@ class APIError(Exception):
     Attributes:
         status_code: The HTTP status code returned by the API.
         body: The raw response body text.
+
+    Examples:
+        >>> err = APIError(404, "Not found")
+        >>> err.status_code
+        404
+        >>> str(err)
+        'Europe PMC API error 404: Not found'
 
     """
 
@@ -84,6 +99,13 @@ class EuropePMCClient:
     Makes raw HTTP requests and returns parsed JSON. Contains no business
     logic — all interpretation of results belongs in the service layer.
     Uses a persistent requests.Session for connection reuse.
+
+    Examples:
+        >>> client = EuropePMCClient()
+        >>> data = client.search("depression AND therapy", page_size=5)  # doctest: +SKIP
+        >>> data["hitCount"]  # doctest: +SKIP
+        4231
+
     """
 
     def __init__(self) -> None:
@@ -122,10 +144,10 @@ class EuropePMCClient:
 
         Examples:
             >>> client = EuropePMCClient()
-            >>> data = client.search("depression AND therapy", page_size=10)
-            >>> print(data["hitCount"])
+            >>> data = client.search("depression AND therapy", page_size=10)  # doctest: +SKIP
+            >>> print(data["hitCount"])  # doctest: +SKIP
             4231
-            >>> print(data["resultList"]["result"][0]["title"])
+            >>> print(data["resultList"]["result"][0]["title"])  # doctest: +SKIP
             'Cognitive behavioural therapy for depression: a meta-analysis'
 
         """
@@ -217,15 +239,17 @@ class EuropePMCClient:
 
         Examples:
             >>> client = EuropePMCClient()
-            >>> pdf_bytes = client.download_pdf("https://europepmc.org/articles/PMC1234567?pdf=render")
-            >>> pdf_bytes[:4]
+            >>> pdf_bytes = client.download_pdf(  # doctest: +SKIP
+            ...     "https://europepmc.org/articles/PMC1234567?pdf=render"
+            ... )
+            >>> pdf_bytes[:4]  # doctest: +SKIP
             b'%PDF'
 
             With cancellation support:
 
             >>> import threading
             >>> cancel = threading.Event()
-            >>> pdf_bytes = client.download_pdf(url, cancel_event=cancel)
+            >>> pdf_bytes = client.download_pdf(url, cancel_event=cancel)  # doctest: +SKIP
 
         """
         last_exc: Exception | None = None

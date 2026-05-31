@@ -62,6 +62,20 @@ def pdf_url_from_raw(raw: dict[str, Any]) -> str | None:
     Returns:
         The PDF URL string, or None if no PDF link is present.
 
+    Examples:
+        >>> raw = {
+        ...     "fullTextUrlList": {
+        ...         "fullTextUrl": [
+        ...             {"documentStyle": "html", "url": "https://example.com/html"},
+        ...             {"documentStyle": "pdf", "url": "https://example.com/paper.pdf"},
+        ...         ]
+        ...     }
+        ... }
+        >>> pdf_url_from_raw(raw)
+        'https://example.com/paper.pdf'
+        >>> pdf_url_from_raw({}) is None
+        True
+
     """
     entries = raw.get("fullTextUrlList", {}).get("fullTextUrl", [])
     for entry in entries:
@@ -82,6 +96,22 @@ def paper_from_raw(raw: dict[str, Any]) -> Paper:
     Returns:
         A fully populated Paper instance.
 
+    Examples:
+        >>> raw = {
+        ...     "pmid": "34567890",
+        ...     "doi": "10.1234/test",
+        ...     "title": "A study on sleep",
+        ...     "authorString": "Smith J",
+        ...     "journalTitle": "Sleep",
+        ...     "pubYear": "2022",
+        ...     "abstractText": "Abstract here.",
+        ... }
+        >>> paper = paper_from_raw(raw)
+        >>> paper.pmid
+        '34567890'
+        >>> paper.pdf_url is None
+        True
+
     """
     pmid = raw.get("pmid") or raw.get("id", "")
     return Paper(
@@ -101,6 +131,15 @@ class SearchService:
 
     Accepts SearchParams from the GUI layer, constructs the API query,
     delegates HTTP calls to EuropePMCClient, and returns typed SearchResult objects.
+
+    Examples:
+        >>> from unittest.mock import MagicMock
+        >>> from epmcminer.api.search_params import SearchParams
+        >>> service = SearchService(client=MagicMock())
+        >>> params = SearchParams(query="sleep", date_from="2020-01-01", date_to="2024-12-31")
+        >>> service.build_query(params)
+        'sleep AND (FIRST_PDATE:[2020-01-01 TO 2024-12-31])'
+
     """
 
     def __init__(self, client: EuropePMCClient) -> None:
@@ -200,11 +239,14 @@ class SearchService:
             ConnectionError: If the HTTP request cannot be completed.
 
         Examples:
+            >>> from unittest.mock import MagicMock
+            >>> from epmcminer.api.search_params import SearchParams
+            >>> service = SearchService(client=MagicMock())
             >>> params = SearchParams(query="sleep", date_from="2020-01-01", date_to="2024-12-31")
-            >>> result = service.preview(params)
-            >>> print(result.total_found)
+            >>> result = service.preview(params)  # doctest: +SKIP
+            >>> print(result.total_found)  # doctest: +SKIP
             142
-            >>> print(len(result.papers))
+            >>> print(len(result.papers))  # doctest: +SKIP
             10
 
         """

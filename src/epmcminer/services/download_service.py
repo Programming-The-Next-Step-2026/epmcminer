@@ -33,6 +33,13 @@ class DownloadService:
     Applies skip logic (already downloaded, no open-access PDF), constructs
     the output folder structure, and returns a DownloadResult list summarising
     the operation.
+
+    Examples:
+        >>> from unittest.mock import MagicMock
+        >>> service = DownloadService(client=MagicMock(), search_service=MagicMock())
+        >>> service.MAX_WORKERS
+        2
+
     """
 
     MAX_WORKERS = 2  # reduced from 4 to limit concurrent request rate and avoid HTTP 429
@@ -82,7 +89,9 @@ class DownloadService:
         Examples:
             >>> import threading
             >>> from pathlib import Path
+            >>> from unittest.mock import MagicMock
             >>> from epmcminer.api.search_params import SearchParams
+            >>> service = DownloadService(client=MagicMock(), search_service=MagicMock())
             >>> params = SearchParams(
             ...     query="memory AND sleep",
             ...     date_from="2022-01-01",
@@ -91,8 +100,10 @@ class DownloadService:
             ...     output_folder=Path("/tmp/my_run"),
             ... )
             >>> cancel = threading.Event()
-            >>> results = service.download(params, progress_callback=print, cancel_event=cancel)
-            >>> print(sum(1 for r in results if r.status == "downloaded"))
+            >>> results = service.download(  # doctest: +SKIP
+            ...     params, progress_callback=print, cancel_event=cancel
+            ... )
+            >>> print(sum(1 for r in results if r.status == "downloaded"))  # doctest: +SKIP
             5
 
         """
@@ -184,6 +195,7 @@ class DownloadService:
         lock = threading.Lock()
 
         def run_one(raw: dict[str, Any]) -> DownloadResult:
+            """Download one paper and maintain the shared active-thread counter."""
             nonlocal active
             if cancel_event.is_set():
                 return DownloadResult(

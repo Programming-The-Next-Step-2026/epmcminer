@@ -21,7 +21,7 @@ class OrcidClient:
 
     Examples:
         >>> client = OrcidClient()
-        >>> client.check_exists("0000-0001-5109-3700")
+        >>> client.check_exists("0000-0001-5109-3700")  # doctest: +SKIP
         True
 
     """
@@ -48,6 +48,13 @@ class OrcidClient:
         Raises:
             ConnectionError: If a network-level failure (connection error or
                 timeout) prevents the request from completing.
+
+        Examples:
+            >>> client = OrcidClient()
+            >>> client.check_exists("0000-0001-5109-3700")  # doctest: +SKIP
+            True
+            >>> client.check_exists("0000-0000-0000-0001")  # doctest: +SKIP
+            False
 
         """
         url = f"{ORCID_API_BASE}/{orcid}"

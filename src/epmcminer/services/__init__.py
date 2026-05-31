@@ -17,6 +17,13 @@ def create_application_services() -> tuple[
         A 4-tuple of ``(SearchService, DownloadService, ReportService,
         OrcidValidationService)`` ready for injection into the GUI screens.
 
+    Examples:
+        >>> search, download, report, orcid = create_application_services()
+        >>> type(search).__name__
+        'SearchService'
+        >>> type(report).__name__
+        'ReportService'
+
     """
     client = EuropePMCClient()
     search_service = SearchService(client=client)
