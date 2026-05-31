@@ -383,7 +383,8 @@ class TestTagInputOptionsMode:
         widget = TagInput(available_options=["Open Access", "CC BY"])
         widget._slot._populate_menu()
         action = next(
-            a for a in widget._slot._menu.actions()  # type: ignore[union-attr]
+            a
+            for a in widget._slot._menu.actions()  # type: ignore[union-attr]
             if a.text() == "Open Access"
         )
         action.trigger()

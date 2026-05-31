@@ -82,9 +82,7 @@ class TestSearchIntegration:
 
     def test_search_sort_by_date(self, client: EuropePMCClient) -> None:
         """Sort by date returns results without API errors."""
-        result = client.search(
-            query=COMMON_QUERY, page_size=SMALL_PAGE_SIZE, sort=SORT_BY_DATE
-        )
+        result = client.search(query=COMMON_QUERY, page_size=SMALL_PAGE_SIZE, sort=SORT_BY_DATE)
 
         assert result["hitCount"] > 0
 
@@ -152,9 +150,7 @@ class TestDownloadPdfIntegration:
                 continue
         pytest.skip("All candidate PDF URLs returned errors or non-PDF content — API degraded")
 
-    def test_download_pdf_content_starts_with_pdf_header(
-        self, client: EuropePMCClient
-    ) -> None:
+    def test_download_pdf_content_starts_with_pdf_header(self, client: EuropePMCClient) -> None:
         """The downloaded bytes begin with the PDF magic bytes ``%PDF``.
 
         Tries each candidate URL in turn; server-side 5xx errors and URLs that

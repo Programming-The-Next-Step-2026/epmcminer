@@ -24,11 +24,12 @@ def normalise_orcid(orcid: str) -> str:
         '0000-0001-5109-3700'
         >>> normalise_orcid("  0000-0001-5109-3700  ")
         '0000-0001-5109-3700'
+
     """
     orcid = orcid.strip()
     for prefix in _URL_PREFIXES:
         if orcid.startswith(prefix):
-            orcid = orcid[len(prefix):]
+            orcid = orcid[len(prefix) :]
             break
     return orcid
 
@@ -41,6 +42,7 @@ def _compute_checksum(digits15: str) -> str:
 
     Returns:
         The expected check character: ``"0"``–``"9"`` or ``"X"`` (representing 10).
+
     """
     total = 0
     for char in digits15:
@@ -70,6 +72,7 @@ def validate_orcid_format(orcid: str) -> bool:
         False
         >>> validate_orcid_format("https://orcid.org/0000-0001-5109-3700")
         True
+
     """
     bare = normalise_orcid(orcid)
     if not _ORCID_PATTERN.match(bare):

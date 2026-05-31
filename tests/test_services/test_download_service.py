@@ -7,8 +7,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from epmcminer.api.client import APIError, EuropePMCClient, InvalidPdfContentError
-from epmcminer.api.download_result import DownloadResult
-from epmcminer.api.models import SearchParams
+from epmcminer.api.search_params import SearchParams
+from epmcminer.services.download_result import DownloadResult
 from epmcminer.services.download_service import DOWNLOAD_PAGE_SIZE, DownloadService
 from epmcminer.services.search_service import SearchService
 
@@ -51,14 +51,12 @@ def make_raw_paper(
         "doi": doi,
         "title": title,
         "authorString": "Smith J",
-        "journalTitle": "Test Journal",
+        "journalInfo": {"journal": {"title": "Test Journal"}},
         "pubYear": "2022",
         "abstractText": "Abstract.",
     }
     if pdf_url is not None:
-        raw["fullTextUrlList"] = {
-            "fullTextUrl": [{"documentStyle": "pdf", "url": pdf_url}]
-        }
+        raw["fullTextUrlList"] = {"fullTextUrl": [{"documentStyle": "pdf", "url": pdf_url}]}
     return raw
 
 
@@ -114,9 +112,7 @@ class TestDownload:
         self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
     ) -> None:
         """A paper with a PDF URL is downloaded and its result has status='downloaded'."""
-        mock_client.search.return_value = make_search_response(
-            [make_raw_paper()], next_cursor="*"
-        )
+        mock_client.search.return_value = make_search_response([make_raw_paper()], next_cursor="*")
         mock_client.download_pdf.return_value = _PDF_BYTES
 
         results = service.download(
@@ -134,9 +130,7 @@ class TestDownload:
         self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
     ) -> None:
         """The PDF bytes from the API are written correctly to the output file."""
-        mock_client.search.return_value = make_search_response(
-            [make_raw_paper()], next_cursor="*"
-        )
+        mock_client.search.return_value = make_search_response([make_raw_paper()], next_cursor="*")
         mock_client.download_pdf.return_value = _PDF_BYTES
 
         results = service.download(
@@ -212,10 +206,8 @@ class TestDownload:
     def test_failed_download_on_http_error(
         self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
     ) -> None:
-        """A non-429 HTTP error returns status='failed' with the numeric status code."""
-        mock_client.search.return_value = make_search_response(
-            [make_raw_paper()], next_cursor="*"
-        )
+        """Any HTTP error returns status='failed' with reason 'PDF unavailable'."""
+        mock_client.search.return_value = make_search_response([make_raw_paper()], next_cursor="*")
         mock_client.download_pdf.side_effect = APIError(503, "Service Unavailable")
 
         results = service.download(
@@ -226,16 +218,14 @@ class TestDownload:
 
         assert len(results) == 1
         assert results[0].status == "failed"
-        assert results[0].reason == "503"
+        assert results[0].reason == "PDF unavailable"
         assert results[0].file_path is None
 
     def test_429_error_reported_as_server_rate_limiting(
         self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
     ) -> None:
         """An exhausted 429 returns status='failed' with reason 'Server rate limiting'."""
-        mock_client.search.return_value = make_search_response(
-            [make_raw_paper()], next_cursor="*"
-        )
+        mock_client.search.return_value = make_search_response([make_raw_paper()], next_cursor="*")
         mock_client.download_pdf.side_effect = APIError(429, "Too Many Requests")
 
         results = service.download(
@@ -253,9 +243,7 @@ class TestDownload:
         self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
     ) -> None:
         """A ConnectionError from the client returns status='failed' instead of raising."""
-        mock_client.search.return_value = make_search_response(
-            [make_raw_paper()], next_cursor="*"
-        )
+        mock_client.search.return_value = make_search_response([make_raw_paper()], next_cursor="*")
         mock_client.download_pdf.side_effect = ConnectionError("Remote end closed connection")
 
         results = service.download(
@@ -273,12 +261,8 @@ class TestDownload:
         self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
     ) -> None:
         """InvalidPdfContentError from the client returns status='skipped' with a clear reason."""
-        mock_client.search.return_value = make_search_response(
-            [make_raw_paper()], next_cursor="*"
-        )
-        mock_client.download_pdf.side_effect = InvalidPdfContentError(
-            "Response is not a valid PDF"
-        )
+        mock_client.search.return_value = make_search_response([make_raw_paper()], next_cursor="*")
+        mock_client.download_pdf.side_effect = InvalidPdfContentError("Response is not a valid PDF")
 
         results = service.download(
             make_params(tmp_path, count=1),
@@ -327,7 +311,10 @@ class TestDownload:
         )
 
         assert mock_client.search.call_count == 1
-        assert len(results) == 1
+        # With one-at-a-time submission, cancel is already set before any
+        # future is queued, so the page produces 0 results (cleaner than the
+        # old all-at-once behaviour which emitted a single "Cancelled" entry).
+        assert len(results) == 0
 
     def test_cancel_mid_batch_does_not_raise(
         self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
@@ -436,9 +423,7 @@ class TestDownload:
         self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
     ) -> None:
         """Each argument passed to progress_callback is a DownloadResult."""
-        mock_client.search.return_value = make_search_response(
-            [make_raw_paper()], next_cursor="*"
-        )
+        mock_client.search.return_value = make_search_response([make_raw_paper()], next_cursor="*")
         mock_client.download_pdf.return_value = _PDF_BYTES
 
         calls: list[DownloadResult] = []
@@ -506,13 +491,13 @@ class TestDownload:
         self, service: DownloadService, mock_client: MagicMock, tmp_path: Path
     ) -> None:
         """OSError writing PDF to disk returns status='failed' instead of raising."""
-        mock_client.search.return_value = make_search_response(
-            [make_raw_paper()], next_cursor="*"
-        )
+        mock_client.search.return_value = make_search_response([make_raw_paper()], next_cursor="*")
         mock_client.download_pdf.return_value = _PDF_BYTES
 
-        with patch("epmcminer.services.download_service.Path.write_bytes",
-                   side_effect=OSError("no space left")):
+        with patch(
+            "epmcminer.services.download_service.Path.write_bytes",
+            side_effect=OSError("no space left"),
+        ):
             results = service.download(
                 make_params(tmp_path, count=1),
                 progress_callback=lambda r: None,
@@ -558,8 +543,7 @@ class TestDownload:
     ) -> None:
         """In single-paper mode, the loop exits as soon as success_count reaches params.count."""
         papers = [
-            make_raw_paper(pmid=str(i), doi=f"10.1/{i:04d}", title=f"Paper {i}")
-            for i in range(3)
+            make_raw_paper(pmid=str(i), doi=f"10.1/{i:04d}", title=f"Paper {i}") for i in range(3)
         ]
         mock_client.search.side_effect = [
             make_search_response([papers[0]], next_cursor="c1"),
@@ -650,9 +634,7 @@ class TestDownload:
     ) -> None:
         """ConnectionError raised while cancel_event is set → STATUS_SKIPPED 'Cancelled'."""
         cancel_event = threading.Event()
-        mock_client.search.return_value = make_search_response(
-            [make_raw_paper()], next_cursor="*"
-        )
+        mock_client.search.return_value = make_search_response([make_raw_paper()], next_cursor="*")
 
         def fail_with_cancel(url: str, cancel_event: threading.Event | None = None) -> bytes:
             if cancel_event is not None:
@@ -676,9 +658,7 @@ class TestDownload:
     ) -> None:
         """ConnectionError when cancel_event is NOT set → STATUS_FAILED 'Connection error'."""
         cancel_event = threading.Event()  # not set
-        mock_client.search.return_value = make_search_response(
-            [make_raw_paper()], next_cursor="*"
-        )
+        mock_client.search.return_value = make_search_response([make_raw_paper()], next_cursor="*")
         mock_client.download_pdf.side_effect = ConnectionError("network unreachable")
 
         results = service.download(
@@ -695,9 +675,7 @@ class TestDownload:
     ) -> None:
         """cancel_event is passed as a keyword argument to client.download_pdf."""
         cancel_event = threading.Event()
-        mock_client.search.return_value = make_search_response(
-            [make_raw_paper()], next_cursor="*"
-        )
+        mock_client.search.return_value = make_search_response([make_raw_paper()], next_cursor="*")
         mock_client.download_pdf.return_value = _PDF_BYTES
 
         service.download(

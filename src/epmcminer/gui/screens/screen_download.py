@@ -30,11 +30,6 @@ _logger = get_logger(__name__)
 # ---------------------------------------------------------------------------
 # Screen-local constants
 # ---------------------------------------------------------------------------
-_SUCCESS_BG = "#1a3d1a"
-_SUCCESS = "#4ade80"
-_DANGER_BG = "#3a1a1a"
-_DANGER = "#f87171"
-_SKIPPED_BG = "rgba(255, 122, 61, 20)"
 _DIVIDER = theme.BORDER_FAINT
 
 _LOG_MIN_HEIGHT = theme.EXPANDABLE_MIN_HEIGHT
@@ -42,6 +37,7 @@ _DOT_SIZE = 26
 _DOT_RADIUS = _DOT_SIZE // 2
 _BYTES_PER_MB = 1_000_000
 _BYTES_PER_KB = 1_000
+_REASON_NO_PDF = "PDF unavailable"
 
 _CANCEL_BTN_STYLE = f"""
     QPushButton {{
@@ -76,6 +72,7 @@ class DownloadWorker(QThread):
         download_finished: Emitted with the full list of results on completion.
         error_occurred: Emitted with an error message string on failure.
         cancel_event: Set this to request cancellation of the download loop.
+
     """
 
     progress_updated = pyqtSignal(DownloadResult)
@@ -88,6 +85,7 @@ class DownloadWorker(QThread):
         Args:
             service: The DownloadService to use.
             params: The search/download parameters.
+
         """
         super().__init__()
         self._service = service
@@ -104,6 +102,7 @@ class DownloadWorker(QThread):
             )
             self.download_finished.emit(results)
         except Exception as exc:  # noqa: BLE001
+            _logger.exception("DownloadWorker failed: %s", exc)
             self.error_occurred.emit(str(exc))
 
 
@@ -137,6 +136,7 @@ class ScreenDownload(QWidget):
             download_service: Injected service that performs the downloads.
             report_service: Injected service that writes report.csv.
             parent: Optional parent widget.
+
         """
         super().__init__(parent)
         self._service = download_service
@@ -162,6 +162,7 @@ class ScreenDownload(QWidget):
 
         Args:
             params: SearchParams including query, count, and output_folder.
+
         """
         self._params = params
         self._results = []
@@ -185,7 +186,7 @@ class ScreenDownload(QWidget):
         self._worker.error_occurred.connect(self._on_error)
         self._worker.start()
 
-    def resizeEvent(self, event: QResizeEvent) -> None:
+    def resizeEvent(self, event: QResizeEvent | None) -> None:
         """Reposition the toast whenever the screen is resized."""
         super().resizeEvent(event)
         if self._toast is not None and not self._toast.isHidden():
@@ -196,6 +197,7 @@ class ScreenDownload(QWidget):
     # ------------------------------------------------------------------
 
     def _build_ui(self) -> None:
+        """Construct the screen layout: scrollable progress and log cards, plus action bar."""
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
@@ -203,7 +205,7 @@ class ScreenDownload(QWidget):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setStyleSheet(
-            f"QScrollArea {{ background-color: {theme.APP_BG}; border: none; }}"
+            f"QScrollArea {{ background-color: {theme.APP_BG}; border: none; }}",
         )
 
         content_widget = QWidget()
@@ -224,6 +226,12 @@ class ScreenDownload(QWidget):
         self._toast = Toast(self)
 
     def _make_progress_card(self) -> QWidget:
+        """Build the download progress card containing the ProgressWidget.
+
+        Returns:
+            The card QWidget containing the progress widget.
+
+        """
         card, layout = make_card(padding=26)
         layout.addWidget(make_section_label("Download progress"))
         self._progress = ProgressWidget()
@@ -231,6 +239,12 @@ class ScreenDownload(QWidget):
         return card
 
     def _make_log_card(self) -> QWidget:
+        """Build the live status card with a scrollable, auto-scrolling log area.
+
+        Returns:
+            The card QWidget containing the log scroll area.
+
+        """
         card, layout = make_card()
         layout.addWidget(make_section_label("Live status"))
 
@@ -240,10 +254,10 @@ class ScreenDownload(QWidget):
         self._log_scroll.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self._log_scroll.setStyleSheet(
             f"QScrollArea {{ background-color: {theme.CARD_BG}; border: none; }}"
-            f"QScrollArea > QWidget > QWidget {{ background-color: {theme.CARD_BG}; }}"
+            f"QScrollArea > QWidget > QWidget {{ background-color: {theme.CARD_BG}; }}",
         )
-        self._log_scroll.verticalScrollBar().rangeChanged.connect(
-            lambda _, max_val: self._log_scroll.verticalScrollBar().setValue(max_val)
+        self._log_scroll.verticalScrollBar().rangeChanged.connect(  # type: ignore[union-attr]
+            lambda _, max_val: self._log_scroll.verticalScrollBar().setValue(max_val),  # type: ignore[union-attr]
         )
 
         log_container = QWidget()
@@ -258,10 +272,16 @@ class ScreenDownload(QWidget):
         return card
 
     def _make_action_bar(self) -> QWidget:
+        """Build the fixed-height action bar with the output path label and Cancel button.
+
+        Returns:
+            A QWidget containing the folder label and cancel button.
+
+        """
         bar = QWidget()
         bar.setFixedHeight(72)
         bar.setStyleSheet(
-            f"background-color: {theme.APP_BG}; border-top: 1px solid {theme.BORDER};"
+            f"background-color: {theme.APP_BG}; border-top: 1px solid {theme.BORDER};",
         )
         bar_layout = QHBoxLayout(bar)
         bar_layout.setContentsMargins(22, 0, 22, 0)
@@ -284,21 +304,21 @@ class ScreenDownload(QWidget):
     # Log row construction
     # ------------------------------------------------------------------
 
-    def _make_status_dot(self, status: str) -> QLabel:
+    def _make_status_dot(self, result: DownloadResult) -> QLabel:
         """Return a circular status indicator for a download row."""
-        if status == DownloadResult.STATUS_DOWNLOADED:
-            bg, fg, symbol = _SUCCESS_BG, _SUCCESS, "✓"
-        elif status == DownloadResult.STATUS_FAILED:
-            bg, fg, symbol = _DANGER_BG, _DANGER, "✗"
+        if result.status == DownloadResult.STATUS_DOWNLOADED:
+            bg, fg, symbol = theme.SUCCESS_BG, theme.SUCCESS, "✓"
+        elif result.status == DownloadResult.STATUS_FAILED or result.reason == _REASON_NO_PDF:
+            bg, fg, symbol = theme.DANGER_BG, theme.DANGER, "✗"
         else:
-            bg, fg, symbol = _SKIPPED_BG, theme.ACCENT, "–"
+            bg, fg, symbol = theme.SKIPPED_BG, theme.ACCENT, "–"
 
         dot = QLabel(symbol)
         dot.setFixedSize(_DOT_SIZE, _DOT_SIZE)
         dot.setAlignment(Qt.AlignmentFlag.AlignCenter)
         dot.setStyleSheet(
             f"background-color: {bg}; color: {fg}; border-radius: {_DOT_RADIUS}px;"
-            f" font-size: 13px; font-weight: 700; border: none;"
+            f" font-size: 13px; font-weight: 700; border: none;",
         )
         return dot
 
@@ -316,14 +336,15 @@ class ScreenDownload(QWidget):
             try:
                 size = result.file_path.stat().st_size
                 size_str = (
-                    f"{size / _BYTES_PER_MB:.1f} MB" if size >= _BYTES_PER_MB
+                    f"{size / _BYTES_PER_MB:.1f} MB"
+                    if size >= _BYTES_PER_MB
                     else f"{size / _BYTES_PER_KB:.0f} KB"
                 )
             except OSError:
                 size_str = ""
             return f"Saved · {size_str}".rstrip(" ·"), theme.TEXT_MUTED
-        if result.status == DownloadResult.STATUS_FAILED:
-            return result.reason or "Download failed", _DANGER
+        if result.status == DownloadResult.STATUS_FAILED or result.reason == _REASON_NO_PDF:
+            return result.reason or "Download failed", theme.DANGER
         return result.reason or "Skipped", theme.TEXT_MUTED
 
     def _make_log_row(self, result: DownloadResult) -> QWidget:
@@ -335,7 +356,7 @@ class ScreenDownload(QWidget):
         layout.setSpacing(16)
         layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        layout.addWidget(self._make_status_dot(result.status))
+        layout.addWidget(self._make_status_dot(result))
 
         text_col = QWidget()
         text_col.setStyleSheet(f"background-color: {theme.CARD_BG};")
@@ -347,7 +368,7 @@ class ScreenDownload(QWidget):
         filename_lbl.setWordWrap(True)
         filename_lbl.setStyleSheet(
             f"color: {theme.TEXT_PRIMARY}; font-size: 14px; font-weight: 600;"
-            f" font-family: monospace; letter-spacing: -0.2px;"
+            f" font-family: monospace; letter-spacing: -0.2px;",
         )
         text_layout.addWidget(filename_lbl)
 
@@ -359,7 +380,7 @@ class ScreenDownload(QWidget):
         separator = QFrame()
         separator.setFrameShape(QFrame.Shape.HLine)
         separator.setStyleSheet(
-            f"background-color: {_DIVIDER}; border: none; max-height: 1px; margin-top: 8px;"
+            f"background-color: {_DIVIDER}; border: none; max-height: 1px; margin-top: 8px;",
         )
         text_layout.addWidget(separator)
 
@@ -374,8 +395,8 @@ class ScreenDownload(QWidget):
         """Remove all rows from the log layout and restore the trailing stretch."""
         while self._log_layout.count():
             item = self._log_layout.takeAt(0)
-            if item.widget():
-                item.widget().deleteLater()
+            if item.widget():  # type: ignore[union-attr]
+                item.widget().deleteLater()  # type: ignore[union-attr]
         self._log_layout.addStretch()
 
     def _add_log_row(self, result: DownloadResult) -> None:
@@ -394,7 +415,7 @@ class ScreenDownload(QWidget):
         elapsed = time.time() - self._start_time
         avg = elapsed / downloaded
         remaining = max(0, self._total - downloaded)
-        return round(avg * remaining) if remaining > 0 else None
+        return round(avg * remaining)
 
     # ------------------------------------------------------------------
     # Slots
@@ -422,12 +443,13 @@ class ScreenDownload(QWidget):
         self._progress.set_progress(downloaded, max(self._total, 1), processed=self._completed)
         if self._params is not None:
             output_folder = self._params.output_folder
-            assert output_folder is not None, "output_folder must be set before download()"
+            if output_folder is None:
+                raise ValueError("output_folder must be set before download()")
             try:
                 self._report_service.save_csv(results, self._params, output_folder)
-            except Exception:  # noqa: BLE001
-                _logger.exception("Failed to save report.csv")
-                self._toast.show_message("Could not save report.csv", success=False)
+            except Exception as exc:  # noqa: BLE001
+                _logger.exception("Failed to save report.csv: %s", exc)
+                self._toast.show_message("Could not save report.csv", success=False)  # type: ignore[union-attr]
         self.download_complete.emit(results)
 
     def _on_error(self, message: str) -> None:
@@ -440,9 +462,11 @@ class ScreenDownload(QWidget):
         _logger.error("Download worker error: %s", message)
         self._cancel_btn.setEnabled(False)
         self._progress.set_progress(
-            self._downloaded_count(), max(self._total, 1), processed=self._completed
+            self._downloaded_count(),
+            max(self._total, 1),
+            processed=self._completed,
         )
-        self._toast.show_message(f"Download error: {message}", success=False)
+        self._toast.show_message(f"Download error: {message}", success=False)  # type: ignore[union-attr]
 
     def _on_cancel(self) -> None:
         """Request cancellation and disable the cancel button."""

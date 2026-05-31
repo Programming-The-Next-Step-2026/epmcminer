@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from PyQt6.QtCore import QDate, Qt, QThread, pyqtSignal
+from PyQt6.QtGui import QResizeEvent
 from PyQt6.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -17,6 +18,7 @@ import epmcminer.gui.theme as theme
 from epmcminer.gui.widgets.card import make_card, make_section_label
 from epmcminer.gui.widgets.date_picker import DatePicker
 from epmcminer.gui.widgets.tag_input import TagInput
+from epmcminer.gui.widgets.toast import Toast
 from epmcminer.services.models import SearchParams
 from epmcminer.services.orcid_validation_service import OrcidValidationService
 
@@ -83,6 +85,7 @@ _CONTINUE_BTN_STYLE = f"""
 """
 
 _HINT_STYLE = f"color: {theme.TEXT_MUTED}; font-size: 13px;"
+_QUERY_HINT_TEXT = "Use AND / OR to combine keywords. Defaults to AND if no operator is specified"
 
 
 # ---------------------------------------------------------------------------
@@ -118,6 +121,7 @@ class OrcidExistenceWorker(QThread):
             orcid: The bare ORCID identifier to look up.
             service: The validation service used to perform the HTTP check.
             parent: Optional parent for ownership / lifetime management.
+
         """
         super().__init__(parent)
         self._orcid = orcid
@@ -165,6 +169,7 @@ class ScreenSearch(QWidget):
                 When ``None``, ORCIDs are accepted without validation (useful
                 in tests that do not need the validation feature).
             parent: Optional parent widget.
+
         """
         super().__init__(parent)
         self._orcid_service = orcid_service
@@ -173,6 +178,7 @@ class ScreenSearch(QWidget):
         self._validated_orcids: set[str] = set()
         # Keep worker references alive until Qt delivers the signals.
         self._workers: list[OrcidExistenceWorker] = []
+        self._toast: Toast | None = None
         self.setStyleSheet(f"background-color: {theme.APP_BG};")
         self._build_ui()
         self._connect_signals()
@@ -187,6 +193,7 @@ class ScreenSearch(QWidget):
 
         Returns:
             A SearchParams built from the current widget state.
+
         """
         return SearchParams(
             query=self._query_edit.text().strip(),
@@ -202,6 +209,7 @@ class ScreenSearch(QWidget):
     # ------------------------------------------------------------------
 
     def _build_ui(self) -> None:
+        """Construct the screen layout: scrollable form cards and fixed action bar."""
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
@@ -209,7 +217,7 @@ class ScreenSearch(QWidget):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setStyleSheet(
-            f"QScrollArea {{ background-color: {theme.APP_BG}; border: none; }}"
+            f"QScrollArea {{ background-color: {theme.APP_BG}; border: none; }}",
         )
 
         content = QWidget()
@@ -228,6 +236,14 @@ class ScreenSearch(QWidget):
         root.addWidget(scroll)
         root.addWidget(self._make_action_bar())
 
+        self._toast = Toast(self)
+
+    def resizeEvent(self, event: QResizeEvent | None) -> None:
+        """Reposition the toast whenever the screen is resized."""
+        super().resizeEvent(event)
+        if self._toast is not None and not self._toast.isHidden():
+            self._toast.reposition()
+
     def _connect_signals(self) -> None:
         """Wire validation signals after all widgets are constructed."""
         self._query_edit.textChanged.connect(self._validate)
@@ -235,6 +251,12 @@ class ScreenSearch(QWidget):
         self._license.tags_changed.connect(self._validate)
 
     def _make_query_card(self) -> QWidget:
+        """Build the search query card with a text input and a usage hint.
+
+        Returns:
+            The card QWidget containing the query input.
+
+        """
         card, layout = make_card()
         layout.addWidget(make_section_label("Search query"))
 
@@ -245,12 +267,18 @@ class ScreenSearch(QWidget):
         self._query_edit.setMaxLength(500)
         layout.addWidget(self._query_edit)
 
-        hint = QLabel("Defaults to AND if no operator specified")
+        hint = QLabel(_QUERY_HINT_TEXT)
         hint.setStyleSheet(_HINT_STYLE)
         layout.addWidget(hint)
         return card
 
     def _make_orcids_card(self) -> QWidget:
+        """Build the Author ORCIDs card with a tag input and a format hint.
+
+        Returns:
+            The card QWidget containing the ORCID tag input.
+
+        """
         card, layout = make_card()
         layout.addWidget(make_section_label("Author ORCIDs"))
 
@@ -264,17 +292,30 @@ class ScreenSearch(QWidget):
         return card
 
     def _make_pub_types_card(self) -> QWidget:
+        """Build the publication types card pre-populated with all default types.
+
+        Returns:
+            The card QWidget containing the publication type tag input.
+
+        """
         card, layout = make_card()
         layout.addWidget(make_section_label("Publication types"))
 
         self._pub_types = TagInput(
-            available_options=DEFAULT_PUBLICATION_TYPES, add_label="+ Add type"
+            available_options=DEFAULT_PUBLICATION_TYPES,
+            add_label="+ Add type",
         )
         self._pub_types.set_tags(list(DEFAULT_PUBLICATION_TYPES))
         layout.addWidget(self._pub_types)
         return card
 
     def _make_two_col_row(self) -> QWidget:
+        """Build a two-column row containing the license and date range cards side by side.
+
+        Returns:
+            A QWidget laying out the license card and date card horizontally.
+
+        """
         row = QWidget()
         row.setStyleSheet(f"background-color: {theme.APP_BG}; border: none;")
         layout = QHBoxLayout(row)
@@ -285,8 +326,14 @@ class ScreenSearch(QWidget):
         return row
 
     def _make_license_card(self) -> QWidget:
+        """Build the license card pre-populated with CC-BY.
+
+        Returns:
+            The card QWidget containing the license tag input.
+
+        """
         card, layout = make_card()
-        layout.addWidget(make_section_label("License"))
+        layout.addWidget(make_section_label("Licenses"))
 
         self._license = TagInput(available_options=_AVAILABLE_LICENSES, add_label="+ Add")
         self._license.set_tags(["CC-BY"])
@@ -294,6 +341,12 @@ class ScreenSearch(QWidget):
         return card
 
     def _make_date_card(self) -> QWidget:
+        """Build the date range card with from/to DatePicker widgets.
+
+        Returns:
+            The card QWidget containing the date range pickers.
+
+        """
         card, layout = make_card()
         layout.addWidget(make_section_label("Date range"))
 
@@ -328,10 +381,16 @@ class ScreenSearch(QWidget):
         return card
 
     def _make_action_bar(self) -> QWidget:
+        """Build the fixed-height action bar with the open-access label and Continue button.
+
+        Returns:
+            A QWidget containing the status label, hint label, and continue button.
+
+        """
         bar = QWidget()
         bar.setFixedHeight(72)
         bar.setStyleSheet(
-            f"background-color: {theme.APP_BG}; border-top: 1px solid {theme.BORDER};"
+            f"background-color: {theme.APP_BG}; border-top: 1px solid {theme.BORDER};",
         )
         bar_layout = QHBoxLayout(bar)
         bar_layout.setContentsMargins(22, 0, 22, 0)
@@ -370,9 +429,9 @@ class ScreenSearch(QWidget):
             parts: list[str] = []
             if not has_query:
                 parts.append("Enter a search keyword")
-            if not has_pub_types:
+            elif not has_pub_types:
                 parts.append("Select a publication type")
-            if not has_license:
+            elif not has_license:
                 parts.append("Select a license")
             self._hint_lbl.setText("  ·  ".join(parts))
             self._hint_lbl.setVisible(True)
@@ -390,6 +449,7 @@ class ScreenSearch(QWidget):
         self._date_from.setMaximumDate(new_to)
 
     def _on_continue(self) -> None:
+        """Emit search_requested with the current form values when Continue is clicked."""
         self.search_requested.emit(self.get_params())
 
     def _on_orcid_tags_changed(self, tags: list[str]) -> None:
@@ -442,6 +502,9 @@ class ScreenSearch(QWidget):
             worker = OrcidExistenceWorker(tag, self._orcid_service)
             worker.validation_done.connect(self._on_orcid_existence_checked)
             worker.network_error.connect(self._on_orcid_network_error)
+            # deleteLater schedules C++ cleanup via the event loop once the
+            # thread finishes — safe to call from within a signal handler.
+            worker.finished.connect(worker.deleteLater)
             self._workers.append(worker)
             worker.start()
 
@@ -451,10 +514,9 @@ class ScreenSearch(QWidget):
         Args:
             orcid: The ORCID that was checked.
             exists: ``True`` if the registry returned HTTP 200.
+
         """
         self._orcids.set_tag_status(orcid, "valid" if exists else "invalid")
-        # Discard completed workers to avoid unbounded growth.
-        self._workers = [w for w in self._workers if w.isRunning()]
 
     def _on_orcid_network_error(self, orcid: str) -> None:
         """Keep the pill in ``"pending"`` state when the network is unreachable.
@@ -464,6 +526,11 @@ class ScreenSearch(QWidget):
 
         Args:
             orcid: The ORCID whose existence check failed due to a network error.
+
         """
-        # Pill already shows "pending" — no style change needed. Just clean up.
-        self._workers = [w for w in self._workers if w.isRunning()]
+        # Pill already shows "pending" — no style change needed.
+        if self._toast is not None:
+            self._toast.show_message(
+                f"Could not verify ORCID {orcid} — network unreachable. Accepted as pending.",
+                success=False,
+            )

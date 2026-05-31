@@ -11,8 +11,8 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import cm
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
-from epmcminer.api.download_result import DownloadResult
-from epmcminer.api.models import SearchParams
+from epmcminer.api.search_params import SearchParams
+from epmcminer.services.download_result import DownloadResult
 from epmcminer.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -65,6 +65,7 @@ def _draw_pdf_bg(canvas: Any, doc: Any) -> None:
     Args:
         canvas: The reportlab canvas for the current page.
         doc: The reportlab document template.
+
     """
     canvas.saveState()
     canvas.setFillColor(_PDF_BG)
@@ -79,6 +80,16 @@ class ReportService:
     Produces a CSV report, an Excel workbook, and a PDF summary document
     from a list of DownloadResult objects. All file I/O runs in the caller's
     thread; callers are responsible for offloading to a QThread worker.
+
+    Examples:
+        >>> service = ReportService()
+        >>> callable(service.save_csv)
+        True
+        >>> callable(service.export_excel)
+        True
+        >>> callable(service.export_pdf)
+        True
+
     """
 
     def save_csv(
@@ -101,6 +112,18 @@ class ReportService:
 
         Raises:
             OSError: If the file cannot be written.
+
+        Examples:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from epmcminer.api.search_params import SearchParams
+            >>> service = ReportService()
+            >>> params = SearchParams(query="sleep", date_from="2020-01-01", date_to="2024-12-31")
+            >>> with tempfile.TemporaryDirectory() as tmp:
+            ...     report_path = service.save_csv([], params, Path(tmp))
+            ...     print(report_path.name)
+            report.csv
+
         """
         output_folder.mkdir(parents=True, exist_ok=True)
         path = output_folder / _CSV_FILENAME
@@ -123,6 +146,16 @@ class ReportService:
 
         Raises:
             OSError: If the file cannot be written.
+
+        Examples:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from epmcminer.api.search_params import SearchParams
+            >>> service = ReportService()
+            >>> params = SearchParams(query="sleep", date_from="2020-01-01", date_to="2024-12-31")
+            >>> with tempfile.TemporaryDirectory() as tmp:
+            ...     service.export_excel([], params, Path(tmp) / "report.xlsx")
+
         """
         output_path.parent.mkdir(parents=True, exist_ok=True)
         self._build_dataframe(results, params).to_excel(output_path, index=False, engine="openpyxl")
@@ -150,6 +183,16 @@ class ReportService:
 
         Raises:
             OSError: If the file cannot be written.
+
+        Examples:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from epmcminer.api.search_params import SearchParams
+            >>> service = ReportService()
+            >>> params = SearchParams(query="sleep", date_from="2020-01-01", date_to="2024-12-31")
+            >>> with tempfile.TemporaryDirectory() as tmp:
+            ...     service.export_pdf([], params, Path(tmp) / "report.pdf", total_found=0)
+
         """
         output_path.parent.mkdir(parents=True, exist_ok=True)
         doc = SimpleDocTemplate(
@@ -174,6 +217,7 @@ class ReportService:
 
         Returns:
             A mapping from style name to ParagraphStyle instance.
+
         """
         return {
             "title": ParagraphStyle(
@@ -273,7 +317,7 @@ class ReportService:
         params: SearchParams,
         total_found: int,
         styles: dict[str, ParagraphStyle],
-    ) -> list[Any]:
+    ) -> list[Any]:  # reportlab flowables have no common base type
         """Assemble all flowable elements into the PDF story list.
 
         Args:
@@ -284,8 +328,9 @@ class ReportService:
 
         Returns:
             A list of reportlab flowable objects ready to pass to ``doc.build()``.
+
         """
-        story: list = []
+        story: list[Any] = []
         story.extend(self._pdf_header(styles))
         story.append(self._pdf_stat_row(results, total_found, styles))
         story.append(Spacer(1, 0.4 * cm))
@@ -300,7 +345,7 @@ class ReportService:
             story.extend(skipped_items)
         return story
 
-    def _pdf_header(self, styles: dict[str, ParagraphStyle]) -> list:
+    def _pdf_header(self, styles: dict[str, ParagraphStyle]) -> list[Any]:
         """Build the title and timestamp header flowables.
 
         Args:
@@ -308,6 +353,7 @@ class ReportService:
 
         Returns:
             List of flowable elements for the header section.
+
         """
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
         return [
@@ -331,12 +377,16 @@ class ReportService:
 
         Returns:
             A reportlab Table containing the three stat cards side by side.
+
         """
         downloaded = sum(1 for r in results if r.status == DownloadResult.STATUS_DOWNLOADED)
         not_downloaded = len(results) - downloaded
 
         def _make_cell(
-            label: str, value: str, value_style_key: str, sub: str
+            label: str,
+            value: str,
+            value_style_key: str,
+            sub: str,
         ) -> list[Paragraph]:
             return [
                 Paragraph(label, styles["stat_label"]),
@@ -344,39 +394,51 @@ class ReportService:
                 Paragraph(sub, styles["stat_sub"]),
             ]
 
-        data = [[
-            _make_cell(
-                "Downloaded", str(downloaded), "stat_value_accent",
-                f"of {len(results)} processed",
-            ),
-            _make_cell(
-                "Skipped", str(not_downloaded), "stat_value_danger",
-                "see reasons below",
-            ),
-            _make_cell(
-                "Total results", f"{total_found:,}", "stat_value_accent",
-                "found in Europe PMC",
-            ),
-        ]]
+        data = [
+            [
+                _make_cell(
+                    "Downloaded",
+                    str(downloaded),
+                    "stat_value_accent",
+                    f"of {len(results)} processed",
+                ),
+                _make_cell(
+                    "Skipped",
+                    str(not_downloaded),
+                    "stat_value_danger",
+                    "see reasons below",
+                ),
+                _make_cell(
+                    "Total results",
+                    f"{total_found:,}",
+                    "stat_value_accent",
+                    "found in Europe PMC",
+                ),
+            ]
+        ]
 
         w = _PDF_STAT_COL_WIDTH
         table = Table(data, colWidths=[w, w, w])
-        table.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), _PDF_CARD),
-            ("TOPPADDING", (0, 0), (-1, -1), 14),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 14),
-            ("LEFTPADDING", (0, 0), (-1, -1), 16),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 16),
-            ("LINEAFTER", (0, 0), (1, -1), 0.5, _PDF_BORDER),
-            ("VALIGN", (0, 0), (-1, -1), "TOP"),
-        ]))
+        table.setStyle(
+            TableStyle(
+                [
+                    ("BACKGROUND", (0, 0), (-1, -1), _PDF_CARD),
+                    ("TOPPADDING", (0, 0), (-1, -1), 14),
+                    ("BOTTOMPADDING", (0, 0), (-1, -1), 14),
+                    ("LEFTPADDING", (0, 0), (-1, -1), 16),
+                    ("RIGHTPADDING", (0, 0), (-1, -1), 16),
+                    ("LINEAFTER", (0, 0), (1, -1), 0.5, _PDF_BORDER),
+                    ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ]
+            )
+        )
         return table
 
     def _pdf_params_card(
         self,
         params: SearchParams,
         styles: dict[str, ParagraphStyle],
-    ) -> list:
+    ) -> list[Any]:
         """Build the search parameters card flowables.
 
         Always includes Query, Sort, and Date. Conditionally appends License,
@@ -388,6 +450,7 @@ class ReportService:
 
         Returns:
             List of flowable elements for the parameters section.
+
         """
         rows: list[tuple[str, str]] = [
             ("Query", params.query),
@@ -412,7 +475,7 @@ class ReportService:
         ]
 
         n = len(rows)
-        style_commands: list = [
+        style_commands: list[Any] = [
             ("BACKGROUND", (0, 0), (-1, -1), _PDF_CARD),
             ("TOPPADDING", (0, 0), (-1, -1), 8),
             ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
@@ -431,7 +494,7 @@ class ReportService:
         self,
         results: list[DownloadResult],
         styles: dict[str, ParagraphStyle],
-    ) -> list:
+    ) -> list[Any]:
         """Build the downloaded papers section flowables.
 
         Returns an empty list when no papers were downloaded successfully.
@@ -443,16 +506,17 @@ class ReportService:
         Returns:
             List of flowable elements for the downloaded papers section, or ``[]``
             when no result has status ``"downloaded"``.
+
         """
         downloaded = [r for r in results if r.status == DownloadResult.STATUS_DOWNLOADED]
         if not downloaded:
             return []
 
-        items: list = [Paragraph("Downloaded papers", styles["section"]), Spacer(1, 4)]
+        items: list[Any] = [Paragraph("Downloaded papers", styles["section"]), Spacer(1, 4)]
         for i, result in enumerate(downloaded):
             meta_parts = [result.paper.authors, result.paper.journal, result.paper.year]
             meta_str = " · ".join(p for p in meta_parts if p)
-            cell_content: list = [
+            cell_content: list[Any] = [
                 Paragraph(result.paper.title or "", styles["paper_title"]),
                 Spacer(1, 2),
                 Paragraph(meta_str or "—", styles["paper_meta"]),
@@ -463,14 +527,18 @@ class ReportService:
                     Paragraph(result.file_path.name, styles["paper_filepath"]),
                 ]
             row_table = Table([[cell_content]], colWidths=[_PDF_USABLE_WIDTH])
-            row_table.setStyle(TableStyle([
-                ("BACKGROUND", (0, 0), (-1, -1), _PDF_CARD),
-                ("TOPPADDING", (0, 0), (-1, -1), 10),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
-                ("LEFTPADDING", (0, 0), (-1, -1), 12),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 12),
-                ("VALIGN", (0, 0), (-1, -1), "TOP"),
-            ]))
+            row_table.setStyle(
+                TableStyle(
+                    [
+                        ("BACKGROUND", (0, 0), (-1, -1), _PDF_CARD),
+                        ("TOPPADDING", (0, 0), (-1, -1), 10),
+                        ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
+                        ("LEFTPADDING", (0, 0), (-1, -1), 12),
+                        ("RIGHTPADDING", (0, 0), (-1, -1), 12),
+                        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                    ]
+                )
+            )
             items.append(row_table)
             if i < len(downloaded) - 1:
                 items.append(Spacer(1, 3))
@@ -480,7 +548,7 @@ class ReportService:
         self,
         results: list[DownloadResult],
         styles: dict[str, ParagraphStyle],
-    ) -> list:
+    ) -> list[Any]:
         """Build the skipped/failed papers section flowables.
 
         Returns an empty list when all papers were downloaded successfully.
@@ -492,16 +560,17 @@ class ReportService:
         Returns:
             List of flowable elements for the skipped papers section, or ``[]``
             when every result has status ``"downloaded"``.
+
         """
         not_downloaded = [r for r in results if r.status != DownloadResult.STATUS_DOWNLOADED]
         if not not_downloaded:
             return []
 
-        items: list = [Paragraph("Skipped papers", styles["section"]), Spacer(1, 4)]
+        items: list[Any] = [Paragraph("Skipped papers", styles["section"]), Spacer(1, 4)]
         for i, result in enumerate(not_downloaded):
             meta_parts = [result.paper.authors, result.paper.journal, result.paper.year]
             meta_str = " · ".join(p for p in meta_parts if p)
-            cell_content: list = [
+            cell_content: list[Any] = [
                 Paragraph(result.paper.title or "", styles["paper_title"]),
                 Spacer(1, 2),
                 Paragraph(meta_str or "—", styles["paper_meta"]),
@@ -509,14 +578,18 @@ class ReportService:
                 Paragraph(result.reason or "Unknown reason", styles["paper_reason"]),
             ]
             row_table = Table([[cell_content]], colWidths=[_PDF_USABLE_WIDTH])
-            row_table.setStyle(TableStyle([
-                ("BACKGROUND", (0, 0), (-1, -1), _PDF_CARD),
-                ("TOPPADDING", (0, 0), (-1, -1), 10),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
-                ("LEFTPADDING", (0, 0), (-1, -1), 12),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 12),
-                ("VALIGN", (0, 0), (-1, -1), "TOP"),
-            ]))
+            row_table.setStyle(
+                TableStyle(
+                    [
+                        ("BACKGROUND", (0, 0), (-1, -1), _PDF_CARD),
+                        ("TOPPADDING", (0, 0), (-1, -1), 10),
+                        ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
+                        ("LEFTPADDING", (0, 0), (-1, -1), 12),
+                        ("RIGHTPADDING", (0, 0), (-1, -1), 12),
+                        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                    ]
+                )
+            )
             items.append(row_table)
             if i < len(not_downloaded) - 1:
                 items.append(Spacer(1, 3))
@@ -527,7 +600,9 @@ class ReportService:
     # ------------------------------------------------------------------
 
     def _build_dataframe(
-        self, results: list[DownloadResult], params: SearchParams
+        self,
+        results: list[DownloadResult],
+        params: SearchParams,
     ) -> pd.DataFrame:
         """Build a pandas DataFrame from download results and search parameters.
 
@@ -537,6 +612,7 @@ class ReportService:
 
         Returns:
             A DataFrame with one row per result and columns matching REPORT_COLUMNS.
+
         """
         rows = [
             {

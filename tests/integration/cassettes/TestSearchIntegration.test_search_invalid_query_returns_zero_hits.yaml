@@ -81,4 +81,262 @@ interactions:
     status:
       code: 200
       message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - JSESSIONID=32066F2B054F2A56CCBA6DC1DB541EE9
+      User-Agent:
+      - python-requests/2.32.5
+    method: GET
+    uri: https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%28xyzzy_impossible_query_string_that_matches_nothing_12345%29+AND+%28HAS_FT%3AY+OR+HAS_FREE_FULLTEXT%3AY%29&format=json&resultType=core&pageSize=5&cursorMark=%2A
+  response:
+    body:
+      string: '{"version":"6.9","hitCount":0,"request":{"queryString":"(xyzzy_impossible_query_string_that_matches_nothing_12345)
+        AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)","resultType":"core","cursorMark":"%2A","pageSize":5,"sort":"","synonym":false},"resultList":{"result":[]}}'
+    headers:
+      Access-Control-Allow-Headers:
+      - Content-Type,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Max-Age:
+      - '3600'
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json;charset=UTF-8
+      Date:
+      - Thu, 28 May 2026 14:53:00 GMT
+      Set-Cookie:
+      - JSESSIONID=F07E98707604AB48ADA91F31CD2A904A; Path=/europepmc/webservices/;
+        HttpOnly
+      Strict-Transport-Security:
+      - max-age=0
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - JSESSIONID=0AA279AF109A335129118FD0D687A767
+      User-Agent:
+      - python-requests/2.32.5
+    method: GET
+    uri: https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%28xyzzy_impossible_query_string_that_matches_nothing_12345%29+AND+%28HAS_FT%3AY+OR+HAS_FREE_FULLTEXT%3AY%29&format=json&resultType=core&pageSize=5&cursorMark=%2A
+  response:
+    body:
+      string: '{"version":"6.9","hitCount":0,"request":{"queryString":"(xyzzy_impossible_query_string_that_matches_nothing_12345)
+        AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)","resultType":"core","cursorMark":"%2A","pageSize":5,"sort":"","synonym":false},"resultList":{"result":[]}}'
+    headers:
+      Access-Control-Allow-Headers:
+      - Content-Type,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Max-Age:
+      - '3600'
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json;charset=UTF-8
+      Date:
+      - Thu, 28 May 2026 15:11:47 GMT
+      Server:
+      - nginx/1.17.7
+      Strict-Transport-Security:
+      - max-age=0
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - JSESSIONID=7C7D70D709AA1B8895439229AC452F27
+      User-Agent:
+      - python-requests/2.32.5
+    method: GET
+    uri: https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%28xyzzy_impossible_query_string_that_matches_nothing_12345%29+AND+%28HAS_FT%3AY+OR+HAS_FREE_FULLTEXT%3AY%29&format=json&resultType=core&pageSize=5&cursorMark=%2A
+  response:
+    body:
+      string: '{"version":"6.9","hitCount":0,"request":{"queryString":"(xyzzy_impossible_query_string_that_matches_nothing_12345)
+        AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)","resultType":"core","cursorMark":"%2A","pageSize":5,"sort":"","synonym":false},"resultList":{"result":[]}}'
+    headers:
+      Access-Control-Allow-Headers:
+      - Content-Type,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Max-Age:
+      - '3600'
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json;charset=UTF-8
+      Date:
+      - Thu, 28 May 2026 15:53:55 GMT
+      Strict-Transport-Security:
+      - max-age=0
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - JSESSIONID=3AFDA9F234CCA77C045F436692CBF77C
+      User-Agent:
+      - python-requests/2.32.5
+    method: GET
+    uri: https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%28xyzzy_impossible_query_string_that_matches_nothing_12345%29+AND+%28HAS_FT%3AY+OR+HAS_FREE_FULLTEXT%3AY%29&format=json&resultType=core&pageSize=5&cursorMark=%2A
+  response:
+    body:
+      string: '{"version":"6.9","hitCount":0,"request":{"queryString":"(xyzzy_impossible_query_string_that_matches_nothing_12345)
+        AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)","resultType":"core","cursorMark":"%2A","pageSize":5,"sort":"","synonym":false},"resultList":{"result":[]}}'
+    headers:
+      Access-Control-Allow-Headers:
+      - Content-Type,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Max-Age:
+      - '3600'
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json;charset=UTF-8
+      Date:
+      - Fri, 29 May 2026 12:24:18 GMT
+      Strict-Transport-Security:
+      - max-age=0
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - JSESSIONID=9C2CF59F3725DEE0B2E9CFC016A54F7D
+      User-Agent:
+      - python-requests/2.32.5
+    method: GET
+    uri: https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%28xyzzy_impossible_query_string_that_matches_nothing_12345%29+AND+%28HAS_FT%3AY+OR+HAS_FREE_FULLTEXT%3AY%29&format=json&resultType=core&pageSize=5&cursorMark=%2A
+  response:
+    body:
+      string: '{"version":"6.9","hitCount":0,"request":{"queryString":"(xyzzy_impossible_query_string_that_matches_nothing_12345)
+        AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)","resultType":"core","cursorMark":"%2A","pageSize":5,"sort":"","synonym":false},"resultList":{"result":[]}}'
+    headers:
+      Access-Control-Allow-Headers:
+      - Content-Type,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Max-Age:
+      - '3600'
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json;charset=UTF-8
+      Date:
+      - Fri, 29 May 2026 12:46:47 GMT
+      Set-Cookie:
+      - JSESSIONID=5C06E54739DEF964F58109C28D6A407A; Path=/europepmc/webservices/;
+        HttpOnly
+      Strict-Transport-Security:
+      - max-age=0
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - JSESSIONID=EB3E914FA07B13894AE7407C5E508492
+      User-Agent:
+      - python-requests/2.32.5
+    method: GET
+    uri: https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%28xyzzy_impossible_query_string_that_matches_nothing_12345%29+AND+%28HAS_FT%3AY+OR+HAS_FREE_FULLTEXT%3AY%29&format=json&resultType=core&pageSize=5&cursorMark=%2A
+  response:
+    body:
+      string: '{"version":"6.9","hitCount":0,"request":{"queryString":"(xyzzy_impossible_query_string_that_matches_nothing_12345)
+        AND (HAS_FT:Y OR HAS_FREE_FULLTEXT:Y)","resultType":"core","cursorMark":"%2A","pageSize":5,"sort":"","synonym":false},"resultList":{"result":[]}}'
+    headers:
+      Access-Control-Allow-Headers:
+      - Content-Type,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Max-Age:
+      - '3600'
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json;charset=UTF-8
+      Date:
+      - Sun, 31 May 2026 07:08:11 GMT
+      Strict-Transport-Security:
+      - max-age=0
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
 version: 1

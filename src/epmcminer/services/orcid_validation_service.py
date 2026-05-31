@@ -27,6 +27,7 @@ class OrcidValidationService:
         >>> service = OrcidValidationService(client=OrcidClient())
         >>> service.validate_format("0000-0001-5109-3700")
         True
+
     """
 
     def __init__(self, client: OrcidClient) -> None:
@@ -45,6 +46,17 @@ class OrcidValidationService:
 
         Returns:
             ``True`` if the format and checksum are correct, ``False`` otherwise.
+
+        Examples:
+            >>> from unittest.mock import MagicMock
+            >>> service = OrcidValidationService(client=MagicMock())
+            >>> service.validate_format("0000-0001-5109-3700")
+            True
+            >>> service.validate_format("not-an-orcid")
+            False
+            >>> service.validate_format("https://orcid.org/0000-0001-5109-3700")
+            True
+
         """
         return validate_orcid_format(orcid)
 
@@ -65,6 +77,15 @@ class OrcidValidationService:
         Raises:
             ConnectionError: If a network-level failure prevents the request
                 from completing.
+
+        Examples:
+            >>> from unittest.mock import MagicMock
+            >>> client = MagicMock()
+            >>> client.check_exists.return_value = True
+            >>> service = OrcidValidationService(client=client)
+            >>> service.check_exists("0000-0001-5109-3700")
+            True
+
         """
         return self._client.check_exists(orcid)
 
@@ -80,5 +101,14 @@ class OrcidValidationService:
 
         Returns:
             The bare ORCID identifier, e.g. ``"0000-0001-5109-3700"``.
+
+        Examples:
+            >>> from unittest.mock import MagicMock
+            >>> service = OrcidValidationService(client=MagicMock())
+            >>> service.normalise("https://orcid.org/0000-0001-5109-3700")
+            '0000-0001-5109-3700'
+            >>> service.normalise("  0000-0001-5109-3700  ")
+            '0000-0001-5109-3700'
+
         """
         return normalise_orcid(orcid)

@@ -2,6 +2,7 @@
 
 import threading
 import time
+from typing import Any, cast
 
 import requests
 
@@ -25,6 +26,8 @@ _HTTP_429_TOO_MANY_REQUESTS = 429
 _MAX_RETRIES = 3
 _RETRY_BACKOFF_BASE = 1
 
+_PDF_MAGIC_BYTES = b"%PDF"
+
 
 def _parse_retry_after(response: requests.Response) -> float | None:
     """Return the Retry-After delay in seconds, or None if the header is absent or invalid.
@@ -34,6 +37,7 @@ def _parse_retry_after(response: requests.Response) -> float | None:
 
     Returns:
         The number of seconds to wait as a float, or None.
+
     """
     header = response.headers.get("Retry-After")
     if header is None:
@@ -44,14 +48,19 @@ def _parse_retry_after(response: requests.Response) -> float | None:
         return None
 
 
-_PDF_MAGIC_BYTES = b"%PDF"
-
-
 class InvalidPdfContentError(Exception):
     """Raised when a 200 response body does not contain valid PDF bytes.
 
     This typically occurs when the server returns an HTML challenge or error page
     instead of the PDF file (e.g. a bot-detection Proof-of-Work page).
+
+    Examples:
+        >>> try:
+        ...     raise InvalidPdfContentError("Got HTML instead of PDF")
+        ... except InvalidPdfContentError as exc:
+        ...     print(exc)
+        Got HTML instead of PDF
+
     """
 
 
@@ -61,6 +70,14 @@ class APIError(Exception):
     Attributes:
         status_code: The HTTP status code returned by the API.
         body: The raw response body text.
+
+    Examples:
+        >>> err = APIError(404, "Not found")
+        >>> err.status_code
+        404
+        >>> str(err)
+        'Europe PMC API error 404: Not found'
+
     """
 
     def __init__(self, status_code: int, body: str) -> None:
@@ -69,6 +86,7 @@ class APIError(Exception):
         Args:
             status_code: The HTTP status code returned by the API.
             body: The raw response body text.
+
         """
         super().__init__(f"Europe PMC API error {status_code}: {body}")
         self.status_code = status_code
@@ -81,6 +99,13 @@ class EuropePMCClient:
     Makes raw HTTP requests and returns parsed JSON. Contains no business
     logic — all interpretation of results belongs in the service layer.
     Uses a persistent requests.Session for connection reuse.
+
+    Examples:
+        >>> client = EuropePMCClient()
+        >>> data = client.search("depression AND therapy", page_size=5)  # doctest: +SKIP
+        >>> data["hitCount"]  # doctest: +SKIP
+        4231
+
     """
 
     def __init__(self) -> None:
@@ -93,7 +118,7 @@ class EuropePMCClient:
         page_size: int,
         sort: str | None = None,
         cursor_mark: str = DEFAULT_CURSOR_MARK,
-    ) -> dict:
+    ) -> dict[str, Any]:
         """Query the Europe PMC search endpoint.
 
         Appends the free-full-text availability filter to every query so
@@ -116,9 +141,18 @@ class EuropePMCClient:
             APIError: If the API returns a non-200, non-retryable HTTP status code, or if
                 a 429 persists after all retry attempts.
             ConnectionError: If the HTTP request cannot be completed after all retries.
+
+        Examples:
+            >>> client = EuropePMCClient()
+            >>> data = client.search("depression AND therapy", page_size=10)  # doctest: +SKIP
+            >>> print(data["hitCount"])  # doctest: +SKIP
+            4231
+            >>> print(data["resultList"]["result"][0]["title"])  # doctest: +SKIP
+            'Cognitive behavioural therapy for depression: a meta-analysis'
+
         """
         full_query = f"({query}) AND ({FREE_FULL_TEXT_FILTER})"
-        params: dict = {
+        params: dict[str, Any] = {
             "query": full_query,
             "format": RESPONSE_FORMAT,
             "resultType": RESULT_TYPE,
@@ -135,7 +169,7 @@ class EuropePMCClient:
             except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:
                 last_exc = exc
                 if attempt < _MAX_RETRIES - 1:
-                    delay = _RETRY_BACKOFF_BASE * (2 ** attempt)
+                    delay = _RETRY_BACKOFF_BASE * (2**attempt)
                     _logger.warning(
                         "search transient error (attempt %d/%d), retrying in %ds: %s",
                         attempt + 1,
@@ -146,11 +180,9 @@ class EuropePMCClient:
                     time.sleep(delay)
                 continue
             if response.status_code == 200:
-                return response.json()
+                return cast(dict[str, Any], response.json())
             if response.status_code == _HTTP_429_TOO_MANY_REQUESTS:
-                delay = _parse_retry_after(response) or (
-                    _RETRY_BACKOFF_BASE * (2 ** attempt)
-                )
+                delay = _parse_retry_after(response) or (_RETRY_BACKOFF_BASE * (2**attempt))
                 last_exc = APIError(response.status_code, response.text)
                 if attempt < _MAX_RETRIES - 1:
                     _logger.warning(
@@ -204,6 +236,21 @@ class EuropePMCClient:
             ConnectionError: If the connection fails on all retry attempts, if a
                 timeout persists after all retry attempts, or if ``cancel_event``
                 is set.
+
+        Examples:
+            >>> client = EuropePMCClient()
+            >>> pdf_bytes = client.download_pdf(  # doctest: +SKIP
+            ...     "https://europepmc.org/articles/PMC1234567?pdf=render"
+            ... )
+            >>> pdf_bytes[:4]  # doctest: +SKIP
+            b'%PDF'
+
+            With cancellation support:
+
+            >>> import threading
+            >>> cancel = threading.Event()
+            >>> pdf_bytes = client.download_pdf(url, cancel_event=cancel)  # doctest: +SKIP
+
         """
         last_exc: Exception | None = None
         for attempt in range(_MAX_RETRIES):
@@ -214,7 +261,7 @@ class EuropePMCClient:
             except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:
                 last_exc = exc
                 if attempt < _MAX_RETRIES - 1:
-                    delay = _RETRY_BACKOFF_BASE * (2 ** attempt)
+                    delay = _RETRY_BACKOFF_BASE * (2**attempt)
                     _logger.warning(
                         "download_pdf transient error (attempt %d/%d), retrying in %ds: %s",
                         attempt + 1,
@@ -233,15 +280,13 @@ class EuropePMCClient:
                     if not response.content.startswith(_PDF_MAGIC_BYTES):
                         raise InvalidPdfContentError(
                             f"Response from {url!r} is not a valid PDF "
-                            f"(got {response.content[:16]!r})"
+                            f"(got {response.content[:16]!r})",
                         )
-                    return response.content
+                    return cast(bytes, response.content)
                 if response.status_code == _HTTP_429_TOO_MANY_REQUESTS:
                     # Rate-limited: honour the Retry-After hint; fall back to
                     # the same exponential schedule used for 5xx errors.
-                    delay = _parse_retry_after(response) or (
-                        _RETRY_BACKOFF_BASE * (2 ** attempt)
-                    )
+                    delay = _parse_retry_after(response) or (_RETRY_BACKOFF_BASE * (2**attempt))
                     last_exc = APIError(response.status_code, response.text)
                     if attempt < _MAX_RETRIES - 1:
                         _logger.warning(
@@ -261,7 +306,7 @@ class EuropePMCClient:
                 # 5xx: treat as transient and retry
                 last_exc = APIError(response.status_code, response.text)
                 if attempt < _MAX_RETRIES - 1:
-                    delay = _RETRY_BACKOFF_BASE * (2 ** attempt)
+                    delay = _RETRY_BACKOFF_BASE * (2**attempt)
                     _logger.warning(
                         "download_pdf HTTP %d (attempt %d/%d), retrying in %ds",
                         response.status_code,

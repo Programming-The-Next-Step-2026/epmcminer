@@ -144,10 +144,10 @@ class _CalendarPopup(QFrame):
         self._calendar.setStyle(theme.get_fusion_style())
         self._calendar.setGridVisible(False)
         self._calendar.setVerticalHeaderFormat(
-            QCalendarWidget.VerticalHeaderFormat.NoVerticalHeader
+            QCalendarWidget.VerticalHeaderFormat.NoVerticalHeader,
         )
         self._calendar.setHorizontalHeaderFormat(
-            QCalendarWidget.HorizontalHeaderFormat.ShortDayNames
+            QCalendarWidget.HorizontalHeaderFormat.ShortDayNames,
         )
         self._calendar.setMinimumWidth(_CALENDAR_MIN_WIDTH)
         self._calendar.clicked.connect(self.date_selected)
@@ -165,10 +165,11 @@ class _CalendarPopup(QFrame):
 
         Returns:
             The QCalendarWidget used inside this popup.
+
         """
         return self._calendar
 
-    def resizeEvent(self, event: QResizeEvent) -> None:
+    def resizeEvent(self, event: QResizeEvent | None) -> None:
         """Clip the popup to its rounded-corner shape so no boxy corners bleed through."""
         super().resizeEvent(event)
         path = QPainterPath()
@@ -224,6 +225,7 @@ class DatePicker(QWidget):
             min_date: Optional lower bound. Dates before this cannot be selected.
             max_date: Optional upper bound. Dates after this cannot be selected.
             parent: Optional parent widget.
+
         """
         super().__init__(parent)
         self._date: QDate = QDate.currentDate()
@@ -245,6 +247,7 @@ class DatePicker(QWidget):
 
         Returns:
             The selected QDate.
+
         """
         return self._date
 
@@ -255,6 +258,7 @@ class DatePicker(QWidget):
 
         Args:
             date: The desired QDate.
+
         """
         if self._min_date is not None and date < self._min_date:
             date = self._min_date
@@ -272,6 +276,7 @@ class DatePicker(QWidget):
 
         Returns:
             The minimum QDate, or None.
+
         """
         return self._min_date
 
@@ -280,6 +285,7 @@ class DatePicker(QWidget):
 
         Args:
             date: The new minimum QDate.
+
         """
         self._min_date = date
         self._popup.calendar().setMinimumDate(date)
@@ -291,6 +297,7 @@ class DatePicker(QWidget):
 
         Returns:
             The maximum QDate, or None.
+
         """
         return self._max_date
 
@@ -299,6 +306,7 @@ class DatePicker(QWidget):
 
         Args:
             date: The new maximum QDate.
+
         """
         self._max_date = date
         self._popup.calendar().setMaximumDate(date)
@@ -310,6 +318,7 @@ class DatePicker(QWidget):
     # ------------------------------------------------------------------
 
     def _build_ui(self) -> None:
+        """Create the display button and attach the calendar popup."""
         self.setStyleSheet("background-color: transparent;")
 
         layout = QVBoxLayout(self)
@@ -332,6 +341,7 @@ class DatePicker(QWidget):
     # ------------------------------------------------------------------
 
     def _toggle_popup(self) -> None:
+        """Show the calendar popup below the display button, or hide it if already visible."""
         if self._popup.isVisible():
             self._popup.hide()
         else:
@@ -340,7 +350,14 @@ class DatePicker(QWidget):
             self._popup.show()
 
     def _on_date_selected(self, date: QDate) -> None:
+        """Handle a date click in the calendar popup by forwarding to setDate.
+
+        Args:
+            date: The QDate clicked in the calendar.
+
+        """
         self.setDate(date)
 
     def _update_display(self) -> None:
+        """Refresh the display button text to show the current selected date."""
         self._display.setText(self._date.toString("d MMM yyyy"))

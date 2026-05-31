@@ -21,9 +21,9 @@ ACCENT = "#ff7a3d"
 TEXT_PRIMARY = "#ededed"
 TEXT_BODY = "#cfcfcf"
 TEXT_MUTED = "#8a8a8d"
-BORDER = "rgba(255, 255, 255, 18)"         # card borders
+BORDER = "rgba(255, 255, 255, 18)"  # card borders
 BORDER_STRONG = "rgba(255, 255, 255, 41)"  # button and menu borders
-BORDER_FAINT = "rgba(255, 255, 255, 10)"   # title-bar border + dividers
+BORDER_FAINT = "rgba(255, 255, 255, 10)"  # title-bar border + dividers
 
 CARD_STYLE = f"""
     QFrame#card {{
@@ -98,11 +98,22 @@ SCROLLBAR_STYLE = f"""
 # at the minimum window size too.
 EXPANDABLE_MIN_HEIGHT: int = 200
 
+# Status colours — shared across screens (download log, summary, PDF export).
+SUCCESS = "#4ade80"
+SUCCESS_BG = "#1a3d1a"
+DANGER = "#f87171"
+DANGER_BG = "#3a1a1a"
+SKIPPED_BG = "rgba(255, 122, 61, 20)"
+
 _fusion_style: QStyle | None = None
 
 
 def get_fusion_style() -> QStyle | None:
     """Return the Fusion QStyle instance, creating it lazily on first call.
+
+    This is needed to enure consistent widget appearance across platforms,
+    since the default style on some platforms (e.g. Windows) doesn't support
+    the full range of QSS features we use.
 
     The style is created on demand so this module is safe to import before
     a QApplication instance exists (e.g. in non-GUI tests or at module load
@@ -110,6 +121,7 @@ def get_fusion_style() -> QStyle | None:
 
     Returns:
         The Fusion QStyle, or ``None`` if the style is unavailable.
+
     """
     global _fusion_style
     if _fusion_style is None:

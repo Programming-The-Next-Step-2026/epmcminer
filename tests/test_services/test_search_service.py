@@ -6,7 +6,8 @@ from unittest.mock import MagicMock
 import pytest
 
 from epmcminer.api.client import SORT_BY_CITATIONS, SORT_BY_DATE, APIError
-from epmcminer.api.models import SearchParams, SearchResult
+from epmcminer.api.search_params import SearchParams
+from epmcminer.api.search_result import SearchResult
 from epmcminer.services.search_service import PREVIEW_PAGE_SIZE, SearchService
 
 # ---------------------------------------------------------------------------
@@ -45,7 +46,7 @@ RAW_PAPER = {
     "doi": "10.1000/xyz123",
     "title": "A study on depression",
     "authorString": "Smith J, Jones A",
-    "journalTitle": "Journal of Psychiatry",
+    "journalInfo": {"journal": {"title": "Journal of Psychiatry"}},
     "pubYear": "2022",
     "abstractText": "This study investigates depression.",
     "fullTextUrlList": {
@@ -63,7 +64,7 @@ RAW_PAPER_NO_PDF = {
     "doi": "10.2000/abc456",
     "title": "A study on anxiety",
     "authorString": "Jones A, Smith J",
-    "journalTitle": "Journal of Psychology",
+    "journalInfo": {"journal": {"title": "Journal of Psychology"}},
     "pubYear": "2021",
     "abstractText": "This study investigates anxiety.",
     "fullTextUrlList": {
@@ -80,7 +81,7 @@ RAW_PAPER_PPR = {
     "doi": "10.3000/ppr123",
     "title": "A preprint on depression",
     "authorString": "Brown K",
-    "journalTitle": "bioRxiv",
+    "journalInfo": {"journal": {"title": "bioRxiv"}},
     "pubYear": "2023",
     "abstractText": "This preprint investigates depression.",
     "fullTextUrlList": {
@@ -230,9 +231,9 @@ class TestBuildQuery:
         assert "depression NOT anxiety" in result
         assert "depression AND NOT" not in result
 
-    def test_free_full_text_filter_always_present(self, service: SearchService) -> None:
-        """HAS_FT:Y OR HAS_FREE_FULLTEXT:Y is always appended."""
-        assert "HAS_FT:Y OR HAS_FREE_FULLTEXT:Y" in service.build_query(make_params())
+    def test_free_full_text_filter_not_in_build_query(self, service: SearchService) -> None:
+        """build_query does not include the free-full-text filter; the HTTP client enforces it."""
+        assert "HAS_FT:Y OR HAS_FREE_FULLTEXT:Y" not in service.build_query(make_params())
 
     def test_all_filters_combined(self, service: SearchService) -> None:
         """All active filters appear in the final query string."""
@@ -250,7 +251,6 @@ class TestBuildQuery:
         assert 'PUB_TYPE:("review")' in result
         assert 'LICENSE:"CC-BY"' in result
         assert "AUTHORID:0000-0001-2345-6789" in result
-        assert "HAS_FT:Y OR HAS_FREE_FULLTEXT:Y" in result
 
 
 # ---------------------------------------------------------------------------
@@ -261,17 +261,13 @@ class TestBuildQuery:
 class TestPreview:
     """Tests for SearchService.preview."""
 
-    def test_preview_returns_search_result(
-        self, service: SearchService, mock_client
-    ) -> None:
+    def test_preview_returns_search_result(self, service: SearchService, mock_client) -> None:
         """preview returns a SearchResult instance."""
         mock_client.search.return_value = MOCK_SEARCH_RESPONSE
 
         assert isinstance(service.preview(make_params()), SearchResult)
 
-    def test_preview_maps_raw_fields_to_paper(
-        self, service: SearchService, mock_client
-    ) -> None:
+    def test_preview_maps_raw_fields_to_paper(self, service: SearchService, mock_client) -> None:
         """Raw API fields are mapped to the correct Paper attributes."""
         mock_client.search.return_value = MOCK_SEARCH_RESPONSE
 
@@ -305,9 +301,7 @@ class TestPreview:
 
         assert service.preview(make_params()).papers[0].pdf_url is None
 
-    def test_preview_total_found_from_hit_count(
-        self, service: SearchService, mock_client
-    ) -> None:
+    def test_preview_total_found_from_hit_count(self, service: SearchService, mock_client) -> None:
         """total_found in SearchResult reflects the API hitCount."""
         mock_client.search.return_value = MOCK_SEARCH_RESPONSE
 
@@ -333,9 +327,7 @@ class TestPreview:
 
         assert service.preview(make_params()).estimated_downloadable == 0
 
-    def test_preview_ppr_paper_uses_id_as_pmid(
-        self, service: SearchService, mock_client
-    ) -> None:
+    def test_preview_ppr_paper_uses_id_as_pmid(self, service: SearchService, mock_client) -> None:
         """For papers without a pmid (e.g. preprints), the id field is used."""
         mock_client.search.return_value = PPR_RESPONSE
 
@@ -353,9 +345,7 @@ class TestPreview:
 
         assert paper.pdf_url == "https://www.biorxiv.org/content/ppr123.full.pdf"
 
-    def test_preview_does_not_call_get_pdf_url(
-        self, service: SearchService, mock_client
-    ) -> None:
+    def test_preview_does_not_call_get_pdf_url(self, service: SearchService, mock_client) -> None:
         """preview reads PDF URLs from the search response; get_pdf_url is not called."""
         mock_client.search.return_value = MOCK_SEARCH_RESPONSE
 
@@ -363,9 +353,7 @@ class TestPreview:
 
         mock_client.get_pdf_url.assert_not_called()
 
-    def test_preview_uses_preview_page_size(
-        self, service: SearchService, mock_client
-    ) -> None:
+    def test_preview_uses_preview_page_size(self, service: SearchService, mock_client) -> None:
         """preview always requests exactly PREVIEW_PAGE_SIZE results."""
         mock_client.search.return_value = MOCK_SEARCH_RESPONSE
 
@@ -414,7 +402,7 @@ class TestPreview:
             "doi": "10.9999/noft",
             "title": "No full text paper",
             "authorString": "Nobody A",
-            "journalTitle": "Journal X",
+            "journalInfo": {"journal": {"title": "Journal X"}},
             "pubYear": "2021",
             "abstractText": "Abstract.",
         }
@@ -428,27 +416,21 @@ class TestPreview:
 
         assert paper.pdf_url is None
 
-    def test_preview_propagates_api_error(
-        self, service: SearchService, mock_client
-    ) -> None:
+    def test_preview_propagates_api_error(self, service: SearchService, mock_client) -> None:
         """APIError raised by client.search is not caught and propagates to the caller."""
         mock_client.search.side_effect = APIError(500, "Internal Server Error")
 
         with pytest.raises(APIError):
             service.preview(make_params())
 
-    def test_preview_propagates_connection_error(
-        self, service: SearchService, mock_client
-    ) -> None:
+    def test_preview_propagates_connection_error(self, service: SearchService, mock_client) -> None:
         """ConnectionError raised by client.search propagates to the caller."""
         mock_client.search.side_effect = ConnectionError("timeout")
 
         with pytest.raises(ConnectionError):
             service.preview(make_params())
 
-    def test_preview_empty_results(
-        self, service: SearchService, mock_client
-    ) -> None:
+    def test_preview_empty_results(self, service: SearchService, mock_client) -> None:
         """preview with no API results returns an empty SearchResult."""
         mock_client.search.return_value = EMPTY_SEARCH_RESPONSE
 

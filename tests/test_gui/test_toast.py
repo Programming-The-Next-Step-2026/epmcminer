@@ -186,9 +186,7 @@ class TestToastInterruption:
 
 
 class TestToastRepositioning:
-    def test_repositioned_within_parent_bounds(
-        self, toast: Toast, parent_widget: QWidget
-    ) -> None:
+    def test_repositioned_within_parent_bounds(self, toast: Toast, parent_widget: QWidget) -> None:
         toast.show_message("Saved!", success=True)
         # x should be non-negative (not clipped left of parent).
         assert toast.x() >= 0
