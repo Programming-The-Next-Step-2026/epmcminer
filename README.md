@@ -113,7 +113,7 @@ pip install jupyter
 jupyter lab docs/vignette.ipynb
 ```
 
-The notebook also renders statically on GitHub (including the Mermaid flowchart) if you'd rather read it without launching Jupyter.
+You can also view the rendered notebook on GitHub: [docs/vignette.html](docs/vignette.html).
 
 ---
 
