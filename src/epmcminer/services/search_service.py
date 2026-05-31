@@ -102,15 +102,15 @@ def paper_from_raw(raw: dict[str, Any]) -> Paper:
         ...     "doi": "10.1234/test",
         ...     "title": "A study on sleep",
         ...     "authorString": "Smith J",
-        ...     "journalTitle": "Sleep",
+        ...     "journalInfo": {"journal": {"title": "Sleep"}},
         ...     "pubYear": "2022",
         ...     "abstractText": "Abstract here.",
         ... }
         >>> paper = paper_from_raw(raw)
         >>> paper.pmid
         '34567890'
-        >>> paper.pdf_url is None
-        True
+        >>> paper.journal
+        'Sleep'
 
     """
     pmid = raw.get("pmid") or raw.get("id", "")
@@ -119,7 +119,7 @@ def paper_from_raw(raw: dict[str, Any]) -> Paper:
         doi=raw.get("doi", ""),
         title=raw.get("title", ""),
         authors=raw.get("authorString", ""),
-        journal=raw.get("journalTitle", ""),
+        journal=raw.get("journalInfo", {}).get("journal", {}).get("title", ""),
         year=raw.get("pubYear", ""),
         abstract=raw.get("abstractText", ""),
         pdf_url=pdf_url_from_raw(raw),

@@ -46,7 +46,7 @@ RAW_PAPER = {
     "doi": "10.1000/xyz123",
     "title": "A study on depression",
     "authorString": "Smith J, Jones A",
-    "journalTitle": "Journal of Psychiatry",
+    "journalInfo": {"journal": {"title": "Journal of Psychiatry"}},
     "pubYear": "2022",
     "abstractText": "This study investigates depression.",
     "fullTextUrlList": {
@@ -64,7 +64,7 @@ RAW_PAPER_NO_PDF = {
     "doi": "10.2000/abc456",
     "title": "A study on anxiety",
     "authorString": "Jones A, Smith J",
-    "journalTitle": "Journal of Psychology",
+    "journalInfo": {"journal": {"title": "Journal of Psychology"}},
     "pubYear": "2021",
     "abstractText": "This study investigates anxiety.",
     "fullTextUrlList": {
@@ -81,7 +81,7 @@ RAW_PAPER_PPR = {
     "doi": "10.3000/ppr123",
     "title": "A preprint on depression",
     "authorString": "Brown K",
-    "journalTitle": "bioRxiv",
+    "journalInfo": {"journal": {"title": "bioRxiv"}},
     "pubYear": "2023",
     "abstractText": "This preprint investigates depression.",
     "fullTextUrlList": {
@@ -402,7 +402,7 @@ class TestPreview:
             "doi": "10.9999/noft",
             "title": "No full text paper",
             "authorString": "Nobody A",
-            "journalTitle": "Journal X",
+            "journalInfo": {"journal": {"title": "Journal X"}},
             "pubYear": "2021",
             "abstractText": "Abstract.",
         }
