@@ -1,6 +1,7 @@
 """SearchParams data model."""
 
 from dataclasses import dataclass, field
+from datetime import date
 from pathlib import Path
 from typing import Literal
 
@@ -21,9 +22,27 @@ class SearchParams:
             ``"citations"``.
         count: Number of papers to successfully download. Must be greater than 0.
         output_folder: Local filesystem path to the folder where downloads are saved.
+            Must be set before calling :meth:`DownloadService.download`; may be
+            ``None`` when the params are only used for a search preview.
 
     Raises:
         ValueError: If ``count`` is not greater than 0.
+        ValueError: If ``date_from`` or ``date_to`` is not a valid ISO-8601 date (YYYY-MM-DD).
+        ValueError: If ``date_from`` is later than ``date_to``.
+
+    Examples:
+        >>> params = SearchParams(
+        ...     query="depression AND therapy",
+        ...     date_from="2020-01-01",
+        ...     date_to="2024-12-31",
+        ...     licenses=["CC-BY"],
+        ...     count=50,
+        ... )
+        >>> params.sort_order
+        'relevance'
+        >>> params.count
+        50
+
     """
 
     query: str
@@ -34,13 +53,32 @@ class SearchParams:
     author_orcids: list[str] = field(default_factory=list)
     sort_order: Literal["relevance", "date", "citations"] = "relevance"
     count: int = 10
-    output_folder: Path = field(default_factory=Path)
+    output_folder: Path | None = None
 
     def __post_init__(self) -> None:
         """Validate field values after initialisation.
 
         Raises:
             ValueError: If ``count`` is not greater than 0.
+            ValueError: If ``date_from`` or ``date_to`` is not a valid ISO-8601 date.
+            ValueError: If ``date_from`` is later than ``date_to``.
+
         """
         if self.count <= 0:
             raise ValueError(f"count must be greater than 0, got {self.count}.")
+        try:
+            parsed_from = date.fromisoformat(self.date_from)
+        except ValueError as exc:
+            raise ValueError(
+                f"date_from must be a valid ISO-8601 date (YYYY-MM-DD), got {self.date_from!r}.",
+            ) from exc
+        try:
+            parsed_to = date.fromisoformat(self.date_to)
+        except ValueError as exc:
+            raise ValueError(
+                f"date_to must be a valid ISO-8601 date (YYYY-MM-DD), got {self.date_to!r}.",
+            ) from exc
+        if parsed_from > parsed_to:
+            raise ValueError(
+                f"date_from ({self.date_from}) must not be later than date_to ({self.date_to}).",
+            )

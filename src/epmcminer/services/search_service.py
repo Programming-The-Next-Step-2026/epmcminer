@@ -1,15 +1,17 @@
 """Search service — builds Europe PMC queries and maps results to data models."""
 
 import re
+from typing import Any
 
 from epmcminer.api.client import (
-    FREE_FULL_TEXT_FILTER,
     PDF_DOCUMENT_STYLE,
     SORT_BY_CITATIONS,
     SORT_BY_DATE,
     EuropePMCClient,
 )
-from epmcminer.api.models import Paper, SearchParams, SearchResult
+from epmcminer.api.paper import Paper
+from epmcminer.api.search_params import SearchParams
+from epmcminer.api.search_result import SearchResult
 
 PREVIEW_PAGE_SIZE = 10
 
@@ -19,8 +21,35 @@ SORT_ORDER_MAP: dict[str, str | None] = {
     "citations": SORT_BY_CITATIONS,
 }
 
+# Europe PMC pub-type API values differ from the human-readable display names in
+# two ways: (1) they are always lowercase; (2) a handful have different spellings.
+# All names not listed here are simply lowercased at query-build time.
+_PUB_TYPE_API_EXCEPTIONS: dict[str, str] = {
+    "Observational study (veterinary)": "observational study, veterinary",
+    "Randomized controlled trial (veterinary)": "randomized controlled trial, veterinary",
+}
 
-def pdf_url_from_raw(raw: dict) -> str | None:
+# Prepended to every pub-type clause so that regular journal articles
+# (stored as "research-article" / "Journal Article" in Europe PMC) are included
+# alongside the explicitly named review/study types. This mirrors the query
+# the Europe PMC website itself generates.
+_PUB_TYPE_CATCH_ALL = "HAS_BOOK:Y OR (SRC:(MED OR PMC OR AGR OR CBA) NOT PUB_TYPE:(Review))"
+
+
+def _pub_type_to_api(display_name: str) -> str:
+    """Convert a publication-type display name to its Europe PMC API value.
+
+    Args:
+        display_name: The human-readable pub type string used in the UI.
+
+    Returns:
+        The lowercase API value accepted by the Europe PMC search endpoint.
+
+    """
+    return _PUB_TYPE_API_EXCEPTIONS.get(display_name, display_name.lower())
+
+
+def pdf_url_from_raw(raw: dict[str, Any]) -> str | None:
     """Extract the PDF URL from a raw core search result.
 
     The core search response embeds fullTextUrlList directly, avoiding a
@@ -32,12 +61,69 @@ def pdf_url_from_raw(raw: dict) -> str | None:
 
     Returns:
         The PDF URL string, or None if no PDF link is present.
+
+    Examples:
+        >>> raw = {
+        ...     "fullTextUrlList": {
+        ...         "fullTextUrl": [
+        ...             {"documentStyle": "html", "url": "https://example.com/html"},
+        ...             {"documentStyle": "pdf", "url": "https://example.com/paper.pdf"},
+        ...         ]
+        ...     }
+        ... }
+        >>> pdf_url_from_raw(raw)
+        'https://example.com/paper.pdf'
+        >>> pdf_url_from_raw({}) is None
+        True
+
     """
     entries = raw.get("fullTextUrlList", {}).get("fullTextUrl", [])
     for entry in entries:
         if entry.get("documentStyle") == PDF_DOCUMENT_STYLE:
-            return entry["url"]
+            return str(entry["url"])
     return None
+
+
+def paper_from_raw(raw: dict[str, Any]) -> Paper:
+    """Build a Paper dataclass from a single raw Europe PMC result dict.
+
+    Handles both MED (PubMed) records that carry a ``pmid`` field and
+    non-MED records (e.g. preprints) that only carry the generic ``id`` field.
+
+    Args:
+        raw: A single result dict from the Europe PMC core search response.
+
+    Returns:
+        A fully populated Paper instance.
+
+    Examples:
+        >>> raw = {
+        ...     "pmid": "34567890",
+        ...     "doi": "10.1234/test",
+        ...     "title": "A study on sleep",
+        ...     "authorString": "Smith J",
+        ...     "journalInfo": {"journal": {"title": "Sleep"}},
+        ...     "pubYear": "2022",
+        ...     "abstractText": "Abstract here.",
+        ... }
+        >>> paper = paper_from_raw(raw)
+        >>> paper.pmid
+        '34567890'
+        >>> paper.journal
+        'Sleep'
+
+    """
+    pmid = raw.get("pmid") or raw.get("id", "")
+    return Paper(
+        pmid=pmid,
+        doi=raw.get("doi", ""),
+        title=raw.get("title", ""),
+        authors=raw.get("authorString", ""),
+        journal=raw.get("journalInfo", {}).get("journal", {}).get("title", ""),
+        year=raw.get("pubYear", ""),
+        abstract=raw.get("abstractText", ""),
+        pdf_url=pdf_url_from_raw(raw),
+    )
 
 
 class SearchService:
@@ -45,6 +131,15 @@ class SearchService:
 
     Accepts SearchParams from the GUI layer, constructs the API query,
     delegates HTTP calls to EuropePMCClient, and returns typed SearchResult objects.
+
+    Examples:
+        >>> from unittest.mock import MagicMock
+        >>> from epmcminer.api.search_params import SearchParams
+        >>> service = SearchService(client=MagicMock())
+        >>> params = SearchParams(query="sleep", date_from="2020-01-01", date_to="2024-12-31")
+        >>> service.build_query(params)
+        'sleep AND (FIRST_PDATE:[2020-01-01 TO 2024-12-31])'
+
     """
 
     def __init__(self, client: EuropePMCClient) -> None:
@@ -52,6 +147,7 @@ class SearchService:
 
         Args:
             client: An EuropePMCClient instance for making HTTP requests.
+
         """
         self._client = client
 
@@ -59,14 +155,15 @@ class SearchService:
         """Build a Europe PMC query string from SearchParams.
 
         Handles AND/OR keyword logic, date range, publication types,
-        licenses, and author ORCIDs. The free-full-text availability
-        filter is always appended and is not derived from params.
+        licenses, and author ORCIDs.  The free-full-text availability
+        filter is **not** included here; the HTTP client appends it to
+        every request as an invariant policy.
 
         Args:
             params: A SearchParams instance containing all search filters.
 
         Returns:
-            A complete Europe PMC query string ready to pass to the API.
+            A Europe PMC query string ready to pass to the API client.
 
         Examples:
             Keyword-only query with a date range:
@@ -77,8 +174,8 @@ class SearchService:
             >>> params = SearchParams(
             ...     query="depression", date_from="2020-01-01", date_to="2024-12-31"
             ... )
-            >>> service.build_query(params)  # doctest: +ELLIPSIS
-            'depression AND (FIRST_PDATE:[2020-01-01 TO 2024-12-31]) AND ...'
+            >>> service.build_query(params)
+            'depression AND (FIRST_PDATE:[2020-01-01 TO 2024-12-31])'
 
             With publication type and license filters added:
 
@@ -91,6 +188,7 @@ class SearchService:
             ... )
             >>> service.build_query(params)  # doctest: +ELLIPSIS
             'memory AND sleep AND (FIRST_PDATE:[2021-01-01 TO 2023-12-31]) AND ...'
+
         """
         parts: list[str] = []
 
@@ -102,18 +200,23 @@ class SearchService:
         parts.append(f"(FIRST_PDATE:[{params.date_from} TO {params.date_to}])")
 
         if params.publication_types:
-            clause = " OR ".join(f'PUB_TYPE:("{pt}")' for pt in params.publication_types)
-            parts.append(f"({clause})")
+            # The catch-all captures regular journal articles (stored as
+            # "research-article" / "Journal Article" in Europe PMC) that would
+            # otherwise be missed by the explicit type list alone.
+            explicit = " OR ".join(
+                f'PUB_TYPE:("{_pub_type_to_api(pt)}")' for pt in params.publication_types
+            )
+            parts.append(f"({_PUB_TYPE_CATCH_ALL} OR {explicit})")
 
         if params.licenses:
             clause = " OR ".join(f'LICENSE:"{lic}"' for lic in params.licenses)
             parts.append(f"({clause})")
 
         if params.author_orcids:
-            clause = " OR ".join(f'AUTHORID:"{oid}"' for oid in params.author_orcids)
+            # Europe PMC AUTHORID field syntax: no quotes, no prefix.
+            # e.g. AUTHORID:0000-0001-5109-3700
+            clause = " OR ".join(f"AUTHORID:{oid}" for oid in params.author_orcids)
             parts.append(f"({clause})")
-
-        parts.append(f"({FREE_FULL_TEXT_FILTER})")
 
         return " AND ".join(parts)
 
@@ -134,27 +237,26 @@ class SearchService:
         Raises:
             APIError: If the Europe PMC API returns a non-200 response.
             ConnectionError: If the HTTP request cannot be completed.
+
+        Examples:
+            >>> from unittest.mock import MagicMock
+            >>> from epmcminer.api.search_params import SearchParams
+            >>> service = SearchService(client=MagicMock())
+            >>> params = SearchParams(query="sleep", date_from="2020-01-01", date_to="2024-12-31")
+            >>> result = service.preview(params)  # doctest: +SKIP
+            >>> print(result.total_found)  # doctest: +SKIP
+            142
+            >>> print(len(result.papers))  # doctest: +SKIP
+            10
+
         """
         query = self.build_query(params)
         sort = SORT_ORDER_MAP.get(params.sort_order)
         data = self._client.search(query=query, page_size=PREVIEW_PAGE_SIZE, sort=sort)
 
-        papers: list[Paper] = []
-        for raw in data.get("resultList", {}).get("result", []):
-            pmid = raw.get("pmid") or raw.get("id", "")
-            pdf_url = pdf_url_from_raw(raw)
-            papers.append(
-                Paper(
-                    pmid=pmid,
-                    doi=raw.get("doi", ""),
-                    title=raw.get("title", ""),
-                    authors=raw.get("authorString", ""),
-                    journal=raw.get("journalTitle", ""),
-                    year=raw.get("pubYear", ""),
-                    abstract=raw.get("abstractText", ""),
-                    pdf_url=pdf_url,
-                )
-            )
+        papers: list[Paper] = [
+            paper_from_raw(raw) for raw in data.get("resultList", {}).get("result", [])
+        ]
 
         estimated_downloadable = sum(1 for p in papers if p.pdf_url is not None)
 

@@ -1,11 +1,14 @@
 """Screen 2 — results preview and download settings."""
 
 import dataclasses
+import os
+import threading
 from pathlib import Path
 
 from PyQt6.QtCore import QPoint, Qt, QThread, pyqtSignal
 from PyQt6.QtWidgets import (
     QFileDialog,
+    QFrame,
     QHBoxLayout,
     QLabel,
     QLineEdit,
@@ -23,6 +26,9 @@ from epmcminer.gui.widgets.card import make_card, make_section_label
 from epmcminer.gui.widgets.progress_widget import ProgressWidget
 from epmcminer.services.models import Paper, SearchParams, SearchResult
 from epmcminer.services.search_service import SORT_ORDER_MAP, SearchService
+from epmcminer.utils.logger import get_logger
+
+_logger = get_logger(__name__)
 
 # ---------------------------------------------------------------------------
 # Screen-local constants
@@ -32,7 +38,7 @@ _SORT_LABELS: dict[str, str] = {"relevance": "Relevance", "date": "Date", "citat
 _DEFAULT_COUNT = 50
 _COUNT_MIN = 1
 _COUNT_MAX = 10_000
-_PAPER_LIST_HEIGHT = 380
+_PAPER_LIST_MIN_HEIGHT = theme.EXPANDABLE_MIN_HEIGHT
 _DIVIDER = theme.BORDER_FAINT
 
 _ACTION_BTN_STYLE = f"""
@@ -132,6 +138,8 @@ _BROWSE_BTN_STYLE = f"""
     }}
 """
 
+_HINT_STYLE = f"color: {theme.TEXT_MUTED}; font-size: 13px;"
+
 
 # ---------------------------------------------------------------------------
 # Worker
@@ -142,8 +150,10 @@ class PreviewWorker(QThread):
     """Background thread that calls SearchService.preview().
 
     Attributes:
-        result_ready: Emitted with the SearchResult on success.
-        error_occurred: Emitted with an error message string on failure.
+        result_ready: Emitted with the SearchResult on success (unless cancelled).
+        error_occurred: Emitted with an error message string on failure (unless cancelled).
+        cancel_event: Set this to discard the result when it arrives instead of emitting.
+
     """
 
     result_ready = pyqtSignal(SearchResult)
@@ -155,18 +165,28 @@ class PreviewWorker(QThread):
         Args:
             service: The SearchService to query.
             params: The search parameters to pass to preview().
+
         """
         super().__init__()
         self._service = service
         self._params = params
+        self.cancel_event = threading.Event()
 
     def run(self) -> None:
-        """Execute the preview call and emit the appropriate signal."""
+        """Execute the preview call and emit the appropriate signal.
+
+        If ``cancel_event`` is set before the HTTP call returns, the result is
+        silently discarded so that a superseded search does not overwrite the
+        UI state produced by a newer one.
+        """
         try:
             result = self._service.preview(self._params)
-            self.result_ready.emit(result)
+            if not self.cancel_event.is_set():
+                self.result_ready.emit(result)
         except Exception as exc:  # noqa: BLE001
-            self.error_occurred.emit(str(exc))
+            if not self.cancel_event.is_set():
+                _logger.exception("PreviewWorker failed: %s", exc)
+                self.error_occurred.emit(str(exc))
 
 
 # ---------------------------------------------------------------------------
@@ -200,12 +220,15 @@ class ScreenPreview(QWidget):
         Args:
             search_service: Injected SearchService used to fetch preview results.
             parent: Optional parent widget.
+
         """
         super().__init__(parent)
         self._service = search_service
         self._params: SearchParams | None = None
         self._worker: PreviewWorker | None = None
         self._sort_index: int = 0
+        # True while the selected output folder is writable (or no folder is set yet).
+        self._folder_writable: bool = True
         self.setStyleSheet(f"background-color: {theme.APP_BG};")
         self._build_ui()
         self._connect_signals()
@@ -223,6 +246,7 @@ class ScreenPreview(QWidget):
 
         Args:
             params: Search parameters to pass to the service.
+
         """
         self._params = params
         sort_idx = (
@@ -231,14 +255,13 @@ class ScreenPreview(QWidget):
         self._sort_index = sort_idx
         self._sort_btn.setText(_SORT_LABELS[_SORT_OPTIONS[sort_idx]] + "  ▾")
 
-        if params.output_folder.is_absolute():
-            self._folder_edit.setText(str(params.output_folder))
-
         self._show_loading()
 
         if self._worker is not None and self._worker.isRunning():
-            self._worker.quit()
-            self._worker.wait()
+            # Signal the old worker to discard its result and let it finish in
+            # the background.  quit()+wait() would block the main thread for
+            # the full HTTP timeout; cancel_event avoids that.
+            self._worker.cancel_event.set()
 
         self._worker = PreviewWorker(self._service, params)
         self._worker.result_ready.connect(self._on_result)
@@ -250,6 +273,7 @@ class ScreenPreview(QWidget):
     # ------------------------------------------------------------------
 
     def _build_ui(self) -> None:
+        """Construct the screen layout: scrollable content area and fixed action bar."""
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
@@ -257,7 +281,7 @@ class ScreenPreview(QWidget):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setStyleSheet(
-            f"QScrollArea {{ background-color: {theme.APP_BG}; border: none; }}"
+            f"QScrollArea {{ background-color: {theme.APP_BG}; border: none; }}",
         )
 
         content_widget = QWidget()
@@ -266,25 +290,51 @@ class ScreenPreview(QWidget):
         layout.setContentsMargins(22, 22, 22, 22)
         layout.setSpacing(18)
 
+        # Loading card — identical structure to the progress card on Screen 3.
+        # Fixed vertical size policy keeps the card at its natural height; the
+        # remaining space stays blank below it rather than stretching the card.
         self._progress = ProgressWidget()
-        self._progress.setVisible(False)
-        layout.addWidget(self._progress)
+        self._loading_card = self._make_loading_card(self._progress)
+        self._loading_card.setVisible(False)
+        self._loading_card.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        layout.addWidget(self._loading_card)
 
         self._error_widget = self._make_error_widget()
         self._error_widget.setVisible(False)
-        layout.addWidget(self._error_widget)
+        self._error_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        layout.addWidget(self._error_widget, 1)
 
         self._content = self._make_content()
         self._content.setVisible(False)
-        layout.addWidget(self._content)
-
-        layout.addStretch()
+        self._content.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        layout.addWidget(self._content, 1)
 
         scroll.setWidget(content_widget)
         root.addWidget(scroll)
         root.addWidget(self._make_action_bar())
 
+    def _make_loading_card(self, progress: ProgressWidget) -> QWidget:
+        """Build the search-progress card, mirroring the download screen's progress card.
+
+        Args:
+            progress: The ProgressWidget to embed in the card.
+
+        Returns:
+            The card QWidget containing the section label and progress widget.
+
+        """
+        card, layout = make_card(padding=26)
+        layout.addWidget(make_section_label("Search progress"))
+        layout.addWidget(progress)
+        return card
+
     def _make_error_widget(self) -> QWidget:
+        """Build the error state widget with a message label and a retry button.
+
+        Returns:
+            A QWidget shown in place of the results when the API call fails.
+
+        """
         widget = QWidget()
         widget.setStyleSheet(f"background-color: {theme.APP_BG};")
         layout = QVBoxLayout(widget)
@@ -308,6 +358,12 @@ class ScreenPreview(QWidget):
         return widget
 
     def _make_content(self) -> QWidget:
+        """Build the main results container holding stat tiles, settings, and paper list.
+
+        Returns:
+            A QWidget that is shown once a successful API result arrives.
+
+        """
         widget = QWidget()
         widget.setStyleSheet(f"background-color: {theme.APP_BG};")
         layout = QVBoxLayout(widget)
@@ -315,8 +371,10 @@ class ScreenPreview(QWidget):
         layout.setSpacing(18)
 
         layout.addWidget(self._make_stat_row())
-        layout.addWidget(self._make_results_card())
         layout.addWidget(self._make_download_settings_card())
+        results_card = self._make_results_card()
+        results_card.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        layout.addWidget(results_card, 1)
 
         return widget
 
@@ -330,7 +388,7 @@ class ScreenPreview(QWidget):
 
         value_lbl = QLabel("—")
         value_lbl.setStyleSheet(
-            f"color: {theme.ACCENT}; font-size: 32px; font-weight: 600; line-height: 1;"
+            f"color: {theme.ACCENT}; font-size: 32px; font-weight: 600; line-height: 1;",
         )
         layout.addWidget(value_lbl)
 
@@ -341,6 +399,12 @@ class ScreenPreview(QWidget):
         return card, value_lbl
 
     def _make_stat_row(self) -> QWidget:
+        """Build the horizontal row of three stat tiles (total, PDF %, previewing).
+
+        Returns:
+            A QWidget containing the three stat tiles laid out side by side.
+
+        """
         row = QWidget()
         row.setStyleSheet(f"background-color: {theme.APP_BG}; border: none;")
         layout = QHBoxLayout(row)
@@ -348,13 +412,16 @@ class ScreenPreview(QWidget):
         layout.setSpacing(16)
 
         tile_total, self._stat_total_value = self._make_stat_tile(
-            "Total results", "matching your query"
+            "Total results",
+            "matching your query",
         )
         tile_pdf, self._stat_pdf_value = self._make_stat_tile(
-            "PDF available", "open-access full text"
+            "PDF available",
+            "of previewed results",
         )
         tile_prev, self._stat_previewing_value = self._make_stat_tile(
-            "Previewing", "top results shown below"
+            "Previewing",
+            "top results shown below",
         )
 
         layout.addWidget(tile_total)
@@ -363,6 +430,12 @@ class ScreenPreview(QWidget):
         return row
 
     def _make_results_card(self) -> QWidget:
+        """Build the results preview card with a sort control and a scrollable paper list.
+
+        Returns:
+            The card QWidget containing the header, sort button, and paper list scroll area.
+
+        """
         card, layout = make_card()
 
         header_row = QWidget()
@@ -391,7 +464,7 @@ class ScreenPreview(QWidget):
         self._sort_menu.setStyleSheet(_SORT_MENU_STYLE)
         for key in _SORT_OPTIONS:
             action = self._sort_menu.addAction(_SORT_LABELS[key])
-            action.triggered.connect(lambda checked, k=key: self._on_sort_menu_selected(k))
+            action.triggered.connect(lambda checked, k=key: self._on_sort_menu_selected(k))  # type: ignore[union-attr]
 
         sort_layout.addWidget(self._sort_btn)
 
@@ -401,10 +474,11 @@ class ScreenPreview(QWidget):
 
         paper_scroll = QScrollArea()
         paper_scroll.setWidgetResizable(True)
-        paper_scroll.setFixedHeight(_PAPER_LIST_HEIGHT)
+        paper_scroll.setMinimumHeight(_PAPER_LIST_MIN_HEIGHT)
+        paper_scroll.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         paper_scroll.setStyleSheet(
             f"QScrollArea {{ background-color: {theme.CARD_BG}; border: none; }}"
-            f"QScrollArea > QWidget > QWidget {{ background-color: {theme.CARD_BG}; }}"
+            f"QScrollArea > QWidget > QWidget {{ background-color: {theme.CARD_BG}; }}",
         )
 
         paper_container = QWidget()
@@ -420,8 +494,15 @@ class ScreenPreview(QWidget):
         return card
 
     def _make_paper_row(self, paper: Paper) -> QWidget:
-        from PyQt6.QtWidgets import QFrame
+        """Build a single row widget displaying title, authors, and metadata for a paper.
 
+        Args:
+            paper: The Paper dataclass whose fields are rendered in the row.
+
+        Returns:
+            A QWidget containing the paper's title, authors, and meta labels.
+
+        """
         row = QWidget()
         row.setStyleSheet(f"background-color: {theme.CARD_BG};")
         layout = QVBoxLayout(row)
@@ -431,7 +512,7 @@ class ScreenPreview(QWidget):
         title_lbl = QLabel(paper.title)
         title_lbl.setWordWrap(True)
         title_lbl.setStyleSheet(
-            f"color: {theme.TEXT_PRIMARY}; font-size: 16px; font-weight: 600;"
+            f"color: {theme.TEXT_PRIMARY}; font-size: 16px; font-weight: 600;",
         )
         layout.addWidget(title_lbl)
 
@@ -448,13 +529,19 @@ class ScreenPreview(QWidget):
         separator = QFrame()
         separator.setFrameShape(QFrame.Shape.HLine)
         separator.setStyleSheet(
-            f"background-color: {_DIVIDER}; border: none; max-height: 1px; margin-top: 10px;"
+            f"background-color: {_DIVIDER}; border: none; max-height: 1px; margin-top: 10px;",
         )
         layout.addWidget(separator)
 
         return row
 
     def _make_download_settings_card(self) -> QWidget:
+        """Build the download settings card with count spinbox and folder picker.
+
+        Returns:
+            The card QWidget containing the paper count, output folder, and browse controls.
+
+        """
         card, layout = make_card()
         layout.addWidget(make_section_label("Download settings"))
 
@@ -467,7 +554,7 @@ class ScreenPreview(QWidget):
         count_layout = QVBoxLayout(count_col)
         count_layout.setContentsMargins(0, 0, 0, 0)
         count_layout.setSpacing(8)
-        count_lbl = QLabel("Count")
+        count_lbl = QLabel("Number of papers")
         count_lbl.setStyleSheet(f"color: {theme.TEXT_BODY}; font-size: 14px; font-weight: 500;")
         count_layout.addWidget(count_lbl)
         self._count_spin = QSpinBox()
@@ -495,7 +582,7 @@ class ScreenPreview(QWidget):
         folder_layout.addWidget(self._folder_edit)
         fields_layout.addWidget(folder_col, 1)
 
-        browse_btn = QPushButton("Browse")
+        browse_btn = QPushButton("Select")
         browse_btn.setStyle(theme.get_fusion_style())
         browse_btn.setStyleSheet(_BROWSE_BTN_STYLE)
         browse_btn.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
@@ -511,10 +598,16 @@ class ScreenPreview(QWidget):
         return card
 
     def _make_action_bar(self) -> QWidget:
+        """Build the fixed-height action bar with Back, hint label, and Start download buttons.
+
+        Returns:
+            A QWidget containing the action buttons pinned to the bottom of the screen.
+
+        """
         bar = QWidget()
         bar.setFixedHeight(72)
         bar.setStyleSheet(
-            f"background-color: {theme.APP_BG}; border-top: 1px solid {theme.BORDER};"
+            f"background-color: {theme.APP_BG}; border-top: 1px solid {theme.BORDER};",
         )
         bar_layout = QHBoxLayout(bar)
         bar_layout.setContentsMargins(22, 0, 22, 0)
@@ -526,6 +619,12 @@ class ScreenPreview(QWidget):
         bar_layout.addWidget(self._back_btn)
 
         bar_layout.addStretch()
+
+        self._hint_lbl = QLabel()
+        self._hint_lbl.setStyleSheet(_HINT_STYLE)
+        self._hint_lbl.setVisible(False)
+        bar_layout.addWidget(self._hint_lbl)
+        bar_layout.addSpacing(16)
 
         self._start_btn = QPushButton("Start download  →")
         self._start_btn.setStyle(theme.get_fusion_style())
@@ -545,8 +644,9 @@ class ScreenPreview(QWidget):
     # ------------------------------------------------------------------
 
     def _show_loading(self) -> None:
+        """Switch the screen to the loading state, hiding content and error widgets."""
         self._progress.set_loading("Searching…")
-        self._progress.setVisible(True)
+        self._loading_card.setVisible(True)
         self._error_widget.setVisible(False)
         self._content.setVisible(False)
 
@@ -555,17 +655,34 @@ class ScreenPreview(QWidget):
     # ------------------------------------------------------------------
 
     def _validate(self) -> None:
-        """Enable Start download when count >= 1 and folder is non-empty."""
-        ok = self._count_spin.value() >= 1 and bool(self._folder_edit.text().strip())
+        """Enable Start download when count >= 1, folder is set, and folder is writable."""
+        has_count = self._count_spin.value() >= 1
+        has_folder = bool(self._folder_edit.text().strip())
+        ok = has_count and has_folder and self._folder_writable
         self._start_btn.setEnabled(ok)
+
+        if not ok:
+            parts: list[str] = []
+            if not has_folder:
+                parts.append("Select an output folder")
+            elif not self._folder_writable:
+                parts.append("Selected folder is not writable")
+            elif not has_count:
+                parts.append("Set a download count")
+            self._hint_lbl.setText("  ·  ".join(parts))
+            self._hint_lbl.setVisible(True)
+        else:
+            self._hint_lbl.setVisible(False)
 
     def _on_result(self, result: SearchResult) -> None:
         """Handle a successful preview result from the worker."""
+        n_previewed = len(result.papers)
+        pdf_pct = round(100 * result.estimated_downloadable / n_previewed) if n_previewed else 0
         self._stat_total_value.setText(f"{result.total_found:,}")
-        self._stat_pdf_value.setText(f"{result.estimated_downloadable:,}")
-        self._stat_previewing_value.setText(str(len(result.papers)))
+        self._stat_pdf_value.setText(f"~{pdf_pct}%")
+        self._stat_previewing_value.setText(str(n_previewed))
         self._populate_paper_list(result.papers)
-        self._progress.setVisible(False)
+        self._loading_card.setVisible(False)
         self._error_widget.setVisible(False)
         self._content.setVisible(True)
         self.result_loaded.emit(result.total_found)
@@ -573,7 +690,7 @@ class ScreenPreview(QWidget):
     def _on_error(self, message: str) -> None:
         """Handle an error emitted by the worker."""
         self._error_label.setText(message)
-        self._progress.setVisible(False)
+        self._loading_card.setVisible(False)
         self._content.setVisible(False)
         self._error_widget.setVisible(True)
 
@@ -593,7 +710,7 @@ class ScreenPreview(QWidget):
         self._sort_btn.setText(_SORT_LABELS[sort_key] + "  ▾")
         if self._params is None:
             return
-        self._params = dataclasses.replace(self._params, sort_order=sort_key)
+        self._params = dataclasses.replace(self._params, sort_order=sort_key)  # type: ignore[arg-type]
         self.load(self._params)
 
     def _on_start_download(self) -> None:
@@ -605,21 +722,33 @@ class ScreenPreview(QWidget):
             self._params,
             count=self._count_spin.value(),
             output_folder=Path(self._folder_edit.text().strip()),
-            sort_order=sort_key,
+            sort_order=sort_key,  # type: ignore[arg-type]
         )
         self.download_requested.emit(params)
 
     def _browse_folder(self) -> None:
+        """Open a folder picker dialog and update the output folder field.
+
+        Also checks whether the selected folder is writable, storing the result
+        in :attr:`_folder_writable` so :meth:`_validate` can gate the button.
+        """
         folder = QFileDialog.getExistingDirectory(self, "Select output folder")
         if folder:
+            self._folder_writable = os.access(folder, os.W_OK)
             self._folder_edit.setText(folder)
 
     def _populate_paper_list(self, papers: list[Paper]) -> None:
+        """Replace the paper list contents with rows built from the given papers.
+
+        Args:
+            papers: The list of Paper objects to render in the results card.
+
+        """
         # Remove all items including the trailing stretch
         while self._paper_list_layout.count():
             item = self._paper_list_layout.takeAt(0)
-            if item.widget():
-                item.widget().deleteLater()
+            if item.widget():  # type: ignore[union-attr]
+                item.widget().deleteLater()  # type: ignore[union-attr]
         for paper in papers:
             self._paper_list_layout.addWidget(self._make_paper_row(paper))
         self._paper_list_layout.addStretch()

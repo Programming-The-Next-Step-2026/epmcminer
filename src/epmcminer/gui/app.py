@@ -1,7 +1,18 @@
 """Main application window managing screen navigation and the step indicator."""
 
-from PyQt6.QtCore import QPoint, Qt
-from PyQt6.QtGui import QMouseEvent
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as _pkg_version
+
+from PyQt6.QtCore import QPoint, QRectF, Qt
+from PyQt6.QtGui import (
+    QColor,
+    QMouseEvent,
+    QPainter,
+    QPainterPath,
+    QPaintEvent,
+    QRegion,
+    QResizeEvent,
+)
 from PyQt6.QtWidgets import (
     QFrame,
     QHBoxLayout,
@@ -19,22 +30,32 @@ from epmcminer.gui.screens.screen_preview import ScreenPreview
 from epmcminer.gui.screens.screen_search import ScreenSearch
 from epmcminer.gui.screens.screen_summary import ScreenSummary
 from epmcminer.services import create_application_services
+from epmcminer.services.download_result import DownloadResult
 from epmcminer.services.models import SearchParams
 
-APP_TITLE = "epmcminer"
+try:
+    APP_VERSION = _pkg_version("epmcminer")
+except PackageNotFoundError:
+    APP_VERSION = "dev"
+
+APP_TITLE = f"epmcminer v{APP_VERSION}"
 MINIMUM_WIDTH = 820
 MINIMUM_HEIGHT = 600
-DEFAULT_WIDTH = 960
-DEFAULT_HEIGHT = 700
+# Increased from 960×700 to 1000×900 to give expandable list sections (results,
+# log, skipped papers) enough vertical room to be usable at their minimum height.
+DEFAULT_WIDTH = 1000
+DEFAULT_HEIGHT = 900
 
 
 # Step indicator geometry
 _STEP_LABELS = ["Search", "Preview", "Download", "Summary"]
 _STEP_COUNT = len(_STEP_LABELS)
 _STEP_FONT_SIZE = 11
-_STEP_TOP_MARGIN = 10  # vertical padding above circles inside each step widget
+_STEP_TOP_MARGIN = 20  # vertical padding above circles inside each step widget
 
-_TITLE_BAR_HEIGHT = 64
+_CORNER_RADIUS = 14.0
+
+_TITLE_BAR_HEIGHT = 74
 _CIRCLE_SIZE = 26
 _CIRCLE_RADIUS = _CIRCLE_SIZE // 2
 _LINE_HEIGHT = 2
@@ -49,6 +70,35 @@ _TRAFFIC_LIGHT_SIZE = 12
 _TRAFFIC_LIGHT_RADIUS = _TRAFFIC_LIGHT_SIZE // 2
 _TRAFFIC_LIGHT_SPACING = 8
 _TRAFFIC_LIGHTS_LEFT_MARGIN = 16
+
+
+# ---------------------------------------------------------------------------
+# Rounded window background
+# ---------------------------------------------------------------------------
+
+
+class _RoundedCentralWidget(QWidget):
+    """Central widget that clips itself and all children to a rounded rectangle.
+
+    Works together with ``WA_TranslucentBackground`` on the parent window:
+    the corners outside the rounded path are fully transparent (the OS renders
+    a native drop shadow into that space on macOS).
+    """
+
+    def paintEvent(self, event: QPaintEvent | None) -> None:
+        """Fill the rounded rect with the app background colour."""
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        path = QPainterPath()
+        path.addRoundedRect(QRectF(self.rect()), _CORNER_RADIUS, _CORNER_RADIUS)
+        painter.fillPath(path, QColor(theme.APP_BG))
+
+    def resizeEvent(self, event: QResizeEvent | None) -> None:
+        """Re-apply the rounded mask whenever the window is resized."""
+        super().resizeEvent(event)
+        path = QPainterPath()
+        path.addRoundedRect(QRectF(self.rect()), _CORNER_RADIUS, _CORNER_RADIUS)
+        self.setMask(QRegion(path.toFillPolygon().toPolygon()))
 
 
 # ---------------------------------------------------------------------------
@@ -68,7 +118,7 @@ class _TitleBar(QWidget):
         self.setFixedHeight(_TITLE_BAR_HEIGHT)
         self.setStyleSheet(
             f"background-color: {theme.TITLE_BAR_BG};"
-            f" border-bottom: 1px solid {theme.BORDER_FAINT};"
+            f" border-bottom: 1px solid {theme.BORDER_FAINT};",
         )
         self._drag_pos: QPoint | None = None
 
@@ -84,26 +134,47 @@ class _TitleBar(QWidget):
         layout.addStretch(1)
         layout.addLayout(self._make_steps())
         layout.addStretch(1)
-        # Mirror the traffic-lights section width on the right to keep steps centred
-        layout.addSpacing(
-            _TRAFFIC_LIGHTS_LEFT_MARGIN * 2
-            + _TRAFFIC_LIGHT_SIZE * 3
-            + _TRAFFIC_LIGHT_SPACING * 2
+        layout.addLayout(self._make_app_title())
+
+    def _make_app_title(self) -> QHBoxLayout:
+        """Build and return the version label layout placed at the right of the title bar.
+
+        Returns:
+            A QHBoxLayout containing the version label.
+
+        """
+        lay = QHBoxLayout()
+        lay.setContentsMargins(0, 0, _TRAFFIC_LIGHTS_LEFT_MARGIN, 0)
+        lay.setSpacing(0)
+        lbl = QLabel(f"epmcminer  v{APP_VERSION}")
+        lbl.setStyleSheet(
+            f"color: {theme.ACCENT}; font-size: 12px; background-color: transparent;",
         )
+        lay.addWidget(lbl)
+        return lay
 
     def _make_traffic_lights(self) -> QHBoxLayout:
+        """Build and return the macOS-style traffic-light button layout.
+
+        Returns:
+            A QHBoxLayout containing the close, minimise, and zoom buttons.
+
+        """
         btn_layout = QHBoxLayout()
         btn_layout.setContentsMargins(0, 0, 0, 0)
         btn_layout.setSpacing(_TRAFFIC_LIGHT_SPACING)
 
         for color, action in [
-            (_CLOSE_COLOR, lambda: self.window().close()),
-            (_MINIMIZE_COLOR, lambda: self.window().showMinimized()),
-            (_ZOOM_COLOR, lambda: (
-                self.window().showNormal()
-                if self.window().isMaximized()
-                else self.window().showMaximized()
-            )),
+            (_CLOSE_COLOR, lambda: self.window().close()),  # type: ignore[union-attr]
+            (_MINIMIZE_COLOR, lambda: self.window().showMinimized()),  # type: ignore[union-attr]
+            (
+                _ZOOM_COLOR,
+                lambda: (
+                    self.window().showNormal()  # type: ignore[union-attr]
+                    if self.window().isMaximized()  # type: ignore[union-attr]
+                    else self.window().showMaximized()  # type: ignore[union-attr]
+                ),
+            ),
         ]:
             btn = QPushButton()
             btn.setFixedSize(_TRAFFIC_LIGHT_SIZE, _TRAFFIC_LIGHT_SIZE)
@@ -112,7 +183,7 @@ class _TitleBar(QWidget):
                 f" background-color: {color};"
                 f" border-radius: {_TRAFFIC_LIGHT_RADIUS}px;"
                 f" border: none;"
-                f"}}"
+                f"}}",
             )
             btn.clicked.connect(action)
             btn_layout.addWidget(btn)
@@ -120,6 +191,13 @@ class _TitleBar(QWidget):
         return btn_layout
 
     def _make_steps(self) -> QHBoxLayout:
+        """Build and return the step-indicator layout with numbered circles and connectors.
+
+        Returns:
+            A QHBoxLayout containing one step widget per wizard step, joined by
+            horizontal connector lines.
+
+        """
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
@@ -170,8 +248,9 @@ class _TitleBar(QWidget):
 
         Args:
             active: Zero-based index of the currently active step (0–3).
+
         """
-        for i, (circle, text) in enumerate(zip(self._circles, self._step_texts)):
+        for i, (circle, text) in enumerate(zip(self._circles, self._step_texts, strict=False)):
             if i < active:
                 circle.setText("✓")
                 circle.setStyleSheet(
@@ -179,10 +258,10 @@ class _TitleBar(QWidget):
                     f" color: {theme.ACCENT};"
                     f" border-radius: {_CIRCLE_RADIUS}px;"
                     f" font-size: 13px; font-weight: 700;"
-                    f" border: 1.5px solid {theme.ACCENT};"
+                    f" border: 1.5px solid {theme.ACCENT};",
                 )
                 text.setStyleSheet(
-                    f"color: {theme.TEXT_MUTED}; font-size: {_STEP_FONT_SIZE}px;"
+                    f"color: {theme.TEXT_MUTED}; font-size: {_STEP_FONT_SIZE}px;",
                 )
             elif i == active:
                 circle.setText(str(i + 1))
@@ -191,11 +270,10 @@ class _TitleBar(QWidget):
                     f" color: white;"
                     f" border-radius: {_CIRCLE_RADIUS}px;"
                     f" font-size: 13px; font-weight: 700;"
-                    f" border: none;"
+                    f" border: none;",
                 )
                 text.setStyleSheet(
-                    f"color: {theme.ACCENT};"
-                    f" font-size: {_STEP_FONT_SIZE}px; font-weight: 600;"
+                    f"color: {theme.ACCENT}; font-size: {_STEP_FONT_SIZE}px; font-weight: 600;",
                 )
             else:
                 circle.setText(str(i + 1))
@@ -204,10 +282,10 @@ class _TitleBar(QWidget):
                     f" color: {theme.TEXT_MUTED};"
                     f" border-radius: {_CIRCLE_RADIUS}px;"
                     f" font-size: 13px;"
-                    f" border: 1.5px solid {theme.TEXT_MUTED};"
+                    f" border: 1.5px solid {theme.TEXT_MUTED};",
                 )
                 text.setStyleSheet(
-                    f"color: {theme.TEXT_MUTED}; font-size: {_STEP_FONT_SIZE}px;"
+                    f"color: {theme.TEXT_MUTED}; font-size: {_STEP_FONT_SIZE}px;",
                 )
 
         for i, line in enumerate(self._connector_lines):
@@ -216,19 +294,22 @@ class _TitleBar(QWidget):
             else:
                 line.setStyleSheet("background-color: rgba(255,255,255,15); border: none;")
 
-    def mousePressEvent(self, event: QMouseEvent) -> None:
+    def mousePressEvent(self, event: QMouseEvent) -> None:  # type: ignore[override]
+        """Record the drag start position when the left mouse button is pressed."""
         if event.button() == Qt.MouseButton.LeftButton:
             self._drag_pos = (
-                event.globalPosition().toPoint() - self.window().frameGeometry().topLeft()
+                event.globalPosition().toPoint() - self.window().frameGeometry().topLeft()  # type: ignore[union-attr]
             )
             event.accept()
 
-    def mouseMoveEvent(self, event: QMouseEvent) -> None:
+    def mouseMoveEvent(self, event: QMouseEvent) -> None:  # type: ignore[override]
+        """Move the window while the left button is held and the bar is being dragged."""
         if event.buttons() == Qt.MouseButton.LeftButton and self._drag_pos is not None:
-            self.window().move(event.globalPosition().toPoint() - self._drag_pos)
+            self.window().move(event.globalPosition().toPoint() - self._drag_pos)  # type: ignore[union-attr]
             event.accept()
 
-    def mouseReleaseEvent(self, event: QMouseEvent) -> None:
+    def mouseReleaseEvent(self, event: QMouseEvent) -> None:  # type: ignore[override]
+        """Clear the stored drag position when the mouse button is released."""
         self._drag_pos = None
 
 
@@ -252,12 +333,15 @@ class MainWindow(QMainWindow):
         self.setMinimumSize(MINIMUM_WIDTH, MINIMUM_HEIGHT)
         self.resize(DEFAULT_WIDTH, DEFAULT_HEIGHT)
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.Window)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
         # Services — created once and injected; never re-created on navigation
-        search_service, download_service, report_service = create_application_services()
+        search_service, download_service, report_service, orcid_service = (
+            create_application_services()
+        )
 
         # Screens
-        self._screen_search = ScreenSearch()
+        self._screen_search = ScreenSearch(orcid_service=orcid_service)
         self._screen_preview = ScreenPreview(search_service)
         self._screen_download = ScreenDownload(download_service, report_service)
         self._screen_summary = ScreenSummary(report_service)
@@ -278,25 +362,23 @@ class MainWindow(QMainWindow):
 
         Args:
             screen_index: Zero-based index of the target screen (0–3).
+
+        Examples:
+            >>> window = MainWindow()  # doctest: +SKIP
+            >>> window.navigate_to(1)  # doctest: +SKIP  — go to preview screen
+            >>> window.navigate_to(0)  # doctest: +SKIP  — back to search screen
+
         """
         self._stack.setCurrentIndex(screen_index)
         self._title_bar.update_steps(screen_index)
 
-    def update_step_indicator(self, active_step: int) -> None:
-        """Update only the step indicator without switching screens.
-
-        Args:
-            active_step: Zero-based index of the currently active step (0–3).
-        """
-        self._title_bar.update_steps(active_step)
-
     # ------------------------------------------------------------------
     # UI construction
-    # ------------------------------------------------------------------
+    # ----------------------------------------------------------------
 
     def _build_ui(self) -> None:
-        central = QWidget()
-        central.setStyleSheet(f"background-color: {theme.APP_BG};")
+        """Construct the main window layout: rounded central widget, title bar, and screen stack."""
+        central = _RoundedCentralWidget()
         self.setCentralWidget(central)
 
         root = QVBoxLayout(central)
@@ -316,6 +398,7 @@ class MainWindow(QMainWindow):
         self._title_bar.update_steps(0)
 
     def _connect_signals(self) -> None:
+        """Connect all inter-screen signals to their corresponding navigation slots."""
         self._screen_search.search_requested.connect(self._on_search_requested)
         self._screen_preview.back_requested.connect(self._on_back_requested)
         self._screen_preview.download_requested.connect(self._on_download_requested)
@@ -328,24 +411,50 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------------------------
 
     def _on_search_requested(self, params: SearchParams) -> None:
+        """Load the preview screen with the given params and navigate to it.
+
+        Args:
+            params: The search parameters collected on Screen 1.
+
+        """
         self._screen_preview.load(params)
         self.navigate_to(1)
 
     def _on_back_requested(self) -> None:
+        """Navigate back to Screen 1 when the preview screen emits back_requested."""
         self.navigate_to(0)
 
     def _on_download_requested(self, params: SearchParams) -> None:
+        """Start the download with the given params and navigate to Screen 3.
+
+        Args:
+            params: The fully populated SearchParams including output_folder and count.
+
+        """
         self._last_params = params
         self._screen_download.start(params)
         self.navigate_to(2)
 
     def _on_result_loaded(self, total_found: int) -> None:
+        """Store the total API result count for use on the summary screen.
+
+        Args:
+            total_found: Total number of papers found by the Europe PMC search.
+
+        """
         self._total_found = total_found
 
-    def _on_download_complete(self, results: list) -> None:
+    def _on_download_complete(self, results: list[DownloadResult]) -> None:
+        """Populate and navigate to the summary screen when the download finishes.
+
+        Args:
+            results: The full list of DownloadResult objects from the download phase.
+
+        """
         if self._last_params is not None:
             self._screen_summary.load(results, self._last_params, self._total_found)
             self.navigate_to(3)
 
     def _on_new_search_requested(self) -> None:
+        """Navigate back to Screen 1 when the summary screen requests a new search."""
         self.navigate_to(0)

@@ -1,14 +1,10 @@
-"""Integration tests for SearchService — hits the real Europe PMC API.
+"""Integration tests for SearchService.
 
-This directory sits outside the unit-test tree defined in CLAUDE.md so that
-integration tests can be excluded from CI with ``-m "not integration"`` without
-touching the mirrored unit-test structure under tests/test_services/.
+HTTP interactions are recorded as VCR cassettes in tests/integration/cassettes/
+and replayed deterministically in CI — no live network access required.
 
-Run with:
-    pytest -m integration
-
-Skip during normal development/CI with:
-    pytest -m "not integration"
+Re-record cassettes when the API changes:
+    pytest -m integration --vcr-record=all
 """
 
 from pathlib import Path
@@ -16,8 +12,11 @@ from pathlib import Path
 import pytest
 
 from epmcminer.api.client import EuropePMCClient
-from epmcminer.api.models import SearchParams, SearchResult
+from epmcminer.api.search_params import SearchParams
+from epmcminer.api.search_result import SearchResult
 from epmcminer.services.search_service import SearchService
+
+pytestmark = [pytest.mark.vcr, pytest.mark.integration]
 
 COMMON_QUERY = "depression"
 DATE_FROM = "2020-01-01"
@@ -52,7 +51,6 @@ def service() -> SearchService:
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.integration
 class TestBuildQueryIntegration:
     """Integration tests verifying build_query output produces valid API results."""
 
@@ -61,13 +59,9 @@ class TestBuildQueryIntegration:
         result = service.preview(make_params())
         assert result.total_found > 0
 
-    def test_built_query_with_all_filters_returns_results(
-        self, service: SearchService
-    ) -> None:
+    def test_built_query_with_all_filters_returns_results(self, service: SearchService) -> None:
         """A query with publication type and license filters still returns results."""
-        result = service.preview(
-            make_params(publication_types=["Review"], licenses=["CC BY"])
-        )
+        result = service.preview(make_params(publication_types=["Review"], licenses=["CC BY"]))
         assert result.total_found > 0
 
     def test_built_query_date_range_respected(self, service: SearchService) -> None:
@@ -82,7 +76,6 @@ class TestBuildQueryIntegration:
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.integration
 class TestPreviewIntegration:
     """Integration tests for SearchService.preview."""
 
@@ -100,9 +93,7 @@ class TestPreviewIntegration:
         result = service.preview(make_params())
         assert result.total_found > 0
 
-    def test_preview_estimated_downloadable_positive(
-        self, service: SearchService
-    ) -> None:
+    def test_preview_estimated_downloadable_positive(self, service: SearchService) -> None:
         """At least one paper in a broad preview has a PDF URL."""
         result = service.preview(make_params())
         assert result.estimated_downloadable > 0
@@ -127,23 +118,17 @@ class TestPreviewIntegration:
             if paper.pdf_url is not None:
                 assert paper.pdf_url.startswith("https://")
 
-    def test_preview_sort_by_date_returns_results(
-        self, service: SearchService
-    ) -> None:
+    def test_preview_sort_by_date_returns_results(self, service: SearchService) -> None:
         """preview with sort_order='date' returns results without error."""
         result = service.preview(make_params(sort_order="date"))
         assert result.total_found > 0
 
-    def test_preview_sort_by_citations_returns_results(
-        self, service: SearchService
-    ) -> None:
+    def test_preview_sort_by_citations_returns_results(self, service: SearchService) -> None:
         """preview with sort_order='citations' returns results without error."""
         result = service.preview(make_params(sort_order="citations"))
         assert result.total_found > 0
 
-    def test_preview_no_results_for_impossible_query(
-        self, service: SearchService
-    ) -> None:
+    def test_preview_no_results_for_impossible_query(self, service: SearchService) -> None:
         """An impossible query returns zero papers without raising."""
         result = service.preview(
             make_params(query="xyzzy_impossible_query_string_that_matches_nothing_12345")

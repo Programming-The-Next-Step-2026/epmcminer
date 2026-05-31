@@ -68,7 +68,7 @@ class TestMainWindowInit:
     """Verify the initial state of a freshly created MainWindow."""
 
     def test_window_title(self, qapp: QApplication) -> None:
-        """Window title is 'epmcminer'."""
+        """Window title matches the APP_TITLE constant (includes version)."""
         w = MainWindow()
         assert w.windowTitle() == APP_TITLE
 
@@ -142,12 +142,6 @@ class TestMainWindowNavigateTo:
         with patch.object(w._title_bar, "update_steps") as mock:
             w.navigate_to(2)
         mock.assert_called_once_with(2)
-
-    def test_update_step_indicator_does_not_change_stack(self, qapp: QApplication) -> None:
-        """update_step_indicator() updates the indicator without switching screens."""
-        w = MainWindow()
-        w.update_step_indicator(2)
-        assert w._stack.currentIndex() == 0
 
 
 # ---------------------------------------------------------------------------

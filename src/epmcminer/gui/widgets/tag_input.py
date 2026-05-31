@@ -1,6 +1,6 @@
 """Reusable tag input widget used on all filter fields."""
 
-from PyQt6.QtCore import QPoint, QRect, QSize, Qt, pyqtSignal
+from PyQt6.QtCore import QPoint, QRect, QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtWidgets import (
     QHBoxLayout,
     QLayout,
@@ -32,6 +32,42 @@ _PILL_STYLE = """
         background-color: #4a2c20;
     }
 """
+
+_PILL_PENDING_STYLE = """
+    QPushButton {
+        background-color: #28282c;
+        color: #8a8a90;
+        border: 1px solid #3c3c42;
+        border-radius: 14px;
+        padding: 6px 12px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    QPushButton:hover {
+        background-color: #303036;
+    }
+"""
+
+_PILL_INVALID_STYLE = """
+    QPushButton {
+        background-color: #2e1a1a;
+        color: #f87171;
+        border: 1px solid #5a2424;
+        border-radius: 14px;
+        padding: 6px 12px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    QPushButton:hover {
+        background-color: #3a2020;
+    }
+"""
+
+_PILL_STYLES: dict[str, str] = {
+    "valid": _PILL_STYLE,
+    "pending": _PILL_PENDING_STYLE,
+    "invalid": _PILL_INVALID_STYLE,
+}
 
 _ADD_BUTTON_STYLE = """
     QPushButton {
@@ -118,32 +154,42 @@ class _FlowLayout(QLayout):
         self._h_spacing = h_spacing
         self._v_spacing = v_spacing
 
-    def addItem(self, item) -> None:  # type: ignore[override]
-        self._items.append(item)
+    def addItem(self, item: QLayoutItem | None) -> None:
+        """Append a layout item to the managed item list."""
+        if item is not None:
+            self._items.append(item)
 
     def count(self) -> int:
+        """Return the number of layout items currently managed."""
         return len(self._items)
 
-    def itemAt(self, index: int):  # type: ignore[override]
+    def itemAt(self, index: int) -> QLayoutItem | None:
+        """Return the layout item at *index*, or ``None`` if out of range."""
         return self._items[index] if 0 <= index < len(self._items) else None
 
-    def takeAt(self, index: int):  # type: ignore[override]
+    def takeAt(self, index: int) -> QLayoutItem | None:
+        """Remove and return the item at *index*, or ``None`` if out of range."""
         return self._items.pop(index) if 0 <= index < len(self._items) else None
 
     def hasHeightForWidth(self) -> bool:
+        """Return ``True`` — this layout's height depends on its width."""
         return True
 
     def heightForWidth(self, width: int) -> int:
+        """Return the height required to lay out all items within *width* pixels."""
         return self._do_layout(QRect(0, 0, width, 0), test_only=True)
 
     def setGeometry(self, rect: QRect) -> None:
+        """Apply *rect* as the layout's geometry and reflow all child items."""
         super().setGeometry(rect)
         self._do_layout(rect, test_only=False)
 
     def sizeHint(self) -> QSize:
+        """Return the preferred size, which equals the minimum size for this layout."""
         return self.minimumSize()
 
     def minimumSize(self) -> QSize:
+        """Return the smallest size that can contain all managed items."""
         size = QSize()
         for item in self._items:
             size = size.expandedTo(item.minimumSize())
@@ -151,6 +197,16 @@ class _FlowLayout(QLayout):
         return size + QSize(m.left() + m.right(), m.top() + m.bottom())
 
     def _do_layout(self, rect: QRect, *, test_only: bool) -> int:
+        """Place child items in wrapping rows and return the total height used.
+
+        Args:
+            rect: The bounding rectangle available for layout.
+            test_only: When True, geometry is calculated but not applied to items.
+
+        Returns:
+            The total height in pixels occupied by all rows.
+
+        """
         m = self.contentsMargins()
         x = rect.x() + m.left()
         y = rect.y() + m.top()
@@ -172,15 +228,35 @@ class _FlowLayout(QLayout):
 
 
 class _TagPill(QPushButton):
-    """A removable pill button representing a single tag."""
+    """A removable pill button representing a single tag.
+
+    The visual appearance is controlled by the ``status`` argument:
+
+    * ``"valid"``   — default orange accent style
+    * ``"pending"`` — muted grey; existence check is in flight
+    * ``"invalid"`` — red; bad format or ORCID not found in registry
+    """
 
     removed = pyqtSignal(str)
 
-    def __init__(self, tag: str, parent: QWidget | None = None) -> None:
+    def __init__(
+        self,
+        tag: str,
+        status: str = "valid",
+        parent: QWidget | None = None,
+    ) -> None:
+        """Initialise the pill button.
+
+        Args:
+            tag: The tag string displayed on the pill.
+            status: Visual state — ``"valid"``, ``"pending"``, or ``"invalid"``.
+            parent: Optional parent widget.
+
+        """
         super().__init__(f"{tag}  ×", parent)
         self._tag = tag
         self.setStyle(theme.get_fusion_style())
-        self.setStyleSheet(_PILL_STYLE)
+        self.setStyleSheet(_PILL_STYLES.get(status, _PILL_STYLE))
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.clicked.connect(lambda: self.removed.emit(self._tag))
@@ -216,6 +292,7 @@ class _InputSlot(QWidget):
             add_label: Text shown on the idle add button.
             available_options: If provided, a QMenu is used instead of QLineEdit.
             parent: Optional parent widget.
+
         """
         super().__init__(parent)
         self._available_options = list(available_options or [])
@@ -271,6 +348,12 @@ class _InputSlot(QWidget):
 
         Args:
             tags: Currently selected tags to omit from the popup menu.
+
+        Examples:
+            >>> widget = TagInput(available_options=["CC-BY", "CC-BY-SA"])  # doctest: +SKIP
+            >>> widget.set_excluded(["CC-BY"])  # doctest: +SKIP
+            >>> # "CC-BY" no longer appears in the add-tag dropdown
+
         """
         self._excluded = set(tags)
         self._update_add_btn_visibility()
@@ -283,7 +366,13 @@ class _InputSlot(QWidget):
         self._add_btn.setVisible(not all_taken)
 
     def reset(self) -> None:
-        """Return to idle state without emitting a signal."""
+        """Return to idle state without emitting a signal.
+
+        Examples:
+            >>> widget = TagInput()  # doctest: +SKIP
+            >>> widget.reset()  # doctest: +SKIP  — clears any pending text input
+
+        """
         if self._input is not None:
             self._add_btn.setVisible(True)
             self._input.setVisible(False)
@@ -304,11 +393,12 @@ class _InputSlot(QWidget):
         for option in self._available_options:
             if option not in self._excluded:
                 action = self._menu.addAction(option)
-                action.triggered.connect(
-                    lambda checked, o=option: self.tag_confirmed.emit(o)
+                action.triggered.connect(  # type: ignore[union-attr]
+                    lambda checked, o=option: self.tag_confirmed.emit(o),
                 )
 
     def _show_menu(self) -> None:
+        """Rebuild and display the options menu below the add button."""
         self._populate_menu()
         pos = self._add_btn.mapToGlobal(QPoint(0, self._add_btn.height() + 4))
         self._menu.exec(pos)  # type: ignore[union-attr]
@@ -318,6 +408,7 @@ class _InputSlot(QWidget):
     # ------------------------------------------------------------------
 
     def _show_input(self) -> None:
+        """Hide the add button and reveal the inline text input and confirm button."""
         self._add_btn.setVisible(False)
         if self._input is not None:
             self._input.setVisible(True)
@@ -328,7 +419,8 @@ class _InputSlot(QWidget):
             self._input.setFocus()
 
     def _confirm(self) -> None:
-        text = self._input.text() if self._input is not None else ""
+        """Read the input text, reset to idle state, and emit tag_confirmed if non-blank."""
+        text = self._input.text().strip() if self._input is not None else ""
         if self._input is not None:
             self._input.clear()
         self._add_btn.setVisible(True)
@@ -337,19 +429,23 @@ class _InputSlot(QWidget):
         if self._confirm_btn is not None:
             self._confirm_btn.setVisible(False)
         self._relayout()
-        self.tag_confirmed.emit(text)
+        if text:
+            self.tag_confirmed.emit(text)
 
     def _relayout(self) -> None:
         """Resize to new sizeHint and force parent flow layout to reposition."""
-        self.layout().invalidate()
-        self.layout().activate()
+        layout = self.layout()
+        if layout is not None:
+            layout.invalidate()
+            layout.activate()
         self.resize(self.sizeHint())
         self.updateGeometry()
         parent = self.parentWidget()
         if parent is not None:
-            if parent.layout() is not None:
-                parent.layout().invalidate()
-                parent.layout().activate()
+            parent_layout = parent.layout()
+            if parent_layout is not None:
+                parent_layout.invalidate()
+                parent_layout.activate()
             parent.updateGeometry()
 
 
@@ -364,6 +460,18 @@ class TagInput(QWidget):
 
     Signals:
         tags_changed: Emitted with the current list of tags after any change.
+
+    Examples:
+        >>> widget = TagInput()  # doctest: +SKIP
+        >>> widget.set_tags(["CC-BY", "CC-BY-SA"])  # doctest: +SKIP
+        >>> widget.get_tags()  # doctest: +SKIP
+        ['CC-BY', 'CC-BY-SA']
+
+        With a constrained option list:
+
+        >>> licenses = ["CC-BY", "CC-BY-SA", "CC0"]
+        >>> widget = TagInput(available_options=licenses)  # doctest: +SKIP
+
     """
 
     tags_changed = pyqtSignal(list)
@@ -380,9 +488,11 @@ class TagInput(QWidget):
             parent: Optional parent widget.
             available_options: If provided, restricts input to these choices.
             add_label: Label on the add button, e.g. '+ Add ORCID'.
+
         """
         super().__init__(parent)
         self._tags: list[str] = []
+        self._tag_statuses: dict[str, str] = {}
         self._available_options = available_options or []
         self._add_label = add_label
         self._build_ui()
@@ -396,19 +506,38 @@ class TagInput(QWidget):
 
         Returns:
             A list of tag strings in insertion order.
+
+        Examples:
+            >>> widget = TagInput()  # doctest: +SKIP
+            >>> widget.add_tag("CC-BY")  # doctest: +SKIP
+            >>> widget.get_tags()  # doctest: +SKIP
+            ['CC-BY']
+
         """
         return list(self._tags)
 
     def add_tag(self, tag: str) -> None:
         """Add a tag if non-blank and not already present.
 
+        The tag is given a default status of ``"valid"``; call
+        :meth:`set_tag_status` afterwards to change it.
+
         Args:
             tag: The tag string to add.
+
+        Examples:
+            >>> widget = TagInput()  # doctest: +SKIP
+            >>> widget.add_tag("CC-BY")  # doctest: +SKIP
+            >>> widget.add_tag("CC-BY")  # doctest: +SKIP  — duplicates are silently ignored
+            >>> widget.get_tags()  # doctest: +SKIP
+            ['CC-BY']
+
         """
         cleaned = tag.strip()
         if not cleaned or cleaned in self._tags:
             return
         self._tags.append(cleaned)
+        self._tag_statuses.setdefault(cleaned, "valid")
         self._rebuild_pills()
         self._slot.set_excluded(self._tags)
         self.tags_changed.emit(list(self._tags))
@@ -418,10 +547,19 @@ class TagInput(QWidget):
 
         Args:
             tag: The tag string to remove.
+
+        Examples:
+            >>> widget = TagInput()  # doctest: +SKIP
+            >>> widget.set_tags(["CC-BY", "CC-BY-SA"])  # doctest: +SKIP
+            >>> widget.remove_tag("CC-BY-SA")  # doctest: +SKIP
+            >>> widget.get_tags()  # doctest: +SKIP
+            ['CC-BY']
+
         """
         if tag not in self._tags:
             return
         self._tags.remove(tag)
+        self._tag_statuses.pop(tag, None)
         self._rebuild_pills()
         self._slot.set_excluded(self._tags)
         self.tags_changed.emit(list(self._tags))
@@ -429,8 +567,18 @@ class TagInput(QWidget):
     def set_tags(self, tags: list[str]) -> None:
         """Replace the tag list. Filters blanks, deduplicates, emits once.
 
+        Existing statuses are preserved for tags that appear in both the old
+        and new lists. New tags start with status ``"valid"``.
+
         Args:
             tags: The new list of tag strings.
+
+        Examples:
+            >>> widget = TagInput()  # doctest: +SKIP
+            >>> widget.set_tags(["CC-BY", "CC-BY-SA", "CC-BY"])  # duplicates removed
+            >>> widget.get_tags()  # doctest: +SKIP
+            ['CC-BY', 'CC-BY-SA']
+
         """
         seen: list[str] = []
         for tag in tags:
@@ -438,15 +586,62 @@ class TagInput(QWidget):
             if cleaned and cleaned not in seen:
                 seen.append(cleaned)
         self._tags = seen
+        # Remove statuses for tags no longer present; keep existing ones.
+        self._tag_statuses = {t: self._tag_statuses.get(t, "valid") for t in self._tags}
         self._rebuild_pills()
         self._slot.set_excluded(self._tags)
         self.tags_changed.emit(list(self._tags))
+
+    def set_tag_status(self, tag: str, status: str) -> None:
+        """Update the visual status of an existing tag pill.
+
+        If ``tag`` is not currently in the tag list this is a no-op.
+
+        Args:
+            tag: The tag string to update.
+            status: One of ``"valid"``, ``"pending"``, or ``"invalid"``.
+
+        Examples:
+            >>> widget = TagInput()  # doctest: +SKIP
+            >>> widget.add_tag("0000-0001-5109-3700")  # doctest: +SKIP
+            >>> widget.set_tag_status("0000-0001-5109-3700", "pending")  # doctest: +SKIP
+            >>> widget.get_tags_by_status(["valid"])  # doctest: +SKIP
+            []
+
+        """
+        if tag not in self._tags:
+            return
+        self._tag_statuses[tag] = status
+        self._rebuild_pills()
+
+    def get_tags_by_status(self, statuses: list[str]) -> list[str]:
+        """Return tags whose current status is one of the given values.
+
+        Useful for filtering out tags that have been marked ``"invalid"``
+        before passing them to a query builder.
+
+        Args:
+            statuses: Status strings to include, e.g. ``["valid", "pending"]``.
+
+        Returns:
+            Tags in insertion order whose status is in ``statuses``.
+
+        Examples:
+            >>> widget = TagInput()  # doctest: +SKIP
+            >>> widget.set_tags(["0000-0001-5109-3700", "bad-id"])  # doctest: +SKIP
+            >>> widget.set_tag_status("bad-id", "invalid")  # doctest: +SKIP
+            >>> widget.get_tags_by_status(["valid", "pending"])  # doctest: +SKIP
+            ['0000-0001-5109-3700']
+
+        """
+        return [t for t in self._tags if self._tag_statuses.get(t, "valid") in statuses]
 
     # ------------------------------------------------------------------
     # Internal UI
     # ------------------------------------------------------------------
 
     def _build_ui(self) -> None:
+        """Set up the flow layout and add the input slot as the first child."""
         self._flow = _FlowLayout(self)
         self._flow.setContentsMargins(0, 0, 0, 0)
 
@@ -455,16 +650,28 @@ class TagInput(QWidget):
         self._flow.addWidget(self._slot)
 
     def _rebuild_pills(self) -> None:
-        # Remove all items except _slot; detach pill widgets immediately.
+        """Rebuild all pill widgets in the flow layout to reflect the current tag list."""
+        # Remove all items except _slot. setParent(None) removes each pill from
+        # TagInput's Qt children tree (so findChildren / rendering ignore it
+        # immediately), but we keep Python references alive in to_delete and
+        # release them via a zero-delay timer.  This lets Qt flush any queued
+        # geometry or paint events for the old pills before their C++ objects
+        # are destroyed, preventing a segfault when those events fire.
+        to_delete: list[QWidget] = []
         while self._flow.count() > 0:
             item = self._flow.takeAt(0)
             widget = item.widget() if item else None
             if widget and widget is not self._slot:
+                widget.hide()
                 widget.setParent(None)
+                to_delete.append(widget)
         # Re-add pills in order, then the input slot.
         for tag in self._tags:
-            pill = _TagPill(tag)
+            status = self._tag_statuses.get(tag, "valid")
+            pill = _TagPill(tag, status=status)
             pill.removed.connect(self.remove_tag)
             self._flow.addWidget(pill)
         self._flow.addWidget(self._slot)
         self.updateGeometry()
+        if to_delete:
+            QTimer.singleShot(0, to_delete.clear)

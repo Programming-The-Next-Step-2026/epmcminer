@@ -6,8 +6,9 @@ from pathlib import Path
 import openpyxl
 import pytest
 
-from epmcminer.api.download_result import DownloadResult
-from epmcminer.api.models import Paper, SearchParams
+from epmcminer.api.paper import Paper
+from epmcminer.api.search_params import SearchParams
+from epmcminer.services.download_result import DownloadResult
 from epmcminer.services.report_service import REPORT_COLUMNS, ReportService
 
 # ---------------------------------------------------------------------------
@@ -182,9 +183,7 @@ class TestSaveCsv:
             row = list(csv.DictReader(f))[0]
         assert row["file_path"] == ""
 
-    def test_csv_includes_search_params(
-        self, service: ReportService, tmp_path: Path
-    ) -> None:
+    def test_csv_includes_search_params(self, service: ReportService, tmp_path: Path) -> None:
         """Search parameters are written as columns in every row."""
         params = make_params(
             query="cancer",
@@ -200,9 +199,7 @@ class TestSaveCsv:
         assert row["date_from"] == "2021-01-01"
         assert row["date_to"] == "2023-12-31"
 
-    def test_csv_licenses_joined(
-        self, service: ReportService, tmp_path: Path
-    ) -> None:
+    def test_csv_licenses_joined(self, service: ReportService, tmp_path: Path) -> None:
         """Multiple licenses are joined with ', ' in the CSV."""
         params = make_params(licenses=["CC-BY", "CC0"])
         path = service.save_csv([make_result()], params, tmp_path)
@@ -210,9 +207,7 @@ class TestSaveCsv:
             row = list(csv.DictReader(f))[0]
         assert row["licenses"] == "CC-BY, CC0"
 
-    def test_csv_publication_types_joined(
-        self, service: ReportService, tmp_path: Path
-    ) -> None:
+    def test_csv_publication_types_joined(self, service: ReportService, tmp_path: Path) -> None:
         """Multiple publication types are joined with ', ' in the CSV."""
         params = make_params(publication_types=["research-article", "review"])
         path = service.save_csv([make_result()], params, tmp_path)
@@ -241,9 +236,7 @@ class TestSaveCsv:
             row = list(csv.DictReader(f))[0]
         assert row["file_path"] == str(file_path)
 
-    def test_csv_empty_licenses(
-        self, service: ReportService, tmp_path: Path
-    ) -> None:
+    def test_csv_empty_licenses(self, service: ReportService, tmp_path: Path) -> None:
         """An empty licenses list is written as an empty string in the CSV."""
         params = make_params(licenses=[])
         path = service.save_csv([make_result()], params, tmp_path)
@@ -251,9 +244,7 @@ class TestSaveCsv:
             row = list(csv.DictReader(f))[0]
         assert row["licenses"] == ""
 
-    def test_csv_empty_publication_types(
-        self, service: ReportService, tmp_path: Path
-    ) -> None:
+    def test_csv_empty_publication_types(self, service: ReportService, tmp_path: Path) -> None:
         """An empty publication_types list is written as an empty string in the CSV."""
         params = make_params(publication_types=[])
         path = service.save_csv([make_result()], params, tmp_path)
@@ -375,13 +366,11 @@ class TestExportExcel:
         wb = openpyxl.load_workbook(out)
         ws = wb.active
         headers = [cell.value for cell in ws[1]]
-        data_row = dict(zip(headers, [cell.value for cell in ws[2]]))
+        data_row = dict(zip(headers, [cell.value for cell in ws[2]], strict=False))
         assert data_row["title"] == result.paper.title
         assert data_row["doi"] == result.paper.doi
 
-    def test_search_params_in_excel(
-        self, service: ReportService, tmp_path: Path
-    ) -> None:
+    def test_search_params_in_excel(self, service: ReportService, tmp_path: Path) -> None:
         """Search parameters appear as column values in each Excel data row."""
         params = make_params(query="anxiety", sort_order="date")
         out = tmp_path / "report.xlsx"
@@ -389,7 +378,7 @@ class TestExportExcel:
         wb = openpyxl.load_workbook(out)
         ws = wb.active
         headers = [cell.value for cell in ws[1]]
-        data_row = dict(zip(headers, [cell.value for cell in ws[2]]))
+        data_row = dict(zip(headers, [cell.value for cell in ws[2]], strict=False))
         assert data_row["query"] == "anxiety"
         assert data_row["sort_order"] == "date"
 
@@ -425,7 +414,7 @@ class TestExportExcel:
         wb = openpyxl.load_workbook(out)
         ws = wb.active
         headers = [cell.value for cell in ws[1]]
-        data_row = dict(zip(headers, [cell.value for cell in ws[2]]))
+        data_row = dict(zip(headers, [cell.value for cell in ws[2]], strict=False))
         assert data_row["file_path"] is None
 
 
@@ -489,4 +478,125 @@ class TestExportPdf:
         service.export_pdf([], params, out)
         assert out.exists()
         assert out.stat().st_size > 0
+        assert out.read_bytes().startswith(b"%PDF-")
+
+    def test_pdf_with_all_downloaded(
+        self, service: ReportService, params: SearchParams, tmp_path: Path
+    ) -> None:
+        """All-downloaded results produce a valid PDF (no skipped section)."""
+        results = [
+            make_result(status="downloaded", file_path=Path("/tmp/a.pdf"), pmid=str(i))
+            for i in range(3)
+        ]
+        out = tmp_path / "report.pdf"
+        service.export_pdf(results, params, out)
+        assert out.exists()
+        assert out.read_bytes().startswith(b"%PDF-")
+
+    def test_pdf_with_all_skipped(
+        self, service: ReportService, params: SearchParams, tmp_path: Path
+    ) -> None:
+        """All-skipped results produce a valid PDF with a skipped section."""
+        results = [
+            make_result(status="skipped", reason="PDF unavailable", file_path=None, pmid=str(i))
+            for i in range(3)
+        ]
+        out = tmp_path / "report.pdf"
+        service.export_pdf(results, params, out)
+        assert out.exists()
+        assert out.read_bytes().startswith(b"%PDF-")
+
+    def test_pdf_with_total_found_nonzero(
+        self, service: ReportService, params: SearchParams, tmp_path: Path
+    ) -> None:
+        """Passing total_found=42 produces a valid PDF."""
+        out = tmp_path / "report.pdf"
+        service.export_pdf([make_result()], params, out, total_found=42)
+        assert out.exists()
+        assert out.read_bytes().startswith(b"%PDF-")
+
+    def test_pdf_with_total_found_zero(
+        self, service: ReportService, params: SearchParams, tmp_path: Path
+    ) -> None:
+        """Default total_found=0 produces a valid PDF."""
+        out = tmp_path / "report.pdf"
+        service.export_pdf([make_result()], params, out, total_found=0)
+        assert out.exists()
+        assert out.read_bytes().startswith(b"%PDF-")
+
+    def test_pdf_mixed_params_filters(self, service: ReportService, tmp_path: Path) -> None:
+        """Non-empty licenses, publication_types, and author_orcids produce a valid PDF."""
+        params = make_params(
+            licenses=["CC BY", "CC0"],
+            publication_types=["Review", "Research Article"],
+            author_orcids=["0000-0001-2345-6789", "0000-0002-9876-5432"],
+        )
+        out = tmp_path / "report.pdf"
+        service.export_pdf([make_result()], params, out)
+        assert out.exists()
+        assert out.read_bytes().startswith(b"%PDF-")
+
+    def test_pdf_result_with_missing_paper_fields(
+        self, service: ReportService, params: SearchParams, tmp_path: Path
+    ) -> None:
+        """A skipped result whose paper has empty optional fields does not raise."""
+        result = make_result(
+            status="skipped",
+            reason="Server rate limiting",
+            file_path=None,
+            authors="",
+            journal="",
+            year="",
+        )
+        out = tmp_path / "report.pdf"
+        service.export_pdf([result], params, out)
+        assert out.exists()
+        assert out.read_bytes().startswith(b"%PDF-")
+
+    def test_pdf_downloaded_section_included_when_downloads_exist(
+        self, service: ReportService, params: SearchParams, tmp_path: Path
+    ) -> None:
+        """Results with status='downloaded' produce a valid PDF (downloaded section present)."""
+        results = [
+            make_result(status="downloaded", file_path=Path("/tmp/a.pdf"), pmid="1"),
+            make_result(status="downloaded", file_path=Path("/tmp/b.pdf"), pmid="2"),
+        ]
+        out = tmp_path / "report.pdf"
+        service.export_pdf(results, params, out)
+        assert out.exists()
+        assert out.read_bytes().startswith(b"%PDF-")
+
+    def test_pdf_downloaded_section_omitted_when_all_skipped(
+        self, service: ReportService, params: SearchParams, tmp_path: Path
+    ) -> None:
+        """All-skipped results produce a valid PDF (downloaded section absent)."""
+        results = [
+            make_result(status="skipped", reason="PDF unavailable", file_path=None, pmid="1"),
+        ]
+        out = tmp_path / "report.pdf"
+        service.export_pdf(results, params, out)
+        assert out.exists()
+        assert out.read_bytes().startswith(b"%PDF-")
+
+    def test_pdf_both_sections_present_for_mixed_results(
+        self, service: ReportService, params: SearchParams, tmp_path: Path
+    ) -> None:
+        """Mixed results produce a valid PDF containing both downloaded and skipped sections."""
+        results = [
+            make_result(status="downloaded", file_path=Path("/tmp/a.pdf"), pmid="1"),
+            make_result(status="skipped", reason="PDF unavailable", file_path=None, pmid="2"),
+        ]
+        out = tmp_path / "report.pdf"
+        service.export_pdf(results, params, out)
+        assert out.exists()
+        assert out.read_bytes().startswith(b"%PDF-")
+
+    def test_pdf_downloaded_paper_without_file_path_does_not_raise(
+        self, service: ReportService, params: SearchParams, tmp_path: Path
+    ) -> None:
+        """A downloaded result with file_path=None renders without error."""
+        result = make_result(status="downloaded", file_path=None, pmid="1")
+        out = tmp_path / "report.pdf"
+        service.export_pdf([result], params, out)
+        assert out.exists()
         assert out.read_bytes().startswith(b"%PDF-")

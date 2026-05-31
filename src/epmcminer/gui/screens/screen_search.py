@@ -1,25 +1,26 @@
 """Screen 1 — search query and filter inputs."""
 
-from pathlib import Path
+from __future__ import annotations
 
-from PyQt6.QtCore import QDate, Qt, pyqtSignal
+from PyQt6.QtCore import QDate, Qt, QThread, pyqtSignal
+from PyQt6.QtGui import QResizeEvent
 from PyQt6.QtWidgets import (
-    QDateEdit,
-    QFileDialog,
     QHBoxLayout,
     QLabel,
     QLineEdit,
     QPushButton,
     QScrollArea,
-    QSizePolicy,
     QVBoxLayout,
     QWidget,
 )
 
 import epmcminer.gui.theme as theme
 from epmcminer.gui.widgets.card import make_card, make_section_label
+from epmcminer.gui.widgets.date_picker import DatePicker
 from epmcminer.gui.widgets.tag_input import TagInput
+from epmcminer.gui.widgets.toast import Toast
 from epmcminer.services.models import SearchParams
+from epmcminer.services.orcid_validation_service import OrcidValidationService
 
 DEFAULT_PUBLICATION_TYPES: list[str] = [
     "Review",
@@ -64,35 +65,6 @@ _QUERY_INPUT_STYLE = f"""
     }}
 """
 
-_FOLDER_INPUT_STYLE = f"""
-    QLineEdit {{
-        background-color: {theme.CARD_INNER};
-        color: {theme.TEXT_PRIMARY};
-        border: 1px solid {theme.BORDER};
-        border-radius: 12px;
-        padding: 14px 16px;
-        font-size: 15px;
-    }}
-"""
-
-_DATE_EDIT_STYLE = f"""
-    QDateEdit {{
-        background-color: {theme.CARD_INNER};
-        color: {theme.TEXT_PRIMARY};
-        border: 1px solid {theme.BORDER};
-        border-radius: 12px;
-        padding: 14px 16px;
-        font-size: 16px;
-    }}
-    QDateEdit:focus {{
-        border-color: rgba(255, 122, 61, 140);
-    }}
-    QDateEdit::drop-down {{
-        border: none;
-        width: 0px;
-    }}
-"""
-
 _CONTINUE_BTN_STYLE = f"""
     QPushButton {{
         background-color: transparent;
@@ -112,22 +84,61 @@ _CONTINUE_BTN_STYLE = f"""
     }}
 """
 
-_BROWSE_BTN_STYLE = f"""
-    QPushButton {{
-        background-color: transparent;
-        color: {theme.TEXT_PRIMARY};
-        border: 1px solid {theme.BORDER_STRONG};
-        border-radius: 12px;
-        padding: 14px 18px;
-        font-size: 15px;
-        font-weight: 500;
-    }}
-    QPushButton:hover {{
-        background-color: rgba(255, 255, 255, 10);
-    }}
-"""
-
 _HINT_STYLE = f"color: {theme.TEXT_MUTED}; font-size: 13px;"
+_QUERY_HINT_TEXT = "Use AND / OR to combine keywords. Defaults to AND if no operator is specified"
+
+
+# ---------------------------------------------------------------------------
+# Background worker
+# ---------------------------------------------------------------------------
+
+
+class OrcidExistenceWorker(QThread):
+    """QThread worker that checks whether an ORCID exists in the public registry.
+
+    Emits :attr:`validation_done` on success/failure, or :attr:`network_error`
+    when a network-level failure prevents the request from completing. The
+    latter leaves the pill in ``"pending"`` state — non-blocking fail-open
+    behaviour so the user can still submit the form.
+
+    Signals:
+        validation_done: Emitted with ``(orcid, exists)`` on HTTP response.
+        network_error: Emitted with ``orcid`` on :class:`ConnectionError`.
+    """
+
+    validation_done = pyqtSignal(str, bool)
+    network_error = pyqtSignal(str)
+
+    def __init__(
+        self,
+        orcid: str,
+        service: OrcidValidationService,
+        parent: QWidget | None = None,
+    ) -> None:
+        """Initialise the worker.
+
+        Args:
+            orcid: The bare ORCID identifier to look up.
+            service: The validation service used to perform the HTTP check.
+            parent: Optional parent for ownership / lifetime management.
+
+        """
+        super().__init__(parent)
+        self._orcid = orcid
+        self._service = service
+
+    def run(self) -> None:
+        """Perform the existence check and emit the result signal."""
+        try:
+            exists = self._service.check_exists(self._orcid)
+            self.validation_done.emit(self._orcid, exists)
+        except ConnectionError:
+            self.network_error.emit(self._orcid)
+
+
+# ---------------------------------------------------------------------------
+# Screen
+# ---------------------------------------------------------------------------
 
 
 class ScreenSearch(QWidget):
@@ -146,13 +157,28 @@ class ScreenSearch(QWidget):
 
     search_requested = pyqtSignal(SearchParams)
 
-    def __init__(self, parent: QWidget | None = None) -> None:
+    def __init__(
+        self,
+        orcid_service: OrcidValidationService | None = None,
+        parent: QWidget | None = None,
+    ) -> None:
         """Initialise the search screen.
 
         Args:
+            orcid_service: Optional service used to validate ORCID identifiers.
+                When ``None``, ORCIDs are accepted without validation (useful
+                in tests that do not need the validation feature).
             parent: Optional parent widget.
+
         """
         super().__init__(parent)
+        self._orcid_service = orcid_service
+        # Track which ORCID tags have already been processed so the handler is
+        # idempotent — we only launch a new worker for newly added tags.
+        self._validated_orcids: set[str] = set()
+        # Keep worker references alive until Qt delivers the signals.
+        self._workers: list[OrcidExistenceWorker] = []
+        self._toast: Toast | None = None
         self.setStyleSheet(f"background-color: {theme.APP_BG};")
         self._build_ui()
         self._connect_signals()
@@ -167,16 +193,15 @@ class ScreenSearch(QWidget):
 
         Returns:
             A SearchParams built from the current widget state.
+
         """
-        folder_text = self._folder_edit.text().strip()
         return SearchParams(
             query=self._query_edit.text().strip(),
             date_from=self._date_from.date().toString("yyyy-MM-dd"),
             date_to=self._date_to.date().toString("yyyy-MM-dd"),
             publication_types=self._pub_types.get_tags(),
             licenses=self._license.get_tags(),
-            author_orcids=self._orcids.get_tags(),
-            output_folder=Path(folder_text) if folder_text else Path(),
+            author_orcids=self._orcids.get_tags_by_status(["valid", "pending"]),
         )
 
     # ------------------------------------------------------------------
@@ -184,6 +209,7 @@ class ScreenSearch(QWidget):
     # ------------------------------------------------------------------
 
     def _build_ui(self) -> None:
+        """Construct the screen layout: scrollable form cards and fixed action bar."""
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
@@ -191,7 +217,7 @@ class ScreenSearch(QWidget):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setStyleSheet(
-            f"QScrollArea {{ background-color: {theme.APP_BG}; border: none; }}"
+            f"QScrollArea {{ background-color: {theme.APP_BG}; border: none; }}",
         )
 
         content = QWidget()
@@ -204,19 +230,33 @@ class ScreenSearch(QWidget):
         layout.addWidget(self._make_orcids_card())
         layout.addWidget(self._make_pub_types_card())
         layout.addWidget(self._make_two_col_row())
-        layout.addWidget(self._make_folder_card())
         layout.addStretch()
 
         scroll.setWidget(content)
         root.addWidget(scroll)
         root.addWidget(self._make_action_bar())
 
+        self._toast = Toast(self)
+
+    def resizeEvent(self, event: QResizeEvent | None) -> None:
+        """Reposition the toast whenever the screen is resized."""
+        super().resizeEvent(event)
+        if self._toast is not None and not self._toast.isHidden():
+            self._toast.reposition()
+
     def _connect_signals(self) -> None:
         """Wire validation signals after all widgets are constructed."""
         self._query_edit.textChanged.connect(self._validate)
         self._pub_types.tags_changed.connect(self._validate)
+        self._license.tags_changed.connect(self._validate)
 
     def _make_query_card(self) -> QWidget:
+        """Build the search query card with a text input and a usage hint.
+
+        Returns:
+            The card QWidget containing the query input.
+
+        """
         card, layout = make_card()
         layout.addWidget(make_section_label("Search query"))
 
@@ -224,37 +264,58 @@ class ScreenSearch(QWidget):
         self._query_edit.setStyle(theme.get_fusion_style())
         self._query_edit.setStyleSheet(_QUERY_INPUT_STYLE)
         self._query_edit.setPlaceholderText("e.g. depression AND therapy")
+        self._query_edit.setMaxLength(500)
         layout.addWidget(self._query_edit)
 
-        hint = QLabel("Defaults to AND if no operator specified")
+        hint = QLabel(_QUERY_HINT_TEXT)
         hint.setStyleSheet(_HINT_STYLE)
         layout.addWidget(hint)
         return card
 
     def _make_orcids_card(self) -> QWidget:
+        """Build the Author ORCIDs card with a tag input and a format hint.
+
+        Returns:
+            The card QWidget containing the ORCID tag input.
+
+        """
         card, layout = make_card()
         layout.addWidget(make_section_label("Author ORCIDs"))
 
         self._orcids = TagInput(add_label="+ Add ORCID")
+        self._orcids.tags_changed.connect(self._on_orcid_tags_changed)
         layout.addWidget(self._orcids)
 
-        hint = QLabel("Multiple ORCIDs use OR logic — leave empty to search all authors")
+        hint = QLabel("Format: 0000-0000-0000-0000 · Multiple ORCIDs use OR logic")
         hint.setStyleSheet(_HINT_STYLE)
         layout.addWidget(hint)
         return card
 
     def _make_pub_types_card(self) -> QWidget:
+        """Build the publication types card pre-populated with all default types.
+
+        Returns:
+            The card QWidget containing the publication type tag input.
+
+        """
         card, layout = make_card()
         layout.addWidget(make_section_label("Publication types"))
 
         self._pub_types = TagInput(
-            available_options=DEFAULT_PUBLICATION_TYPES, add_label="+ Add type"
+            available_options=DEFAULT_PUBLICATION_TYPES,
+            add_label="+ Add type",
         )
         self._pub_types.set_tags(list(DEFAULT_PUBLICATION_TYPES))
         layout.addWidget(self._pub_types)
         return card
 
     def _make_two_col_row(self) -> QWidget:
+        """Build a two-column row containing the license and date range cards side by side.
+
+        Returns:
+            A QWidget laying out the license card and date card horizontally.
+
+        """
         row = QWidget()
         row.setStyleSheet(f"background-color: {theme.APP_BG}; border: none;")
         layout = QHBoxLayout(row)
@@ -265,8 +326,14 @@ class ScreenSearch(QWidget):
         return row
 
     def _make_license_card(self) -> QWidget:
+        """Build the license card pre-populated with CC-BY.
+
+        Returns:
+            The card QWidget containing the license tag input.
+
+        """
         card, layout = make_card()
-        layout.addWidget(make_section_label("License"))
+        layout.addWidget(make_section_label("Licenses"))
 
         self._license = TagInput(available_options=_AVAILABLE_LICENSES, add_label="+ Add")
         self._license.set_tags(["CC-BY"])
@@ -274,6 +341,12 @@ class ScreenSearch(QWidget):
         return card
 
     def _make_date_card(self) -> QWidget:
+        """Build the date range card with from/to DatePicker widgets.
+
+        Returns:
+            The card QWidget containing the date range pickers.
+
+        """
         card, layout = make_card()
         layout.addWidget(make_section_label("Date range"))
 
@@ -285,12 +358,9 @@ class ScreenSearch(QWidget):
         date_layout.setContentsMargins(0, 0, 0, 0)
         date_layout.setSpacing(10)
 
-        self._date_from = QDateEdit()
-        self._date_from.setStyle(theme.get_fusion_style())
-        self._date_from.setStyleSheet(_DATE_EDIT_STYLE)
-        self._date_from.setCalendarPopup(True)
+        self._date_from = DatePicker()
         self._date_from.setDate(five_years_ago)
-        self._date_from.setMinimumDate(QDate(2000, 1, 1))
+        self._date_from.setMinimumDate(QDate(1900, 1, 1))
         self._date_from.setMaximumDate(today)
         self._date_from.dateChanged.connect(self._on_date_from_changed)
         date_layout.addWidget(self._date_from)
@@ -300,49 +370,27 @@ class ScreenSearch(QWidget):
         arrow.setStyleSheet(f"color: {theme.TEXT_MUTED}; font-size: 16px;")
         date_layout.addWidget(arrow)
 
-        self._date_to = QDateEdit()
-        self._date_to.setStyle(theme.get_fusion_style())
-        self._date_to.setStyleSheet(_DATE_EDIT_STYLE)
-        self._date_to.setCalendarPopup(True)
+        self._date_to = DatePicker()
         self._date_to.setDate(today)
         self._date_to.setMinimumDate(five_years_ago)
         self._date_to.setMaximumDate(today)
+        self._date_to.dateChanged.connect(self._on_date_to_changed)
         date_layout.addWidget(self._date_to)
 
         layout.addWidget(date_row)
         return card
 
-    def _make_folder_card(self) -> QWidget:
-        card, layout = make_card()
-        layout.addWidget(make_section_label("Output folder"))
-
-        folder_row = QWidget()
-        folder_layout = QHBoxLayout(folder_row)
-        folder_layout.setContentsMargins(0, 0, 0, 0)
-        folder_layout.setSpacing(10)
-
-        self._folder_edit = QLineEdit()
-        self._folder_edit.setStyle(theme.get_fusion_style())
-        self._folder_edit.setStyleSheet(_FOLDER_INPUT_STYLE)
-        self._folder_edit.setPlaceholderText("/path/to/output")
-        self._folder_edit.setReadOnly(True)
-        folder_layout.addWidget(self._folder_edit, 1)
-
-        browse_btn = QPushButton("Browse")
-        browse_btn.setStyle(theme.get_fusion_style())
-        browse_btn.setStyleSheet(_BROWSE_BTN_STYLE)
-        browse_btn.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-        browse_btn.clicked.connect(self._browse_folder)
-        folder_layout.addWidget(browse_btn)
-
-        layout.addWidget(folder_row)
-        return card
-
     def _make_action_bar(self) -> QWidget:
+        """Build the fixed-height action bar with the open-access label and Continue button.
+
+        Returns:
+            A QWidget containing the status label, hint label, and continue button.
+
+        """
         bar = QWidget()
         bar.setFixedHeight(72)
         bar.setStyleSheet(
-            f"background-color: {theme.APP_BG}; border-top: 1px solid {theme.BORDER};"
+            f"background-color: {theme.APP_BG}; border-top: 1px solid {theme.BORDER};",
         )
         bar_layout = QHBoxLayout(bar)
         bar_layout.setContentsMargins(22, 0, 22, 0)
@@ -351,6 +399,12 @@ class ScreenSearch(QWidget):
         lock_lbl.setStyleSheet(f"color: {theme.TEXT_BODY}; font-size: 15px;")
         bar_layout.addWidget(lock_lbl)
         bar_layout.addStretch()
+
+        self._hint_lbl = QLabel()
+        self._hint_lbl.setStyleSheet(_HINT_STYLE)
+        self._hint_lbl.setVisible(False)
+        bar_layout.addWidget(self._hint_lbl)
+        bar_layout.addSpacing(16)
 
         self._continue_btn = QPushButton("Continue to preview  →")
         self._continue_btn.setStyle(theme.get_fusion_style())
@@ -364,9 +418,25 @@ class ScreenSearch(QWidget):
     # ------------------------------------------------------------------
 
     def _validate(self) -> None:
-        """Enable the continue button when query is non-empty and pub types selected."""
-        ok = bool(self._query_edit.text().strip()) and bool(self._pub_types.get_tags())
+        """Enable the continue button when all required fields are satisfied."""
+        has_query = bool(self._query_edit.text().strip())
+        has_pub_types = bool(self._pub_types.get_tags())
+        has_license = bool(self._license.get_tags())
+        ok = has_query and has_pub_types and has_license
         self._continue_btn.setEnabled(ok)
+
+        if not ok:
+            parts: list[str] = []
+            if not has_query:
+                parts.append("Enter a search keyword")
+            elif not has_pub_types:
+                parts.append("Select a publication type")
+            elif not has_license:
+                parts.append("Select a license")
+            self._hint_lbl.setText("  ·  ".join(parts))
+            self._hint_lbl.setVisible(True)
+        else:
+            self._hint_lbl.setVisible(False)
 
     def _on_date_from_changed(self, new_from: QDate) -> None:
         """Enforce start ≤ end by updating the end date minimum and value."""
@@ -374,10 +444,93 @@ class ScreenSearch(QWidget):
             self._date_to.setDate(new_from)
         self._date_to.setMinimumDate(new_from)
 
+    def _on_date_to_changed(self, new_to: QDate) -> None:
+        """Enforce start ≤ end by constraining the start date maximum."""
+        self._date_from.setMaximumDate(new_to)
+
     def _on_continue(self) -> None:
+        """Emit search_requested with the current form values when Continue is clicked."""
         self.search_requested.emit(self.get_params())
 
-    def _browse_folder(self) -> None:
-        folder = QFileDialog.getExistingDirectory(self, "Select output folder")
-        if folder:
-            self._folder_edit.setText(folder)
+    def _on_orcid_tags_changed(self, tags: list[str]) -> None:
+        """Handle additions and removals on the ORCID tag input.
+
+        For each newly added tag:
+
+        1. Normalise it — if the user pasted a URL-prefixed form, replace the
+           tag in the widget with its bare form and return (the signal will
+           re-fire with the normalised value).
+        2. Run a format check synchronously. Invalid format → mark red.
+        3. If format is valid, mark pending and launch an
+           :class:`OrcidExistenceWorker` for the async registry check.
+
+        When the service is ``None`` (tests / no-service mode) tags are
+        accepted as-is without any validation styling.
+        """
+        if self._orcid_service is None:
+            return
+
+        current_set = set(tags)
+
+        # Clean up stale state for removed tags.
+        removed = self._validated_orcids - current_set
+        self._validated_orcids -= removed
+
+        for tag in tags:
+            if tag in self._validated_orcids:
+                continue  # already processed
+
+            # Step 1: normalise URL-prefixed ORCIDs.
+            normalised = self._orcid_service.normalise(tag)
+            if normalised != tag:
+                # Replace the raw tag with the bare form. The subsequent
+                # tags_changed signal will re-enter this handler with the
+                # normalised value, so we return early.
+                self._validated_orcids.add(tag)  # prevent infinite loop
+                self._orcids.remove_tag(tag)
+                self._orcids.add_tag(normalised)
+                return
+
+            # Step 2: format validation (synchronous, local).
+            self._validated_orcids.add(tag)
+            if not self._orcid_service.validate_format(tag):
+                self._orcids.set_tag_status(tag, "invalid")
+                continue
+
+            # Step 3: existence check (async, HTTP).
+            self._orcids.set_tag_status(tag, "pending")
+            worker = OrcidExistenceWorker(tag, self._orcid_service)
+            worker.validation_done.connect(self._on_orcid_existence_checked)
+            worker.network_error.connect(self._on_orcid_network_error)
+            # deleteLater schedules C++ cleanup via the event loop once the
+            # thread finishes — safe to call from within a signal handler.
+            worker.finished.connect(worker.deleteLater)
+            self._workers.append(worker)
+            worker.start()
+
+    def _on_orcid_existence_checked(self, orcid: str, exists: bool) -> None:
+        """Update the pill status once the registry check completes.
+
+        Args:
+            orcid: The ORCID that was checked.
+            exists: ``True`` if the registry returned HTTP 200.
+
+        """
+        self._orcids.set_tag_status(orcid, "valid" if exists else "invalid")
+
+    def _on_orcid_network_error(self, orcid: str) -> None:
+        """Keep the pill in ``"pending"`` state when the network is unreachable.
+
+        This is a deliberate fail-open: the user can still submit the form
+        with a pending ORCID; the tag simply has not been confirmed.
+
+        Args:
+            orcid: The ORCID whose existence check failed due to a network error.
+
+        """
+        # Pill already shows "pending" — no style change needed.
+        if self._toast is not None:
+            self._toast.show_message(
+                f"Could not verify ORCID {orcid} — network unreachable. Accepted as pending.",
+                success=False,
+            )

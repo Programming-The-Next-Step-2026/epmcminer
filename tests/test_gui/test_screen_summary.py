@@ -32,7 +32,9 @@ def _make_paper() -> Paper:
 
 def _make_downloaded() -> DownloadResult:
     return DownloadResult(
-        paper=_make_paper(), status="downloaded", reason=None,
+        paper=_make_paper(),
+        status="downloaded",
+        reason=None,
         file_path=Path("/tmp/test.pdf"),
     )
 
@@ -406,19 +408,19 @@ class TestScreenSummaryExport:
         fn()
         report_svc.export_pdf.assert_called_once()
 
-    def test_export_done_shows_information_dialog(self, qapp: QApplication) -> None:
-        """_on_export_done shows a QMessageBox.information dialog."""
+    def test_export_done_shows_success_toast(self, qapp: QApplication) -> None:
+        """_on_export_done shows a success toast with the filename (not the full path)."""
         w = _make_screen()
-        with patch("epmcminer.gui.screens.screen_summary.QMessageBox.information") as mock_msg:
-            w._on_export_done("/tmp/report.xlsx")
-        mock_msg.assert_called_once()
+        w._on_export_done("/tmp/report.xlsx")
+        assert not w._toast.isHidden()
+        assert "report.xlsx" in w._toast._msg_lbl.text()
 
-    def test_export_error_shows_warning_dialog(self, qapp: QApplication) -> None:
-        """_on_export_error shows a QMessageBox.warning dialog."""
+    def test_export_error_shows_error_toast(self, qapp: QApplication) -> None:
+        """_on_export_error shows an error toast containing the error message."""
         w = _make_screen()
-        with patch("epmcminer.gui.screens.screen_summary.QMessageBox.warning") as mock_warn:
-            w._on_export_error("disk full")
-        mock_warn.assert_called_once()
+        w._on_export_error("disk full")
+        assert not w._toast.isHidden()
+        assert "disk full" in w._toast._msg_lbl.text()
 
     def test_export_does_nothing_before_load(self, qapp: QApplication) -> None:
         """Export buttons do nothing if load() has not been called."""

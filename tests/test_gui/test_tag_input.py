@@ -383,7 +383,8 @@ class TestTagInputOptionsMode:
         widget = TagInput(available_options=["Open Access", "CC BY"])
         widget._slot._populate_menu()
         action = next(
-            a for a in widget._slot._menu.actions()  # type: ignore[union-attr]
+            a
+            for a in widget._slot._menu.actions()  # type: ignore[union-attr]
             if a.text() == "Open Access"
         )
         action.trigger()
@@ -432,3 +433,75 @@ class TestTagInputOptionsMode:
             widget.add_tag(opt)
         widget.remove_tag("A")
         assert not widget._slot._add_btn.isHidden()
+
+
+# ---------------------------------------------------------------------------
+# TestTagInputStatus
+# ---------------------------------------------------------------------------
+
+
+class TestTagInputStatus:
+    """Tests for set_tag_status and get_tags_by_status."""
+
+    def test_new_tag_defaults_to_valid(self, qapp: QApplication) -> None:
+        """Tags start with status 'valid' unless explicitly changed."""
+        widget = TagInput()
+        widget.add_tag("alpha")
+        assert widget._tag_statuses.get("alpha") == "valid"
+
+    def test_set_tag_status_updates_status(self, qapp: QApplication) -> None:
+        """set_tag_status changes the stored status for an existing tag."""
+        widget = TagInput()
+        widget.add_tag("alpha")
+        widget.set_tag_status("alpha", "invalid")
+        assert widget._tag_statuses.get("alpha") == "invalid"
+
+    def test_set_tag_status_noop_for_unknown_tag(self, qapp: QApplication) -> None:
+        """set_tag_status on a non-existent tag does not raise and changes nothing."""
+        widget = TagInput()
+        widget.set_tag_status("missing", "invalid")  # must not raise
+        assert "missing" not in widget._tag_statuses
+
+    def test_get_tags_by_status_returns_matching(self, qapp: QApplication) -> None:
+        """get_tags_by_status returns only tags whose status is in the given list."""
+        widget = TagInput()
+        widget.add_tag("alpha")
+        widget.add_tag("beta")
+        widget.set_tag_status("beta", "invalid")
+        assert widget.get_tags_by_status(["valid"]) == ["alpha"]
+
+    def test_get_tags_by_status_multiple_statuses(self, qapp: QApplication) -> None:
+        """get_tags_by_status accepts multiple statuses and includes all matching tags."""
+        widget = TagInput()
+        widget.add_tag("alpha")
+        widget.add_tag("beta")
+        widget.add_tag("gamma")
+        widget.set_tag_status("beta", "pending")
+        widget.set_tag_status("gamma", "invalid")
+        result = widget.get_tags_by_status(["valid", "pending"])
+        assert result == ["alpha", "beta"]
+        assert "gamma" not in result
+
+    def test_get_tags_by_status_empty_when_no_match(self, qapp: QApplication) -> None:
+        """get_tags_by_status returns an empty list when no tags match."""
+        widget = TagInput()
+        widget.add_tag("alpha")
+        widget.set_tag_status("alpha", "invalid")
+        assert widget.get_tags_by_status(["valid"]) == []
+
+    def test_get_tags_by_status_preserves_insertion_order(self, qapp: QApplication) -> None:
+        """get_tags_by_status preserves insertion order of matching tags."""
+        widget = TagInput()
+        for tag in ["c", "a", "b"]:
+            widget.add_tag(tag)
+        widget.set_tag_status("a", "invalid")
+        assert widget.get_tags_by_status(["valid"]) == ["c", "b"]
+
+    def test_get_tags_by_status_all_invalid(self, qapp: QApplication) -> None:
+        """Excluding all invalid tags returns an empty list."""
+        widget = TagInput()
+        widget.add_tag("x")
+        widget.add_tag("y")
+        widget.set_tag_status("x", "invalid")
+        widget.set_tag_status("y", "invalid")
+        assert widget.get_tags_by_status(["valid", "pending"]) == []

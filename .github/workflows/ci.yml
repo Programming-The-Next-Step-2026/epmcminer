@@ -38,7 +38,7 @@ jobs:
         env:
           QT_QPA_PLATFORM: offscreen
         run: |
-          pytest tests/ \
+          pytest tests/ --block-network \
             --cov=src/epmcminer \
             --cov-report=xml \
             --cov-report=term-missing

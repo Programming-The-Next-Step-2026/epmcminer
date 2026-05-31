@@ -1,14 +1,10 @@
-"""Integration tests for EuropePMCClient — hits the real Europe PMC API.
+"""Integration tests for EuropePMCClient.
 
-This directory sits outside the unit-test tree defined in CLAUDE.md so that
-integration tests can be excluded from CI with ``-m "not integration"`` without
-touching the mirrored unit-test structure under tests/test_api/.
+HTTP interactions are recorded as VCR cassettes in tests/integration/cassettes/
+and replayed deterministically in CI — no live network access required.
 
-Run with:
-    pytest -m integration
-
-Skip during normal development/CI with:
-    pytest -m "not integration"
+Re-record cassettes when the API changes:
+    pytest -m integration --vcr-record=all
 """
 
 import pytest
@@ -19,7 +15,10 @@ from epmcminer.api.client import (
     SORT_BY_DATE,
     APIError,
     EuropePMCClient,
+    InvalidPdfContentError,
 )
+
+pytestmark = [pytest.mark.vcr, pytest.mark.integration]
 
 KNOWN_PMID = "28796235"  # A real open-access paper (PMID for a stable OA article)
 COMMON_QUERY = "depression"
@@ -38,7 +37,6 @@ def client() -> EuropePMCClient:
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.integration
 class TestSearchIntegration:
     """Integration tests for EuropePMCClient.search."""
 
@@ -84,9 +82,7 @@ class TestSearchIntegration:
 
     def test_search_sort_by_date(self, client: EuropePMCClient) -> None:
         """Sort by date returns results without API errors."""
-        result = client.search(
-            query=COMMON_QUERY, page_size=SMALL_PAGE_SIZE, sort=SORT_BY_DATE
-        )
+        result = client.search(query=COMMON_QUERY, page_size=SMALL_PAGE_SIZE, sort=SORT_BY_DATE)
 
         assert result["hitCount"] > 0
 
@@ -122,7 +118,6 @@ class TestSearchIntegration:
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.integration
 class TestDownloadPdfIntegration:
     """Integration tests for EuropePMCClient.download_pdf."""
 
@@ -149,16 +144,13 @@ class TestDownloadPdfIntegration:
         for url in urls:
             try:
                 pdf_bytes = client.download_pdf(url=url)
-                if pdf_bytes[:4] == b"%PDF":
-                    assert len(pdf_bytes) > 0
-                    return
-            except APIError:
+                assert len(pdf_bytes) > 0
+                return
+            except (APIError, InvalidPdfContentError):
                 continue
         pytest.skip("All candidate PDF URLs returned errors or non-PDF content — API degraded")
 
-    def test_download_pdf_content_starts_with_pdf_header(
-        self, client: EuropePMCClient
-    ) -> None:
+    def test_download_pdf_content_starts_with_pdf_header(self, client: EuropePMCClient) -> None:
         """The downloaded bytes begin with the PDF magic bytes ``%PDF``.
 
         Tries each candidate URL in turn; server-side 5xx errors and URLs that
@@ -171,8 +163,8 @@ class TestDownloadPdfIntegration:
         for url in urls:
             try:
                 pdf_bytes = client.download_pdf(url=url)
-                if pdf_bytes[:4] == b"%PDF":
-                    return
-            except APIError:
+                assert pdf_bytes[:4] == b"%PDF"
+                return
+            except (APIError, InvalidPdfContentError):
                 continue
         pytest.skip("All candidate PDF URLs returned errors or non-PDF content — API degraded")

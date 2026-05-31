@@ -142,11 +142,17 @@ class TestProgressWidgetProgressState:
         w.set_progress(23, 50)
         assert w._pct_label.text() == "46%"
 
-    def test_set_progress_count_label(self, qapp: QApplication) -> None:
-        """Count label shows 'X downloaded out of Y processed papers'."""
+    def test_set_progress_count_label_without_processed(self, qapp: QApplication) -> None:
+        """Count label shows 'downloaded X out of Y' when processed is not given."""
         w = ProgressWidget()
         w.set_progress(23, 50)
-        assert w._count_label.text() == "23 downloaded out of 50 processed papers"
+        assert w._count_label.text() == "downloaded 23 out of 50"
+
+    def test_set_progress_count_label_with_processed(self, qapp: QApplication) -> None:
+        """Count label includes processed count when the processed argument is provided."""
+        w = ProgressWidget()
+        w.set_progress(23, 50, processed=30)
+        assert w._count_label.text() == "downloaded 23 out of 50  –  processed 30 results"
 
     def test_set_progress_percentage_zero(self, qapp: QApplication) -> None:
         """Percentage is 0% when current is 0."""
@@ -166,7 +172,7 @@ class TestProgressWidgetProgressState:
         w.set_progress(10, 50)
         w.set_progress(30, 50)
         assert w._pct_label.text() == "60%"
-        assert w._count_label.text() == "30 downloaded out of 50 processed papers"
+        assert w._count_label.text() == "downloaded 30 out of 50"
 
 
 # ---------------------------------------------------------------------------
@@ -223,12 +229,6 @@ class TestProgressWidgetETA:
 class TestProgressWidgetThreadDots:
     """Tests for the thread count dot indicators."""
 
-    def test_thread_row_hidden_when_none(self, qapp: QApplication) -> None:
-        """Thread row is hidden when thread_count is None."""
-        w = ProgressWidget()
-        w.set_progress(10, 50, thread_count=None)
-        assert w._thread_row.isHidden()
-
     def test_thread_row_visible_when_provided(self, qapp: QApplication) -> None:
         """Thread row is visible when thread_count is given."""
         w = ProgressWidget()
@@ -247,12 +247,12 @@ class TestProgressWidgetThreadDots:
         w.set_progress(10, 50, thread_count=3)
         assert w._thread_label.text() == "3 threads running"
 
-    def test_thread_dots_count(self, qapp: QApplication) -> None:
-        """Visible thread dots match thread_count (up to the max)."""
+    def test_thread_dots_always_three(self, qapp: QApplication) -> None:
+        """All 3 thread dots are always visible regardless of thread_count."""
         w = ProgressWidget()
-        w.set_progress(10, 50, thread_count=2)
-        visible = [d for d in w._thread_dots if not d.isHidden()]
-        assert len(visible) == 2
+        w.set_progress(10, 50, thread_count=1)
+        assert len(w._thread_dots) == 3
+        assert all(not d.isHidden() for d in w._thread_dots)
 
     def test_thread_row_hidden_after_none_call(self, qapp: QApplication) -> None:
         """Thread row is hidden when set_progress is called with thread_count=None."""
@@ -260,6 +260,18 @@ class TestProgressWidgetThreadDots:
         w.set_progress(10, 50, thread_count=3)
         w.set_progress(20, 50, thread_count=None)
         assert w._thread_row.isHidden()
+
+    def test_thread_label_cancelling_singular(self, qapp: QApplication) -> None:
+        """cancelling=True with thread_count=1 shows 'cancelling, waiting for 1 thread'."""
+        w = ProgressWidget()
+        w.set_progress(10, 50, thread_count=1, cancelling=True)
+        assert w._thread_label.text() == "cancelling, waiting for 1 thread"
+
+    def test_thread_label_cancelling_plural(self, qapp: QApplication) -> None:
+        """cancelling=True with thread_count>1 shows 'cancelling, waiting for N threads'."""
+        w = ProgressWidget()
+        w.set_progress(10, 50, thread_count=3, cancelling=True)
+        assert w._thread_label.text() == "cancelling, waiting for 3 threads"
 
 
 # ---------------------------------------------------------------------------
