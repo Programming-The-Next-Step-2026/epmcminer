@@ -4,6 +4,33 @@ epmcminer is a PyQt6 desktop application that lets researchers search the **Euro
 
 ---
 
+## Contents
+
+- [Three-layer separation](#three-layer-separation)
+- [Data models](#data-models)
+- [API layer](#api-layer)
+  - [`EuropePMCClient`](#europepmcclient)
+  - [`OrcidClient`](#orcidclient)
+- [Service layer](#service-layer)
+  - [`SearchService`](#searchservice)
+  - [`DownloadService`](#downloadservice)
+  - [`ReportService`](#reportservice)
+  - [`OrcidValidationService`](#orcidvalidationservice)
+- [GUI layer](#gui-layer)
+  - [`MainWindow` (`app.py`)](#mainwindow-apppy)
+  - [Threading model](#threading-model)
+  - [Reusable widgets](#reusable-widgets)
+- [Qt signals and slots](#qt-signals-and-slots)
+  - [The core idea](#the-core-idea)
+  - [Why signals exist](#why-signals-exist)
+  - [How this project uses signals](#how-this-project-uses-signals)
+  - [Signal type safety in PyQt6](#signal-type-safety-in-pyqt6)
+  - [What signals are not](#what-signals-are-not)
+- [Testing](#testing)
+- [Tooling](#tooling)
+
+---
+
 ## Three-layer separation
 
 ```
