@@ -8,6 +8,12 @@
 - [Screenshots](#screenshots)
 - [Usage](#usage)
 - [Python API](#python-api)
+  - [SearchParams](#searchparams)
+  - [SearchService](#searchservice)
+  - [DownloadService](#downloadservice)
+  - [ReportService](#reportservice)
+  - [OrcidValidationService](#orcidvalidationservice)
+  - [Data models](#data-models)
 - [Development](#development)
 - [Architecture](#architecture)
 - [Specifications](#specifications)
@@ -38,22 +44,22 @@ epmcminer only retrieves papers that are freely and legally available in full te
 <table>
   <tr>
     <td align="center" width="50%">
-      <img src="docs/screenshots/mockup_screen_1.png" width="90%"><br>
+      <img src="docs/screenshots/screen_1.png" width="90%"><br>
       Screen 1 - Search and filter configuration
     </td>
     <td align="center" width="50%">
-      <img src="docs/screenshots/mockup_screen_2.png" width="90%"><br>
+      <img src="docs/screenshots/screen_2.png" width="90%"><br>
       Screen 2 - Results preview and download settings
     </td>
   </tr>
 
   <tr>
     <td align="center" width="50%">
-      <img src="docs/screenshots/mockup_screen_3.png" width="90%"><br>
+      <img src="docs/screenshots/screen_3.png" width="90%"><br>
       Screen 3 - Download progress
     </td>
     <td align="center" width="50%">
-      <img src="docs/screenshots/mockup_screen_4.png" width="90%"><br>
+      <img src="docs/screenshots/screen_4.png" width="90%"><br>
       Screen 4 - Summary report
     </td>
   </tr>
@@ -74,12 +80,18 @@ macOS and Windows users do not need this step.
 
 ### Install and run
 
-First, create and activate your virtual environment and install the package:
-
 ```bash
-python -m venv venv
-source venv/bin/activate
+# either install via pip
+pip install git+https://github.com/Programming-The-Next-Step-2026/epmcminer.git
+
+# or clone the repo from github, install all dependencies and run locally in a new virtual environment
+git clone https://github.com/Programming-The-Next-Step-2026/epmcminer.git
+cd epmcminer
+python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
+
+# run the app
+epmcminer
 ```
 
 Then launch the application using either of the following:
@@ -110,28 +122,37 @@ The notebook also renders statically on GitHub (including the Mermaid flowchart)
 
 epmcminer can be used as a library without launching the GUI. All public classes and functions are importable directly from the top-level package.
 
-### Available exports
-
-| Name | What it is |
-|---|---|
-| `SearchParams` | Input model — configure your query, filters, and output folder |
-| `SearchResult` | Output model returned by `SearchService.preview()` |
-| `Paper` | A single paper with title, authors, DOI, PDF URL, etc. |
-| `DownloadResult` | Outcome of one download attempt (downloaded / skipped / failed) |
-| `SearchService` | Searches Europe PMC and returns `SearchResult` |
-| `DownloadService` | Downloads PDFs in parallel and returns `list[DownloadResult]` |
-| `ReportService` | Saves `report.csv`, Excel, or PDF exports from results |
-| `OrcidValidationService` | Validates ORCID format (checksum) and registry existence |
-| `create_application_services` | Factory that wires up all four services in one call |
-
-### Example: search and preview results
-
 ```python
-import threading
-from pathlib import Path
 import epmcminer
 
 search, download, report, orcid = epmcminer.create_application_services()
+```
+
+`create_application_services()` wires up all four services and returns them as a tuple. You can also instantiate them individually if you only need a subset (see each service section below).
+
+---
+
+### SearchParams
+
+All searches are configured through a `SearchParams` dataclass. Only `query`, `date_from`, and `date_to` are required; everything else has a sensible default.
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `query` | `str` | — | Free-text search query. Multi-word terms without operators are joined with AND automatically. |
+| `date_from` | `str` | — | Start of publication date range in ISO format (`YYYY-MM-DD`). |
+| `date_to` | `str` | — | End of publication date range in ISO format (`YYYY-MM-DD`). |
+| `publication_types` | `list[str]` | `[]` | Europe PMC publication types, e.g. `["Review", "Meta analysis"]`. Empty means all types. |
+| `licenses` | `list[str]` | `[]` | License identifiers, e.g. `["CC-BY", "CC-BY-NC"]`. Empty means all licenses. |
+| `author_orcids` | `list[str]` | `[]` | Author ORCID identifiers. Results matching any listed ORCID are included. |
+| `sort_order` | `"relevance" \| "date" \| "citations"` | `"relevance"` | Result ordering. |
+| `count` | `int` | `10` | Number of PDFs to successfully download. Must be > 0. |
+| `output_folder` | `Path \| None` | `None` | Destination folder. Required by `DownloadService.download()`; optional for preview-only use. |
+
+`SearchParams` validates itself on construction — passing an invalid date string, a reversed date range, or `count ≤ 0` raises `ValueError` immediately.
+
+```python
+from pathlib import Path
+import epmcminer
 
 params = epmcminer.SearchParams(
     query="depression AND therapy",
@@ -139,35 +160,216 @@ params = epmcminer.SearchParams(
     date_to="2024-12-31",
     publication_types=["Review", "Meta analysis"],
     licenses=["CC-BY"],
-    count=10,
+    sort_order="citations",
+    count=25,
     output_folder=Path("/tmp/papers"),
 )
-
-result = search.preview(params)
-print(f"{result.total_found} total results, ~{result.estimated_downloadable} with PDFs")
-for paper in result.papers:
-    print(paper.title, "—", paper.authors)
 ```
 
-### Example: download PDFs
+---
+
+### SearchService
 
 ```python
-results = download.download(
-    params,
-    progress_callback=lambda r: print(r.status, r.paper.title),
-    cancel_event=threading.Event(),
-)
+from epmcminer.api.client import EuropePMCClient
+from epmcminer.services.search_service import SearchService
+
+client = EuropePMCClient()
+search = SearchService(client=client)
+```
+
+#### `preview(params) → SearchResult`
+
+Fetches the first page of results (up to 10 papers) and returns a `SearchResult` with a total hit count and an estimate of how many have a downloadable PDF.
+
+```python
+result = search.preview(params)
+
+print(f"{result.total_found} papers found")
+print(f"~{result.estimated_downloadable} have a direct PDF link")
+
+for paper in result.papers:
+    print(f"{paper.title} ({paper.year})")
+    print(f"  {paper.authors}")
+    print(f"  {paper.journal}")
+    print(f"  DOI: {paper.doi}")
+    print(f"  PDF: {paper.pdf_url}")
+```
+
+#### `build_query(params) → str`
+
+Returns the raw Europe PMC query string that `preview()` and `download()` send to the API. Useful for debugging or logging.
+
+```python
+query_string = search.build_query(params)
+print(query_string)
+# → '(depression AND therapy) AND (PUB_TYPE:"review" OR PUB_TYPE:"meta-analysis") AND ...'
+```
+
+---
+
+### DownloadService
+
+```python
+import threading
+from epmcminer.api.client import EuropePMCClient
+from epmcminer.services.search_service import SearchService
+from epmcminer.services.download_service import DownloadService
+
+client = EuropePMCClient()
+download = DownloadService(client=client, search_service=SearchService(client=client))
+```
+
+#### `download(params, progress_callback, cancel_event) → list[DownloadResult]`
+
+Downloads up to `params.count` PDFs into `params.output_folder/pdfs/`. Calls `progress_callback` once per paper as it completes. Pass a `threading.Event` as `cancel_event`; set it to stop early.
+
+```python
+import threading
+
+cancel = threading.Event()
+
+def on_progress(result):
+    if result.status == epmcminer.DownloadResult.STATUS_DOWNLOADED:
+        print(f"✓  {result.paper.title}")
+    elif result.status == epmcminer.DownloadResult.STATUS_SKIPPED:
+        print(f"–  {result.paper.title}  ({result.reason})")
+    else:
+        print(f"✗  {result.paper.title}  ({result.reason})")
+
+results = download.download(params, progress_callback=on_progress, cancel_event=cancel)
 
 downloaded = [r for r in results if r.status == epmcminer.DownloadResult.STATUS_DOWNLOADED]
-print(f"Downloaded {len(downloaded)} PDFs to {params.output_folder}/pdfs/")
+skipped    = [r for r in results if r.status == epmcminer.DownloadResult.STATUS_SKIPPED]
+failed     = [r for r in results if r.status == epmcminer.DownloadResult.STATUS_FAILED]
+
+print(f"Downloaded {len(downloaded)}, skipped {len(skipped)}, failed {len(failed)}")
 ```
 
-### Example: save a report
+PDFs are written to `output_folder/pdfs/` with filenames of the form `{doi}_{title}.pdf`. If a file already exists it is skipped automatically, so re-running into the same folder is safe.
+
+To cancel mid-run:
 
 ```python
-report.save_csv(results, params, params.output_folder)
-# report.csv is now in /tmp/papers/report.csv
+cancel.set()  # gracefully stops after the current batch
 ```
+
+---
+
+### ReportService
+
+```python
+from epmcminer.services.report_service import ReportService
+
+report = ReportService()
+```
+
+All three export methods accept the same `(results, params, output_folder)` arguments and return a `Path` to the written file.
+
+#### `save_csv(results, params, output_folder) → Path`
+
+Writes `report.csv` to `output_folder`. One row per paper (downloaded and skipped alike). Columns: `title`, `authors`, `journal`, `year`, `doi`, `status`, `reason`, `file_path`, `query`, `sort_order`, `date_from`, `date_to`, `licenses`, `publication_types`.
+
+```python
+csv_path = report.save_csv(results, params, params.output_folder)
+print(f"Report saved to {csv_path}")
+```
+
+#### `export_excel(results, params, output_folder) → Path`
+
+Writes `report.xlsx` — same columns as the CSV but with auto-formatted cells via openpyxl.
+
+```python
+xlsx_path = report.export_excel(results, params, params.output_folder)
+```
+
+#### `export_pdf(results, params, output_folder) → Path`
+
+Writes `report.pdf` — a portrait A4 document with a stat block, search parameters, and per-paper sections for downloaded and skipped papers.
+
+```python
+pdf_path = report.export_pdf(results, params, params.output_folder)
+```
+
+---
+
+### OrcidValidationService
+
+```python
+from epmcminer.api.orcid_client import OrcidClient
+from epmcminer.services.orcid_validation_service import OrcidValidationService
+
+orcid = OrcidValidationService(client=OrcidClient())
+```
+
+#### `validate_format(orcid) → bool`
+
+Checks the ORCID pattern and ISO 7064 MOD 11-2 checksum locally — no network call.
+
+```python
+orcid.validate_format("0000-0001-5109-3700")          # True
+orcid.validate_format("https://orcid.org/0000-0001-5109-3700")  # True — URL prefix accepted
+orcid.validate_format("not-an-orcid")                 # False
+```
+
+#### `normalise(orcid) → str`
+
+Strips the URL prefix and surrounding whitespace, returning the bare 16-digit identifier.
+
+```python
+orcid.normalise("https://orcid.org/0000-0001-5109-3700")  # "0000-0001-5109-3700"
+orcid.normalise("  0000-0001-5109-3700  ")                # "0000-0001-5109-3700"
+```
+
+#### `check_exists(orcid) → bool`
+
+Queries the ORCID public registry. Makes an HTTP request — call from a background thread when used in a GUI context.
+
+```python
+orcid.check_exists("0000-0001-5109-3700")  # True / False (requires network)
+```
+
+---
+
+### Data models
+
+#### `Paper`
+
+| Field | Type | Description |
+|---|---|---|
+| `pmid` | `str` | PubMed identifier (or generic API `id` for non-PubMed records). |
+| `doi` | `str` | Digital Object Identifier. |
+| `title` | `str` | Full paper title. |
+| `authors` | `str` | Author list formatted as `"Smith J, Jones A"`. |
+| `journal` | `str` | Publishing journal name. |
+| `year` | `str` | Four-digit publication year. |
+| `abstract` | `str` | Full abstract text. |
+| `pdf_url` | `str \| None` | Direct URL to the open-access PDF, or `None` if unavailable. |
+
+#### `SearchResult`
+
+| Field | Type | Description |
+|---|---|---|
+| `papers` | `list[Paper]` | Up to 10 papers from the first results page. |
+| `total_found` | `int` | Total hit count for the query from the API. |
+| `estimated_downloadable` | `int` | Number of papers in the first page that have a `pdf_url`. |
+
+#### `DownloadResult`
+
+| Field | Type | Description |
+|---|---|---|
+| `paper` | `Paper` | The paper this result describes. |
+| `status` | `str` | One of `STATUS_DOWNLOADED`, `STATUS_SKIPPED`, `STATUS_FAILED`. |
+| `reason` | `str \| None` | Human-readable skip or failure reason; `None` for successful downloads. |
+| `file_path` | `Path \| None` | Path to the written PDF, or `None` if nothing was saved. |
+
+Status constants on `DownloadResult`:
+
+| Constant | Value | When set |
+|---|---|---|
+| `STATUS_DOWNLOADED` | `"downloaded"` | PDF written to disk successfully. |
+| `STATUS_SKIPPED` | `"skipped"` | Paper intentionally not downloaded (already exists, no PDF link). |
+| `STATUS_FAILED` | `"failed"` | Download attempted but failed (HTTP error, connection error, write error). |
 
 ---
 
